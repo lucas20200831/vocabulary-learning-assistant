@@ -1,0 +1,354 @@
+{
+  "第1课": {
+    "阳光": {
+      "meaning": "阳光",
+      "attempts": 1,
+      "correct": 1,
+      "incorrect": 0,
+      "history": [
+        {
+          "timestamp": "2026-01-20 02:35:41",
+          "known": true
+        }
+      ]
+    },
+    "学校": {
+      "meaning": "学校",
+      "attempts": 3,
+      "correct": 2,
+      "incorrect": 1,
+      "history": [
+        {
+          "timestamp": "2026-01-20 02:36:02",
+          "known": false
+        },
+        {
+          "timestamp": "2026-01-20 02:38:08",
+          "known": true
+        },
+        {
+          "timestamp": "2026-01-20 02:46:30",
+          "known": true
+        }
+      ]
+    },
+    "老师": {
+      "meaning": "老师",
+      "attempts": 1,
+      "correct": 1,
+      "incorrect": 0,
+      "history": [
+        {
+          "timestamp": "2026-01-20 02:36:05",
+          "known": true
+        }
+      ]
+    },
+    "学生": {
+      "meaning": "学生",
+      "attempts": 1,
+      "correct": 0,
+      "incorrect": 1,
+      "history": [
+        {
+          "timestamp": "2026-01-20 02:38:10",
+          "known": false
+        }
+      ]
+    },
+    "书本": {
+      "meaning": "书本",
+      "attempts": 1,
+      "correct": 1,
+      "incorrect": 0,
+      "history": [
+        {
+          "timestamp": "2026-01-20 02:38:13",
+          "known": true
+        }
+      ]
+    },
+    "铅笔": {
+      "meaning": "铅笔",
+      "attempts": 1,
+      "correct": 0,
+      "incorrect": 1,
+      "history": [
+        {
+          "timestamp": "2026-01-20 02:38:16",
+          "known": false
+        }
+      ]
+    },
+    "橡皮": {
+      "meaning": "橡皮",
+      "attempts": 1,
+      "correct": 1,
+      "incorrect": 0,
+      "history": [
+        {
+          "timestamp": "2026-01-20 02:38:18",
+          "known": true
+        }
+      ]
+    },
+    "桌子": {
+      "meaning": "桌子",
+      "attempts": 1,
+      "correct": 0,
+      "incorrect": 1,
+      "history": [
+        {
+          "timestamp": "2026-01-20 02:38:23",
+          "known": false
+        }
+      ]
+    },
+    "椅子": {
+      "meaning": "椅子",
+      "attempts": 1,
+      "correct": 0,
+      "incorrect": 1,
+      "history": [
+        {
+          "timestamp": "2026-01-20 02:38:24",
+          "known": false
+        }
+      ]
+    },
+    "黑板": {
+      "meaning": "黑板",
+      "attempts": 1,
+      "correct": 0,
+      "incorrect": 1,
+      "history": [
+        {
+          "timestamp": "2026-01-20 02:38:28",
+          "known": false
+        }
+      ]
+    },
+    "教室": {
+      "meaning": "教室",
+      "attempts": 1,
+      "correct": 0,
+      "incorrect": 1,
+      "history": [
+        {
+          "timestamp": "2026-01-20 02:38:31",
+          "known": false
+        }
+      ]
+    },
+    "朋友": {
+      "meaning": "朋友",
+      "attempts": 1,
+      "correct": 1,
+      "incorrect": 0,
+      "history": [
+        {
+          "timestamp": "2026-01-20 02:38:33",
+          "known": true
+        }
+      ]
+    },
+    "家庭": {
+      "meaning": "家庭",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "父母": {
+      "meaning": "父母",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "兄弟": {
+      "meaning": "兄弟",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "姐妹": {
+      "meaning": "姐妹",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "花园": {
+      "meaning": "花园",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "动物": {
+      "meaning": "动物",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "植物": {
+      "meaning": "植物",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "水果": {
+      "meaning": "水果",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    }
+  },
+  "第2课": {
+    "春天": {
+      "meaning": "春天",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "夏天": {
+      "meaning": "夏天",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "秋天": {
+      "meaning": "秋天",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "冬天": {
+      "meaning": "冬天",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "花朵": {
+      "meaning": "花朵",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "草地": {
+      "meaning": "草地",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "河流": {
+      "meaning": "河流",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "山峰": {
+      "meaning": "山峰",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "森林": {
+      "meaning": "森林",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "天空": {
+      "meaning": "天空",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "云朵": {
+      "meaning": "云朵",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "彩虹": {
+      "meaning": "彩虹",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "自行车": {
+      "meaning": "自行车",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "汽车": {
+      "meaning": "汽车",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "飞机": {
+      "meaning": "飞机",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "火车": {
+      "meaning": "火车",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "图书馆": {
+      "meaning": "图书馆",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "博物馆": {
+      "meaning": "博物馆",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "医院": {
+      "meaning": "医院",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    },
+    "商店": {
+      "meaning": "商店",
+      "attempts": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "history": []
+    }
+  }
+}

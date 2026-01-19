@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生词表管理 - 词汇学习助手</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .lesson-card {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 10px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 5px;
+            transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .btn-quiz {
+            background-color: #f39c12;
+        }
+        .btn-quiz:hover {
+            background-color: #d35400;
+        }
+        .btn-review {
+            background-color: #e74c3c;
+        }
+        .btn-review:hover {
+            background-color: #c0392b;
+        }
+        .btn-stats {
+            background-color: #2ecc71;
+        }
+        .btn-stats:hover {
+            background-color: #27ae60;
+        }
+        .back-btn {
+            background-color: #95a5a6;
+        }
+        .back-btn:hover {
+            background-color: #7f8c8d;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #ecf0f1;
+        }
+        .word-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📖 生词表列表</h1>
+        
+        {% if lessons %}
+            <p>以下是您创建的所有课程：</p>
+            
+            {% for lesson in lessons %}
+                <div class="lesson-card">
+                    <h3>{{ lesson }}</h3>
+                    
+                    <div class="word-list">
+                        <strong>词汇列表：</strong><br>
+                        {% for word, info in data[lesson].items() %}
+                            {{ word }}: {{ info.meaning }}<br>
+                        {% endfor %}
+                    </div>
+                    
+                    <a href="{{ url_for('quiz', lesson_name=lesson) }}" class="btn btn-quiz">开始听写</a>
+                    <a href="{{ url_for('review', lesson_name=lesson) }}" class="btn btn-review">复习未掌握</a>
+                    <a href="{{ url_for('lesson_stats', lesson_name=lesson) }}" class="btn btn-stats">查看统计</a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>还没有创建任何课程。 <a href="{{ url_for('create_lesson') }}" class="btn">点击这里创建第一个课程</a></p>
+        {% endif %}
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="{{ url_for('create_lesson') }}" class="btn">创建新课程</a>
+            <a href="{{ url_for('index') }}" class="btn back-btn">返回首页</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>复习未掌握词汇 - {{ lesson_name }} - 词汇学习助手</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .lesson-title {
+            color: #7f8c8d;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+        }
+        .summary {
+            background-color: #eaf2f8;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .accuracy-high {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .accuracy-medium {
+            color: #f39c12;
+            font-weight: bold;
+        }
+        .accuracy-low {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 5px;
+            transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .btn-back {
+            background-color: #95a5a6;
+        }
+        .btn-back:hover {
+            background-color: #7f8c8d;
+        }
+        .btn-quiz {
+            background-color: #f39c12;
+        }
+        .btn-quiz:hover {
+            background-color: #d35400;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 复习未掌握词汇</h1>
+        <div class="lesson-title">{{ lesson_name }}</div>
+        
+        <div class="summary">
+            <p>需要复习的词汇数: <strong>{{ review_words|length }}</strong></p>
+            <p>这些是准确率低于80%或尚未测试的词汇</p>
+        </div>
+        
+        {% if review_words %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>词汇</th>
+                        <th>释义</th>
+                        <th>尝试次数</th>
+                        <th>正确</th>
+                        <th>错误</th>
+                        <th>准确率</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for word in review_words %}
+                    <tr>
+                        <td><strong>{{ word.word }}</strong></td>
+                        <td>{{ word.meaning }}</td>
+                        <td>{{ word.attempts }}</td>
+                        <td>{{ word.correct }}</td>
+                        <td>{{ word.incorrect }}</td>
+                        <td class="
+                            {% if word.accuracy >= 80 %}accuracy-high
+                            {% elif word.accuracy >= 50 %}accuracy-medium
+                            {% else %}accuracy-low
+                            {% endif %}">
+                            {{ word.accuracy }}%
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div style="text-align: center; padding: 30px;">
+                <h3>🎉 恭喜！该课程的所有词汇都已掌握（准确率≥80%）</h3>
+                <p>您可以继续学习新课程，或重新挑战已完成的课程。</p>
+            </div>
+        {% endif %}
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="{{ url_for('quiz', lesson_name=lesson_name) }}" class="btn btn-quiz">再次测试此课程</a>
+            <a href="{{ url_for('vocab_list') }}" class="btn">返回课程列表</a>
+            <a href="{{ url_for('index') }}" class="btn btn-back">返回首页</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创建课程 - 词汇学习助手</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        textarea {
+            width: 100%;
+            height: 300px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: monospace;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 5px;
+            transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .btn-back {
+            background-color: #95a5a6;
+        }
+        .btn-back:hover {
+            background-color: #7f8c8d;
+        }
+        .instructions {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 创建新课程</h1>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="lesson_name">课程名称:</label>
+                <input type="text" id="lesson_name" name="lesson_name" placeholder="例如：第一课" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="words_input">词汇列表 (格式: 词语:释义 每行一组):</label>
+                <textarea id="words_input" name="words_input" placeholder="示例：
+苹果:一种水果
+电脑:电子计算机
+书本:装订成册的著作" required></textarea>
+            </div>
+            
+            <button type="submit" class="btn">创建课程</button>
+        </form>
+        
+        <div class="instructions">
+            <h3>📝 使用说明</h3>
+            <p>请按以下格式输入词汇：</p>
+            <ul>
+                <li>每行输入一个词汇及其释义</li>
+                <li>用英文冒号 <code>:</code> 分隔词汇和释义</li>
+                <li>示例：<code>苹果:一种水果</code></li>
+            </ul>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="{{ url_for('index') }}" class="btn btn-back">返回首页</a>
+        </div>
+    </div>
+</body>
+</html>

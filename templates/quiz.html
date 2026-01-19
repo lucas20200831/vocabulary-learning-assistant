@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>听写测试 - {{ lesson_name }} - 词汇学习助手</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .lesson-title {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+        }
+        .progress {
+            background-color: #ecf0f1;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .word-display {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 30px 0;
+            min-height: 60px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 5px;
+            transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .btn-known {
+            background-color: #2ecc71;
+        }
+        .btn-known:hover {
+            background-color: #27ae60;
+        }
+        .btn-unknown {
+            background-color: #e74c3c;
+        }
+        .btn-unknown:hover {
+            background-color: #c0392b;
+        }
+        .btn-speak {
+            background-color: #9b59b6;
+        }
+        .btn-speak:hover {
+            background-color: #8e44ad;
+        }
+        .result-container {
+            margin: 30px 0;
+        }
+        .result-item {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            text-align: left;
+        }
+        .result-known {
+            background-color: #d5f4e6;
+            border-left: 4px solid #2ecc71;
+        }
+        .result-unknown {
+            background-color: #fadbd8;
+            border-left: 4px solid #e74c3c;
+        }
+        .hidden {
+            display: none;
+        }
+        .speak-instruction {
+            font-size: 1.2em;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #fff3cd;
+            border-radius: 4px;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✍️ 听写测试</h1>
+        <div class="lesson-title">{{ lesson_name }} (共 {{ word_count }} 个词)</div>
+        
+        <div class="progress">
+            当前进度: <span id="current-index">1</span> / {{ word_count }}
+        </div>
+        
+        <div class="speak-instruction">
+            <p>点击下面的按钮听词汇发音，然后告诉系统您是否能默写出这个词。</p>
+        </div>
+        
+        <div class="word-display" id="word-display">
+            {{ current_word }}
+        </div>
+        
+        <div id="quiz-area">
+            <button class="btn btn-speak" onclick="speakCurrentWord()">🔊 播放发音</button>
+            <br>
+            <button class="btn btn-known" onclick="recordResult(true)">✅ 我能默写</button>
+            <button class="btn btn-unknown" onclick="recordResult(false)">❌ 默写不出</button>
+        </div>
+        
+        <div id="result-area" class="result-container hidden">
+            <h3>测试完成！</h3>
+            <div id="results-list"></div>
+            <a href="{{ url_for('vocab_list') }}" class="btn">返回课程列表</a>
+        </div>
+    </div>
+
+    <script>
+        let currentIndex = 0; // 从0开始计数
+        const totalWords = {{ word_count }};
+        let currentWord = '{{ current_word|default("") }}';
+        
+        async function speakCurrentWord() {
+            // 检查当前显示的词汇，如果为空则使用JS中的currentWord变量
+            const wordDisplay = document.getElementById('word-display').textContent.trim();
+            const wordToSpeak = wordDisplay !== '' && wordDisplay !== '(您已掌握)' ? wordDisplay : currentWord;
+            
+            // Play the audio using browser text-to-speech API
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(wordToSpeak);
+                utterance.lang = 'zh-CN';  // Set language to Chinese
+                utterance.rate = 0.8;  // Slower rate for clarity
+                utterance.pitch = 1;   // Normal pitch
+                speechSynthesis.speak(utterance);
+            } else {
+                // Fallback to server-side TTS if browser doesn't support it
+                try {
+                    await fetch(`/speak_word/${encodeURIComponent(wordToSpeak)}`);
+                } catch (error) {
+                    console.error('Error speaking word:', error);
+                    alert('播放发音时出现问题，请稍后再试');
+                }
+            }
+        }
+
+        async function recordResult(isKnown) {
+            const wordDisplay = document.getElementById('word-display');
+            const quizArea = document.getElementById('quiz-area');
+            
+            // Show the word if the user couldn't write it
+            if (!isKnown) {
+                wordDisplay.textContent = currentWord;
+            } else {
+                wordDisplay.textContent = '(您已掌握)';
+            }
+            
+            // Disable buttons to prevent double submission
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.disabled = true;
+            });
+            
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('answer', currentWord);
+            formData.append('is_known', isKnown);
+            
+            try {
+                const response = await fetch('/submit_answer', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'finished') {
+                    // Show results
+                    document.getElementById('quiz-area').classList.add('hidden');
+                    document.getElementById('result-area').classList.remove('hidden');
+                    
+                    const resultsList = document.getElementById('results-list');
+                    data.results.forEach(result => {
+                        const div = document.createElement('div');
+                        div.className = `result-item ${result.known ? 'result-known' : 'result-unknown'}`;
+                        div.innerHTML = `<strong>${result.word}</strong>: ${result.known ? '✅ 已掌握' : '❌ 未掌握'}`;
+                        resultsList.appendChild(div);
+                    });
+                } else if (data.status === 'continue') {
+                    // Move to next word
+                    currentIndex = data.current_index;
+                    document.getElementById('current-index').textContent = currentIndex + 1;
+                    
+                    // Update the current word variable
+                    currentWord = data.next_word;
+                    
+                    // Update display for next word
+                    wordDisplay.textContent = currentWord;
+                    
+                    // Re-enable buttons
+                    document.querySelectorAll('.btn').forEach(btn => {
+                        btn.disabled = false;
+                    });
+                    
+                    // Focus back to speak button
+                    document.querySelector('.btn-speak').focus();
+                }
+            } catch (error) {
+                console.error('Error submitting answer:', error);
+                alert('提交答案时出现错误，请重试');
+                
+                // Re-enable buttons in case of error
+                document.querySelectorAll('.btn').forEach(btn => {
+                    btn.disabled = false;
+                });
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>词汇学习助手</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .card {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 5px;
+            transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .btn-review {
+            background-color: #e74c3c;
+        }
+        .btn-review:hover {
+            background-color: #c0392b;
+        }
+        .btn-create {
+            background-color: #2ecc71;
+        }
+        .btn-create:hover {
+            background-color: #27ae60;
+        }
+        .btn-stats {
+            background-color: #9b59b6;
+        }
+        .btn-stats:hover {
+            background-color: #8e44ad;
+        }
+        .nav-links {
+            text-align: center;
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 词汇学习助手</h1>
+        
+        <div class="card">
+            <h2>📖 生词表管理</h2>
+            <p>创建和管理课程生词表，添加新词汇及其释义。</p>
+            <a href="{{ url_for('create_lesson') }}" class="btn btn-create">创建新课程</a>
+            <a href="{{ url_for('vocab_list') }}" class="btn">查看所有课程</a>
+        </div>
+        
+        <div class="card">
+            <h2>✍️ 听写默写</h2>
+            <p>从生词表中选择词汇进行听写测试，检验掌握情况。</p>
+            <a href="{{ url_for('vocab_list') }}" class="btn">开始听写</a>
+        </div>
+        
+        <div class="card">
+            <h2>🔄 巩固复习</h2>
+            <p>针对未掌握的词汇进行重点复习，提升记忆效果。</p>
+            <a href="{{ url_for('vocab_list') }}" class="btn btn-review">开始复习</a>
+        </div>
+        
+        <div class="nav-links">
+            <a href="{{ url_for('vocab_list') }}" class="btn btn-stats">📊 查看统计</a>
+        </div>
+    </div>
+</body>
+</html>
