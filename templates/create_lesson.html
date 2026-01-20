@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>创建课程 - 词汇学习助手</title>
+    <title>輸入新的內容 - 詞彙學習助手</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
             background-color: #f5f5f5;
@@ -23,6 +23,28 @@
             text-align: center;
             margin-bottom: 30px;
         }
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 0 5px;
+            background-color: #ecf0f1;
+            font-weight: bold;
+        }
+        .step.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .step.completed {
+            background-color: #27ae60;
+            color: white;
+        }
         .form-group {
             margin-bottom: 20px;
         }
@@ -32,7 +54,8 @@
             font-weight: bold;
             color: #34495e;
         }
-        input[type="text"] {
+        input[type="text"],
+        select {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
@@ -42,7 +65,7 @@
         }
         textarea {
             width: 100%;
-            height: 300px;
+            height: 200px;
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -51,6 +74,28 @@
             box-sizing: border-box;
             resize: vertical;
         }
+        .radio-group {
+            margin: 15px 0;
+        }
+        .radio-option {
+            margin: 10px 0;
+        }
+        .radio-option input[type="radio"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+        .radio-option label {
+            display: inline;
+            margin: 0;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        .step-content {
+            display: none;
+        }
+        .step-content.active {
+            display: block;
+        }
         .btn {
             display: inline-block;
             background-color: #3498db;
@@ -58,7 +103,7 @@
             padding: 12px 24px;
             text-decoration: none;
             border-radius: 4px;
-            margin: 10px 5px;
+            margin: 10px 5px 10px 0;
             transition: background-color 0.3s;
             border: none;
             cursor: pointer;
@@ -73,48 +118,442 @@
         .btn-back:hover {
             background-color: #7f8c8d;
         }
+        .btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
         .instructions {
             background-color: #f8f9fa;
             padding: 15px;
             border-radius: 4px;
             margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+        .summary-box {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .paragraph-item {
+            background-color: #f8f9fa;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            border-left: 4px solid #3498db;
+        }
+        .remove-btn {
+            background-color: #e74c3c;
+            padding: 8px 15px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .remove-btn:hover {
+            background-color: #c0392b;
+        }
+        .add-paragraph-btn {
+            background-color: #27ae60;
+            margin-top: 15px;
+        }
+        .add-paragraph-btn:hover {
+            background-color: #229954;
+        }
+        .sentence-input {
+            margin: 10px 0;
+        }
+        .sentence-input input {
+            margin-bottom: 5px;
+        }
+        .remove-sentence-btn {
+            background-color: #e74c3c;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        .remove-sentence-btn:hover {
+            background-color: #c0392b;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📝 创建新课程</h1>
+        <h1>📝 輸入新的內容</h1>
         
-        <form method="POST">
-            <div class="form-group">
-                <label for="lesson_name">课程名称:</label>
-                <input type="text" id="lesson_name" name="lesson_name" placeholder="例如：第一课" required>
+        <div class="progress-bar">
+            <div class="step active" id="step-indicator-1">第一步：選擇語言</div>
+            <div class="step" id="step-indicator-2">第二步：課程編號</div>
+            <div class="step" id="step-indicator-3">第三步：內容類型</div>
+            <div class="step" id="step-indicator-4">第四步：輸入內容</div>
+            <div class="step" id="step-indicator-5">第五步：確認提交</div>
+        </div>
+
+        <form id="lessonsForm" method="POST">
+            <!-- Step 1: Language Selection -->
+            <div class="step-content active" id="step-1">
+                <h2>第一步：選擇語言</h2>
+                <div class="form-group">
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="lang-chinese" name="language" value="中文" required>
+                            <label for="lang-chinese">中文</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="lang-english" name="language" value="英文">
+                            <label for="lang-english">英文</label>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn" onclick="nextStep(1)">下一步</button>
             </div>
-            
-            <div class="form-group">
-                <label for="words_input">词汇列表 (格式: 词语:释义 每行一组):</label>
-                <textarea id="words_input" name="words_input" placeholder="示例：
-苹果:一种水果
-电脑:电子计算机
-书本:装订成册的著作" required></textarea>
+
+            <!-- Step 2: Lesson Number -->
+            <div class="step-content" id="step-2">
+                <h2>第二步：課程編號</h2>
+                <div class="form-group">
+                    <label for="lesson_number">請輸入課程編號 (例如：第一課、第二課、第三課):</label>
+                    <input type="text" id="lesson_number" name="lesson_number" placeholder="例如：第一課" required>
+                </div>
+                <button type="button" class="btn btn-back" onclick="prevStep(2)">上一步</button>
+                <button type="button" class="btn" onclick="nextStep(2)">下一步</button>
             </div>
-            
-            <button type="submit" class="btn">创建课程</button>
+
+            <!-- Step 3: Content Type -->
+            <div class="step-content" id="step-3">
+                <h2>第三步：內容類型</h2>
+                <div class="form-group">
+                    <p>請選擇這次要添加的內容類型：</p>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="type-words" name="content_type" value="詞語" required onchange="updateContentTypeDisplay()">
+                            <label for="type-words">詞語 (逐個詞彙聽寫)</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="type-paragraphs" name="content_type" value="段落" onchange="updateContentTypeDisplay()">
+                            <label for="type-paragraphs">段落 (逐句聽寫)</label>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-back" onclick="prevStep(3)">上一步</button>
+                <button type="button" class="btn" onclick="nextStep(3)">下一步</button>
+            </div>
+
+            <!-- Step 4: Input Content -->
+            <div class="step-content" id="step-4">
+                <h2>第四步：輸入內容</h2>
+                
+                <!-- Words Input Section -->
+                <div id="words-section" class="hidden">
+                    <div class="instructions">
+                        <h4>📝 詞語輸入說明</h4>
+                        <p>在下方文本框中輸入詞語，每行一個。系統會自動保存所有詞語。</p>
+                        <p>示例：<br>蘋果<br>香蕉<br>橙子</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="words_input">請輸入詞語 (每行一個):</label>
+                        <textarea id="words_input" name="words_input" placeholder="蘋果
+香蕉
+橙子
+葡萄
+西瓜"></textarea>
+                    </div>
+                </div>
+
+                <!-- Paragraphs Input Section -->
+                <div id="paragraphs-section" class="hidden">
+                    <div class="instructions">
+                        <h4>📝 段落輸入說明</h4>
+                        <p>每個段落需要：</p>
+                        <ul>
+                            <li>段落標題（例如：家庭介紹）</li>
+                            <li>句子 - 每行一個句子，系統將逐句進行聽寫</li>
+                        </ul>
+                        <p>您可以添加多個段落，每個段落會分開處理。</p>
+                    </div>
+                    <div id="paragraphs-list"></div>
+                    <button type="button" class="btn add-paragraph-btn" onclick="addParagraph()">➕ 添加新段落</button>
+                </div>
+
+                <button type="button" class="btn btn-back" onclick="prevStep(4)">上一步</button>
+                <button type="button" class="btn" onclick="nextStep(4)">下一步</button>
+            </div>
+
+            <!-- Step 5: Confirm and Submit -->
+            <div class="step-content" id="step-5">
+                <h2>第五步：確認提交</h2>
+                <div class="summary-box" id="summary"></div>
+                
+                <div class="button-group">
+                    <button type="button" class="btn btn-back" onclick="prevStep(5)">上一步</button>
+                    <button type="submit" class="btn" style="background-color: #27ae60;">✓ 確認提交</button>
+                    <a href="{{ url_for('index') }}" class="btn btn-back">返回首頁</a>
+                </div>
+            </div>
         </form>
-        
-        <div class="instructions">
-            <h3>📝 使用说明</h3>
-            <p>请按以下格式输入词汇：</p>
-            <ul>
-                <li>每行输入一个词汇及其释义</li>
-                <li>用英文冒号 <code>:</code> 分隔词汇和释义</li>
-                <li>示例：<code>苹果:一种水果</code></li>
-            </ul>
-        </div>
-        
-        <div style="text-align: center; margin-top: 30px;">
-            <a href="{{ url_for('index') }}" class="btn btn-back">返回首页</a>
-        </div>
     </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 5;
+
+        function updateStepIndicator(step) {
+            for (let i = 1; i <= totalSteps; i++) {
+                const indicator = document.getElementById(`step-indicator-${i}`);
+                if (i === step) {
+                    indicator.classList.add('active');
+                    indicator.classList.remove('completed');
+                } else if (i < step) {
+                    indicator.classList.add('completed');
+                    indicator.classList.remove('active');
+                } else {
+                    indicator.classList.remove('active', 'completed');
+                }
+            }
+        }
+
+        function updateContentTypeDisplay() {
+            const wordsSection = document.getElementById('words-section');
+            const paragraphsSection = document.getElementById('paragraphs-section');
+            const contentType = document.querySelector('input[name="content_type"]:checked')?.value;
+
+            if (contentType === '詞語') {
+                wordsSection.classList.remove('hidden');
+                paragraphsSection.classList.add('hidden');
+            } else if (contentType === '段落') {
+                wordsSection.classList.add('hidden');
+                paragraphsSection.classList.remove('hidden');
+                if (document.getElementById('paragraphs-list').children.length === 0) {
+                    addParagraph();
+                }
+            }
+        }
+
+        function nextStep(currentStepNum) {
+            if (validateStep(currentStepNum)) {
+                currentStep = currentStepNum + 1;
+                showStep(currentStep);
+            }
+        }
+
+        function prevStep(currentStepNum) {
+            currentStep = currentStepNum - 1;
+            showStep(currentStep);
+        }
+
+        function showStep(step) {
+            for (let i = 1; i <= totalSteps; i++) {
+                document.getElementById(`step-${i}`).classList.remove('active');
+            }
+            document.getElementById(`step-${step}`).classList.add('active');
+            updateStepIndicator(step);
+            
+            if (step === 5) {
+                generateSummary();
+            }
+        }
+
+        function validateStep(step) {
+            switch(step) {
+                case 1:
+                    if (!document.querySelector('input[name="language"]:checked')) {
+                        alert('請選擇一種語言');
+                        return false;
+                    }
+                    return true;
+                case 2:
+                    if (!document.getElementById('lesson_number').value.trim()) {
+                        alert('請輸入課程編號');
+                        return false;
+                    }
+                    return true;
+                case 3:
+                    if (!document.querySelector('input[name="content_type"]:checked')) {
+                        alert('請選擇內容類型');
+                        return false;
+                    }
+                    return true;
+                case 4:
+                    const contentType = document.querySelector('input[name="content_type"]:checked').value;
+                    if (contentType === '詞語') {
+                        if (!document.getElementById('words_input').value.trim()) {
+                            alert('請輸入至少一個詞語');
+                            return false;
+                        }
+                    } else if (contentType === '段落') {
+                        const paragraphs = document.querySelectorAll('.paragraph-item');
+                        if (paragraphs.length === 0) {
+                            alert('請至少添加一個段落');
+                            return false;
+                        }
+                        for (let para of paragraphs) {
+                            const title = para.querySelector('input[name="paragraph_title"]').value.trim();
+                            const sentences = para.querySelectorAll('input[name="paragraph_sentence"]');
+                            if (!title) {
+                                alert('請輸入段落標題');
+                                return false;
+                            }
+                            if (sentences.length === 0 || !Array.from(sentences).some(s => s.value.trim())) {
+                                alert('請為每個段落至少輸入一個句子');
+                                return false;
+                            }
+                        }
+                    }
+                    return true;
+                default:
+                    return true;
+            }
+        }
+
+        function addParagraph() {
+            const container = document.getElementById('paragraphs-list');
+            const index = container.children.length;
+            
+            const paragraphDiv = document.createElement('div');
+            paragraphDiv.className = 'paragraph-item';
+            paragraphDiv.id = `paragraph-${index}`;
+            
+            paragraphDiv.innerHTML = `
+                <h4>段落 ${index + 1}</h4>
+                <div class="form-group">
+                    <label>段落標題:</label>
+                    <input type="text" name="paragraph_title" placeholder="例如：家庭介紹" required>
+                </div>
+                <div class="form-group">
+                    <label>句子:</label>
+                    <div id="sentences-list-${index}"></div>
+                    <button type="button" class="btn" onclick="addSentence(${index})" style="margin-top: 10px;">➕ 添加句子</button>
+                </div>
+                <button type="button" class="remove-btn" onclick="removeParagraph(${index})">🗑️ 刪除段落</button>
+            `;
+            
+            container.appendChild(paragraphDiv);
+            addSentence(index);
+        }
+
+        function addSentence(paragraphIndex) {
+            const sentenceList = document.getElementById(`sentences-list-${paragraphIndex}`);
+            const sentenceIndex = sentenceList.children.length;
+            
+            const sentenceDiv = document.createElement('div');
+            sentenceDiv.className = 'sentence-input';
+            sentenceDiv.id = `sentence-${paragraphIndex}-${sentenceIndex}`;
+            
+            sentenceDiv.innerHTML = `
+                <div style="display: flex; gap: 10px; margin-bottom: 8px;">
+                    <input type="text" name="paragraph_sentence" placeholder="輸入句子 ${sentenceIndex + 1}" style="flex: 1;" required>
+                    ${sentenceIndex > 0 ? `<button type="button" class="remove-sentence-btn" onclick="removeSentence(${paragraphIndex}, ${sentenceIndex})">✕</button>` : ''}
+                </div>
+            `;
+            
+            sentenceList.appendChild(sentenceDiv);
+        }
+
+        function removeSentence(paragraphIndex, sentenceIndex) {
+            document.getElementById(`sentence-${paragraphIndex}-${sentenceIndex}`).remove();
+        }
+
+        function removeParagraph(paragraphIndex) {
+            document.getElementById(`paragraph-${paragraphIndex}`).remove();
+        }
+
+        function generateSummary() {
+            const language = document.querySelector('input[name="language"]:checked').value;
+            const lessonNumber = document.getElementById('lesson_number').value;
+            const contentType = document.querySelector('input[name="content_type"]:checked').value;
+            
+            let summary = `
+                <h3>✓ 課程信息確認</h3>
+                <p><strong>語言：</strong> ${language}</p>
+                <p><strong>課程編號：</strong> ${lessonNumber}</p>
+                <p><strong>內容類型：</strong> ${contentType}</p>
+            `;
+            
+            if (contentType === '詞語') {
+                const words = document.getElementById('words_input').value
+                    .split('\n')
+                    .map(w => w.trim())
+                    .filter(w => w);
+                summary += `<p><strong>詞語數量：</strong> ${words.length}</p>`;
+                summary += '<p><strong>詞語列表：</strong></p><ul>';
+                words.forEach(word => {
+                    summary += `<li>${word}</li>`;
+                });
+                summary += '</ul>';
+            } else if (contentType === '段落') {
+                const paragraphs = document.querySelectorAll('.paragraph-item');
+                summary += `<p><strong>段落數量：</strong> ${paragraphs.length}</p>`;
+                paragraphs.forEach((para, idx) => {
+                    const title = para.querySelector('input[name="paragraph_title"]').value;
+                    const sentences = para.querySelectorAll('input[name="paragraph_sentence"]');
+                    const sentenceCount = Array.from(sentences).filter(s => s.value.trim()).length;
+                    summary += `<p><strong>段落 ${idx + 1}：${title}</strong> (${sentenceCount} 句)</p>`;
+                });
+            }
+            
+            document.getElementById('summary').innerHTML = summary;
+        }
+
+        // Initialize
+        document.getElementById('lessonsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Convert form data and submit
+            submitLesson();
+        });
+
+        async function submitLesson() {
+            const language = document.querySelector('input[name="language"]:checked').value;
+            const lessonNumber = document.getElementById('lesson_number').value;
+            const contentType = document.querySelector('input[name="content_type"]:checked').value;
+            
+            const data = {
+                language: language,
+                lesson_number: lessonNumber,
+                content_type: contentType
+            };
+            
+            if (contentType === '詞語') {
+                const words = document.getElementById('words_input').value
+                    .split('\n')
+                    .map(w => w.trim())
+                    .filter(w => w);
+                data.words = words;
+            } else if (contentType === '段落') {
+                const paragraphs = [];
+                document.querySelectorAll('.paragraph-item').forEach(para => {
+                    const title = para.querySelector('input[name="paragraph_title"]').value;
+                    const sentences = Array.from(para.querySelectorAll('input[name="paragraph_sentence"]'))
+                        .map(s => s.value.trim())
+                        .filter(s => s);
+                    paragraphs.push({ title, sentences });
+                });
+                data.paragraphs = paragraphs;
+            }
+            
+            try {
+                const response = await fetch('/add_content', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    alert('課程已成功添加！');
+                    window.location.href = '{{ url_for("index") }}';
+                } else {
+                    alert('添加失敗，請重試');
+                }
+            } catch (error) {
+                alert('錯誤：' + error);
+            }
+        }
+    </script>
 </body>
 </html>

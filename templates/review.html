@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>复习未掌握词汇 - {{ lesson_name }} - 词汇学习助手</title>
+    <title>複習未掌握內容 - {{ lesson_name }} - 詞彙學習助手</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -97,24 +97,24 @@
 </head>
 <body>
     <div class="container">
-        <h1>🔄 复习未掌握词汇</h1>
+        <h1>🔄 複習未掌握內容</h1>
         <div class="lesson-title">{{ lesson_name }}</div>
         
         <div class="summary">
-            <p>需要复习的词汇数: <strong>{{ review_words|length }}</strong></p>
-            <p>这些是准确率低于80%或尚未测试的词汇</p>
+            <p>需要複習的項目數: <strong>{{ review_words|length }}</strong></p>
+            <p>這些是準確率低於80%或尚未測試的項目</p>
         </div>
         
         {% if review_words %}
             <table>
                 <thead>
                     <tr>
-                        <th>词汇</th>
-                        <th>释义</th>
-                        <th>尝试次数</th>
-                        <th>正确</th>
-                        <th>错误</th>
-                        <th>准确率</th>
+                        <th>詞彙</th>
+                        <th>釋義</th>
+                        <th>嘗試次數</th>
+                        <th>正確</th>
+                        <th>錯誤</th>
+                        <th>準確率</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -138,15 +138,15 @@
             </table>
         {% else %}
             <div style="text-align: center; padding: 30px;">
-                <h3>🎉 恭喜！该课程的所有词汇都已掌握（准确率≥80%）</h3>
-                <p>您可以继续学习新课程，或重新挑战已完成的课程。</p>
+                <h3>🎉 恭喜！該內容的所有項目都已掌握（準確率≥80%）</h3>
+                <p>您可以繼續學習新的聽寫內容，或重新挑戰已完成的內容。</p>
             </div>
         {% endif %}
         
         <div style="text-align: center; margin-top: 30px;">
-            <a href="{{ url_for('quiz', lesson_name=lesson_name) }}" class="btn btn-quiz">再次测试此课程</a>
-            <a href="{{ url_for('vocab_list') }}" class="btn">返回课程列表</a>
-            <a href="{{ url_for('index') }}" class="btn btn-back">返回首页</a>
+            <a href="{{ url_for('quiz', lesson_name=lesson_name) }}" class="btn btn-quiz">再次測試此內容</a>
+            <a href="{{ url_for('vocab_list') }}" class="btn">返回聽寫內容列表</a>
+            <a href="{{ url_for('index') }}" class="btn btn-back">返回首頁</a>
         </div>
     </div>
 </body>

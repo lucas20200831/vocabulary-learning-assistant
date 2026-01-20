@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>生词表管理 - 词汇学习助手</title>
+    <title>聽寫內容列表 - 詞彙學習助手</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
             background-color: #f5f5f5;
@@ -23,12 +23,106 @@
             text-align: center;
             margin-bottom: 30px;
         }
+        .language-section {
+            margin-bottom: 30px;
+        }
+        .language-title {
+            background-color: #34495e;
+            color: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
         .lesson-card {
             background-color: #f8f9fa;
             border-radius: 6px;
-            padding: 20px;
-            margin: 15px 0;
+            padding: 0;
+            margin: 10px 0;
             border-left: 4px solid #3498db;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .lesson-header {
+            background-color: #ecf0f1;
+            padding: 15px;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        .lesson-header:hover {
+            background-color: #d5dbdb;
+        }
+        .lesson-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+        .lesson-toggle {
+            font-size: 18px;
+            transition: transform 0.3s;
+            min-width: 25px;
+        }
+        .lesson-toggle.expanded {
+            transform: rotate(90deg);
+        }
+        .lesson-info {
+            color: #666;
+            font-size: 14px;
+        }
+        .lesson-content {
+            display: none;
+            padding: 20px;
+            background-color: #ffffff;
+        }
+        .lesson-content.expanded {
+            display: block;
+        }
+        .content-section {
+            margin-bottom: 20px;
+        }
+        .content-section h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+        }
+        .words-list {
+            background-color: #f9f9f9;
+            padding: 12px;
+            border-radius: 4px;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        .word-item {
+            padding: 5px 0;
+            color: #333;
+        }
+        .paragraphs-list {
+            background-color: #f9f9f9;
+            padding: 12px;
+            border-radius: 4px;
+        }
+        .paragraph-item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .paragraph-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .paragraph-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
         }
         .btn {
             display: inline-block;
@@ -37,7 +131,7 @@
             padding: 10px 16px;
             text-decoration: none;
             border-radius: 4px;
-            margin: 5px;
+            margin: 5px 5px 5px 0;
             transition: background-color 0.3s;
             border: none;
             cursor: pointer;
@@ -64,66 +158,183 @@
         .btn-stats:hover {
             background-color: #27ae60;
         }
+        .btn-edit {
+            background-color: #3498db;
+        }
+        .btn-edit:hover {
+            background-color: #2980b9;
+        }
+        .btn-delete {
+            background-color: #e74c3c;
+        }
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
         .back-btn {
             background-color: #95a5a6;
         }
         .back-btn:hover {
             background-color: #7f8c8d;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
+        .action-buttons {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
         }
-        th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-        th {
-            background-color: #ecf0f1;
-        }
-        .word-list {
-            max-height: 200px;
-            overflow-y: auto;
-            background-color: #f9f9f9;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 10px 0;
+        .empty-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7f8c8d;
         }
     </style>
 </head>
 <body>
+    <!-- 自定義確認對話框 -->
+    <div id="confirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-width: 400px; text-align: center;">
+            <h2 style="margin-top: 0; color: #2c3e50; font-size: 18px;" id="confirmTitle">確認</h2>
+            <p id="confirmMessage" style="color: #555; margin: 20px 0; font-size: 14px;"></p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button id="confirmYes" style="padding: 10px 30px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">確定刪除</button>
+                <button id="confirmNo" style="padding: 10px 30px; background: #95a5a6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">取消</button>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
-        <h1>📖 生词表列表</h1>
+        <h1>📖 聽寫內容列表</h1>
         
-        {% if lessons %}
-            <p>以下是您创建的所有课程：</p>
+        {% if contents %}
+            <p style="color: #666; margin-bottom: 20px;">點擊課程名稱以展開或收起詳細內容</p>
             
-            {% for lesson in lessons %}
+            {% set current_language = '' %}
+            {% for item in contents %}
+                {% if current_language != item.language %}
+                    {% if current_language != '' %}</div>{% endif %}
+                    <div class="language-section">
+                    <div class="language-title">{{ item.language }}</div>
+                    {% set current_language = item.language %}
+                {% endif %}
+                
                 <div class="lesson-card">
-                    <h3>{{ lesson }}</h3>
-                    
-                    <div class="word-list">
-                        <strong>词汇列表：</strong><br>
-                        {% for word, info in data[lesson].items() %}
-                            {{ word }}: {{ info.meaning }}<br>
-                        {% endfor %}
+                    <div class="lesson-header" onclick="toggleLesson(this)">
+                        <div class="lesson-title">
+                            <span class="lesson-toggle">▶</span>
+                            <div>
+                                <div style="font-weight: bold; color: #2c3e50;">{{ item.lesson_number }}</div>
+                                <div class="lesson-info">詞語: {{ item.word_count }} 個 | 段落: {{ item.para_count }} 個</div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <a href="{{ url_for('quiz', lesson_name=lesson) }}" class="btn btn-quiz">开始听写</a>
-                    <a href="{{ url_for('review', lesson_name=lesson) }}" class="btn btn-review">复习未掌握</a>
-                    <a href="{{ url_for('lesson_stats', lesson_name=lesson) }}" class="btn btn-stats">查看统计</a>
+                    <div class="lesson-content" data-language="{{ item.language }}" data-lesson="{{ item.lesson_number }}">
+                        {% if item.word_count > 0 %}
+                        <div class="content-section">
+                            <h4>📝 詞語 ({{ item.word_count }} 個)</h4>
+                            <div class="words-list">
+                                {% for word in item.content.get('詞語', []) %}
+                                    <div class="word-item">• {{ word.word }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if item.para_count > 0 %}
+                        <div class="content-section">
+                            <h4>📄 段落 ({{ item.para_count }} 個)</h4>
+                            <div class="paragraphs-list">
+                                {% for para in item.content.get('段落', []) %}
+                                    <div class="paragraph-item">
+                                        <div class="paragraph-title">{{ para.title }}</div>
+                                        <div style="font-size: 13px; color: #666;">
+                                            {% for sent in para.sentences %}
+                                                <div style="margin-bottom: 4px;">{{ sent.sentence }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="action-buttons">
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <a href="{{ url_for('quiz_new', language=item.language, lesson_num=item.lesson_number) }}?content_type=詞語" class="btn btn-quiz">🎙️ 聽寫詞語</a>
+                                <a href="{{ url_for('quiz_new', language=item.language, lesson_num=item.lesson_number) }}?content_type=段落" class="btn btn-quiz">🎙️ 聽寫段落</a>
+                                <a href="{{ url_for('review_new', language=item.language, lesson_num=item.lesson_number) }}" class="btn btn-review">🔄 複習未掌握</a>
+                                <a href="{{ url_for('lesson_stats_new', language=item.language, lesson_num=item.lesson_number) }}" class="btn btn-stats">📊 查看統計</a>
+                                <a href="{{ url_for('edit_content', language=item.language, lesson_num=item.lesson_number) }}" class="btn btn-edit">✏️ 編輯</a>
+                                <button type="button" class="btn btn-delete" onclick="showDeleteConfirm('{{ item.language }}', '{{ item.lesson_number }}')">🗑️ 刪除</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             {% endfor %}
+            </div>
         {% else %}
-            <p>还没有创建任何课程。 <a href="{{ url_for('create_lesson') }}" class="btn">点击这里创建第一个课程</a></p>
+            <div class="empty-message">
+                <p style="font-size: 16px; margin-bottom: 15px;">還沒有輸入任何聽寫內容</p>
+                <a href="{{ url_for('create_lesson') }}" class="btn">點擊這裡輸入第一個內容</a>
+            </div>
         {% endif %}
         
         <div style="text-align: center; margin-top: 30px;">
-            <a href="{{ url_for('create_lesson') }}" class="btn">创建新课程</a>
-            <a href="{{ url_for('index') }}" class="btn back-btn">返回首页</a>
+            <a href="{{ url_for('create_lesson') }}" class="btn">➕ 輸入新的內容</a>
+            <a href="{{ url_for('index') }}" class="btn back-btn">返回首頁</a>
         </div>
     </div>
+
+    <script>
+        let deleteLanguage = '';
+        let deleteLesson = '';
+
+        function toggleLesson(headerElement) {
+            const contentElement = headerElement.nextElementSibling;
+            const toggleIcon = headerElement.querySelector('.lesson-toggle');
+            
+            contentElement.classList.toggle('expanded');
+            toggleIcon.classList.toggle('expanded');
+        }
+
+        function showDeleteConfirm(language, lesson) {
+            deleteLanguage = language;
+            deleteLesson = lesson;
+            
+            const modal = document.getElementById('confirmModal');
+            const message = document.getElementById('confirmMessage');
+            message.textContent = `確認要刪除 ${language} - ${lesson} 嗎？此操作不可撤銷！`;
+            
+            modal.style.display = 'flex';
+        }
+
+        function hideDeleteConfirm() {
+            const modal = document.getElementById('confirmModal');
+            modal.style.display = 'none';
+            deleteLanguage = '';
+            deleteLesson = '';
+        }
+
+        function confirmDelete() {
+            if (deleteLanguage && deleteLesson) {
+                const encodedLanguage = encodeURIComponent(deleteLanguage);
+                const encodedLesson = encodeURIComponent(deleteLesson);
+                const url = `/delete_content/${encodedLanguage}/${encodedLesson}`;
+                
+                // 使用表單提交
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = url;
+                document.body.appendChild(form);
+                form.submit();
+            }
+            hideDeleteConfirm();
+        }
+
+        // 綁定按鈕事件
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('confirmYes').addEventListener('click', confirmDelete);
+            document.getElementById('confirmNo').addEventListener('click', hideDeleteConfirm);
+        });
+    </script>
 </body>
 </html>

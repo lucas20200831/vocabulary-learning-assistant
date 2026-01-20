@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>词汇学习助手</title>
+    <title>詞彙學習助手</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -72,29 +72,29 @@
 </head>
 <body>
     <div class="container">
-        <h1>📚 词汇学习助手</h1>
+        <h1>📚 詞彙學習助手</h1>
         
         <div class="card">
-            <h2>📖 生词表管理</h2>
-            <p>创建和管理课程生词表，添加新词汇及其释义。</p>
-            <a href="{{ url_for('create_lesson') }}" class="btn btn-create">创建新课程</a>
-            <a href="{{ url_for('vocab_list') }}" class="btn">查看所有课程</a>
+            <h2>📖 聽寫內容管理</h2>
+            <p>輸入和管理聽寫內容，新增詞語或段落用於聽寫測試。</p>
+            <a href="{{ url_for('create_lesson') }}" class="btn btn-create">輸入新的內容</a>
+            <a href="{{ url_for('vocab_list') }}" class="btn">查看所有聽寫內容</a>
         </div>
         
         <div class="card">
-            <h2>✍️ 听写默写</h2>
-            <p>从生词表中选择词汇进行听写测试，检验掌握情况。</p>
-            <a href="{{ url_for('vocab_list') }}" class="btn">开始听写</a>
+            <h2>✍️ 聽寫測試</h2>
+            <p>選擇聽寫內容進行測試，檢驗掌握情況。</p>
+            <a href="{{ url_for('vocab_list') }}" class="btn">開始聽寫</a>
         </div>
         
         <div class="card">
-            <h2>🔄 巩固复习</h2>
-            <p>针对未掌握的词汇进行重点复习，提升记忆效果。</p>
-            <a href="{{ url_for('vocab_list') }}" class="btn btn-review">开始复习</a>
+            <h2>🔄 鞏固複習</h2>
+            <p>針對未掌握的項目進行重點複習，提升記憶效果。</p>
+            <a href="{{ url_for('vocab_list') }}" class="btn btn-review">開始複習</a>
         </div>
         
         <div class="nav-links">
-            <a href="{{ url_for('vocab_list') }}" class="btn btn-stats">📊 查看统计</a>
+            <a href="{{ url_for('vocab_list') }}" class="btn btn-stats">📊 查看統計</a>
         </div>
     </div>
 </body>

@@ -1,354 +1,670 @@
 {
-  "第1课": {
-    "阳光": {
-      "meaning": "阳光",
-      "attempts": 1,
-      "correct": 1,
-      "incorrect": 0,
-      "history": [
+  "中文": {
+    "第一課": {
+      "詞語": [
         {
-          "timestamp": "2026-01-20 02:35:41",
-          "known": true
-        }
-      ]
-    },
-    "学校": {
-      "meaning": "学校",
-      "attempts": 3,
-      "correct": 2,
-      "incorrect": 1,
-      "history": [
-        {
-          "timestamp": "2026-01-20 02:36:02",
-          "known": false
+          "word": "媽媽",
+          "meaning": "",
+          "attempts": 12,
+          "correct": 12,
+          "incorrect": 0,
+          "history": [
+            {
+              "timestamp": "2026-01-21 01:14:33",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:17:23",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:18:52",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:26:07",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:26:17",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:28:20",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:32:21",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:33:05",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:33:33",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:39:37",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:41:48",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:47:03",
+              "known": true
+            }
+          ]
         },
         {
-          "timestamp": "2026-01-20 02:38:08",
-          "known": true
+          "word": "爸爸",
+          "meaning": "",
+          "attempts": 12,
+          "correct": 11,
+          "incorrect": 1,
+          "history": [
+            {
+              "timestamp": "2026-01-21 01:14:33",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:17:23",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:18:52",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:26:07",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:26:17",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:28:20",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:32:21",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:33:05",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:33:33",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:39:37",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:41:51",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:47:09",
+              "known": false
+            }
+          ]
         },
         {
-          "timestamp": "2026-01-20 02:46:30",
-          "known": true
-        }
-      ]
-    },
-    "老师": {
-      "meaning": "老师",
-      "attempts": 1,
-      "correct": 1,
-      "incorrect": 0,
-      "history": [
+          "word": "哥哥",
+          "meaning": "",
+          "attempts": 12,
+          "correct": 10,
+          "incorrect": 2,
+          "history": [
+            {
+              "timestamp": "2026-01-21 01:14:33",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:17:23",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:18:52",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:26:07",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:26:17",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:28:20",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:32:21",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:33:05",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:33:33",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:39:37",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:41:54",
+              "known": false
+            },
+            {
+              "timestamp": "2026-01-21 01:47:11",
+              "known": false
+            }
+          ]
+        },
         {
-          "timestamp": "2026-01-20 02:36:05",
-          "known": true
-        }
-      ]
-    },
-    "学生": {
-      "meaning": "学生",
-      "attempts": 1,
-      "correct": 0,
-      "incorrect": 1,
-      "history": [
+          "word": "妹妹",
+          "meaning": "",
+          "attempts": 12,
+          "correct": 12,
+          "incorrect": 0,
+          "history": [
+            {
+              "timestamp": "2026-01-21 01:14:33",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:17:23",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:18:52",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:26:07",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:26:17",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:28:20",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:32:21",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:33:05",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:33:33",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:39:37",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:41:56",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:47:15",
+              "known": true
+            }
+          ]
+        },
         {
-          "timestamp": "2026-01-20 02:38:10",
-          "known": false
+          "word": "姐姐",
+          "meaning": "",
+          "attempts": 0,
+          "correct": 0,
+          "incorrect": 0,
+          "history": []
         }
-      ]
-    },
-    "书本": {
-      "meaning": "书本",
-      "attempts": 1,
-      "correct": 1,
-      "incorrect": 0,
-      "history": [
+      ],
+      "段落": [
         {
-          "timestamp": "2026-01-20 02:38:13",
-          "known": true
+          "title": "家庭介紹",
+          "sentences": [
+            {
+              "sentence": "我有一個媽媽和一個爸爸。",
+              "attempts": 5,
+              "correct": 5,
+              "incorrect": 0,
+              "history": [
+                {
+                  "timestamp": "2026-01-21 01:36:22",
+                  "known": true
+                },
+                {
+                  "timestamp": "2026-01-21 01:36:56",
+                  "known": true
+                },
+                {
+                  "timestamp": "2026-01-21 01:37:40",
+                  "known": true
+                },
+                {
+                  "timestamp": "2026-01-21 01:42:05",
+                  "known": true
+                },
+                {
+                  "timestamp": "2026-01-21 01:58:16",
+                  "known": true
+                }
+              ]
+            },
+            {
+              "sentence": "我還有一個哥哥和一個妹妹。",
+              "attempts": 4,
+              "correct": 0,
+              "incorrect": 4,
+              "history": [
+                {
+                  "timestamp": "2026-01-21 01:36:56",
+                  "known": false
+                },
+                {
+                  "timestamp": "2026-01-21 01:38:05",
+                  "known": false
+                },
+                {
+                  "timestamp": "2026-01-21 01:42:08",
+                  "known": false
+                },
+                {
+                  "timestamp": "2026-01-21 01:58:21",
+                  "known": false
+                }
+              ]
+            },
+            {
+              "sentence": "我們一家人都很快樂。",
+              "attempts": 3,
+              "correct": 3,
+              "incorrect": 0,
+              "history": [
+                {
+                  "timestamp": "2026-01-21 01:36:56",
+                  "known": true
+                },
+                {
+                  "timestamp": "2026-01-21 01:38:09",
+                  "known": true
+                },
+                {
+                  "timestamp": "2026-01-21 01:42:17",
+                  "known": true
+                }
+              ]
+            },
+            {
+              "sentence": "你是个坏人。",
+              "attempts": 1,
+              "correct": 0,
+              "incorrect": 1,
+              "history": [
+                {
+                  "timestamp": "2026-01-21 01:42:22",
+                  "known": false
+                }
+              ]
+            }
+          ]
         }
       ]
     },
-    "铅笔": {
-      "meaning": "铅笔",
-      "attempts": 1,
-      "correct": 0,
-      "incorrect": 1,
-      "history": [
+    "第二課": {
+      "詞語": [
         {
-          "timestamp": "2026-01-20 02:38:16",
-          "known": false
-        }
-      ]
-    },
-    "橡皮": {
-      "meaning": "橡皮",
-      "attempts": 1,
-      "correct": 1,
-      "incorrect": 0,
-      "history": [
+          "word": "書",
+          "meaning": "印刷品",
+          "attempts": 2,
+          "correct": 2,
+          "incorrect": 0,
+          "history": [
+            {
+              "timestamp": "2026-01-21 01:15:08",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:19:18",
+              "known": true
+            }
+          ]
+        },
         {
-          "timestamp": "2026-01-20 02:38:18",
-          "known": true
-        }
-      ]
-    },
-    "桌子": {
-      "meaning": "桌子",
-      "attempts": 1,
-      "correct": 0,
-      "incorrect": 1,
-      "history": [
+          "word": "筆",
+          "meaning": "書寫工具",
+          "attempts": 2,
+          "correct": 1,
+          "incorrect": 1,
+          "history": [
+            {
+              "timestamp": "2026-01-21 01:15:17",
+              "known": false
+            },
+            {
+              "timestamp": "2026-01-21 01:19:23",
+              "known": true
+            }
+          ]
+        },
         {
-          "timestamp": "2026-01-20 02:38:23",
-          "known": false
-        }
-      ]
-    },
-    "椅子": {
-      "meaning": "椅子",
-      "attempts": 1,
-      "correct": 0,
-      "incorrect": 1,
-      "history": [
+          "word": "桌子",
+          "meaning": "家具",
+          "attempts": 2,
+          "correct": 2,
+          "incorrect": 0,
+          "history": [
+            {
+              "timestamp": "2026-01-21 01:15:22",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:19:26",
+              "known": true
+            }
+          ]
+        },
         {
-          "timestamp": "2026-01-20 02:38:24",
-          "known": false
-        }
-      ]
-    },
-    "黑板": {
-      "meaning": "黑板",
-      "attempts": 1,
-      "correct": 0,
-      "incorrect": 1,
-      "history": [
+          "word": "椅子",
+          "meaning": "座椅",
+          "attempts": 2,
+          "correct": 1,
+          "incorrect": 1,
+          "history": [
+            {
+              "timestamp": "2026-01-21 01:15:28",
+              "known": false
+            },
+            {
+              "timestamp": "2026-01-21 01:19:29",
+              "known": true
+            }
+          ]
+        },
         {
-          "timestamp": "2026-01-20 02:38:28",
-          "known": false
+          "word": "教室",
+          "meaning": "上課的房間",
+          "attempts": 2,
+          "correct": 2,
+          "incorrect": 0,
+          "history": [
+            {
+              "timestamp": "2026-01-21 01:15:32",
+              "known": true
+            },
+            {
+              "timestamp": "2026-01-21 01:19:32",
+              "known": true
+            }
+          ]
         }
-      ]
-    },
-    "教室": {
-      "meaning": "教室",
-      "attempts": 1,
-      "correct": 0,
-      "incorrect": 1,
-      "history": [
+      ],
+      "段落": [
         {
-          "timestamp": "2026-01-20 02:38:31",
-          "known": false
+          "title": "學校用品",
+          "sentences": [
+            {
+              "sentence": "我在教室裡有一張桌子和一把椅子。",
+              "attempts": 0,
+              "correct": 0,
+              "incorrect": 0,
+              "history": []
+            },
+            {
+              "sentence": "我用筆在書上寫字。",
+              "attempts": 0,
+              "correct": 0,
+              "incorrect": 0,
+              "history": []
+            },
+            {
+              "sentence": "這是我最喜歡的書。",
+              "attempts": 0,
+              "correct": 0,
+              "incorrect": 0,
+              "history": []
+            }
+          ]
         }
       ]
     },
-    "朋友": {
-      "meaning": "朋友",
-      "attempts": 1,
-      "correct": 1,
-      "incorrect": 0,
-      "history": [
+    "第三課": {
+      "詞語": [
         {
-          "timestamp": "2026-01-20 02:38:33",
-          "known": true
+          "word": "蘋果",
+          "meaning": "水果",
+          "attempts": 0,
+          "correct": 0,
+          "incorrect": 0,
+          "history": []
+        },
+        {
+          "word": "香蕉",
+          "meaning": "黃色水果",
+          "attempts": 0,
+          "correct": 0,
+          "incorrect": 0,
+          "history": []
+        },
+        {
+          "word": "橙子",
+          "meaning": "橘色水果",
+          "attempts": 0,
+          "correct": 0,
+          "incorrect": 0,
+          "history": []
+        },
+        {
+          "word": "葡萄",
+          "meaning": "紫色水果",
+          "attempts": 0,
+          "correct": 0,
+          "incorrect": 0,
+          "history": []
+        },
+        {
+          "word": "西瓜",
+          "meaning": "綠色水果",
+          "attempts": 0,
+          "correct": 0,
+          "incorrect": 0,
+          "history": []
+        }
+      ],
+      "段落": [
+        {
+          "title": "水果市場",
+          "sentences": [
+            {
+              "sentence": "市場裡有很多新鮮的水果。",
+              "attempts": 0,
+              "correct": 0,
+              "incorrect": 0,
+              "history": []
+            },
+            {
+              "sentence": "我喜歡吃蘋果和香蕉。",
+              "attempts": 0,
+              "correct": 0,
+              "incorrect": 0,
+              "history": []
+            },
+            {
+              "sentence": "這個西瓜看起來很甜。",
+              "attempts": 0,
+              "correct": 0,
+              "incorrect": 0,
+              "history": []
+            }
+          ]
         }
       ]
-    },
-    "家庭": {
-      "meaning": "家庭",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "父母": {
-      "meaning": "父母",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "兄弟": {
-      "meaning": "兄弟",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "姐妹": {
-      "meaning": "姐妹",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "花园": {
-      "meaning": "花园",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "动物": {
-      "meaning": "动物",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "植物": {
-      "meaning": "植物",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "水果": {
-      "meaning": "水果",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
     }
   },
-  "第2课": {
-    "春天": {
-      "meaning": "春天",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
+  "英文": {
+    "第一課": {
+      "詞語": [
+        {
+          "word": "hello",
+          "meaning": "問候",
+          "attempts": 0,
+          "correct": 0,
+          "incorrect": 0,
+          "history": []
+        },
+        {
+          "word": "goodbye",
+          "meaning": "再見",
+          "attempts": 0,
+          "correct": 0,
+          "incorrect": 0,
+          "history": []
+        },
+        {
+          "word": "please",
+          "meaning": "請",
+          "attempts": 0,
+          "correct": 0,
+          "incorrect": 0,
+          "history": []
+        },
+        {
+          "word": "thank you",
+          "meaning": "謝謝",
+          "attempts": 0,
+          "correct": 0,
+          "incorrect": 0,
+          "history": []
+        },
+        {
+          "word": "sorry",
+          "meaning": "對不起",
+          "attempts": 0,
+          "correct": 0,
+          "incorrect": 0,
+          "history": []
+        }
+      ],
+      "段落": [
+        {
+          "title": "Basic Greetings",
+          "sentences": [
+            {
+              "sentence": "Hello, my name is Tom.",
+              "attempts": 0,
+              "correct": 0,
+              "incorrect": 0,
+              "history": []
+            },
+            {
+              "sentence": "Nice to meet you, please sit down.",
+              "attempts": 0,
+              "correct": 0,
+              "incorrect": 0,
+              "history": []
+            },
+            {
+              "sentence": "Thank you very much, goodbye.",
+              "attempts": 0,
+              "correct": 0,
+              "incorrect": 0,
+              "history": []
+            }
+          ]
+        }
+      ]
     },
-    "夏天": {
-      "meaning": "夏天",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "秋天": {
-      "meaning": "秋天",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "冬天": {
-      "meaning": "冬天",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "花朵": {
-      "meaning": "花朵",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "草地": {
-      "meaning": "草地",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "河流": {
-      "meaning": "河流",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "山峰": {
-      "meaning": "山峰",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "森林": {
-      "meaning": "森林",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "天空": {
-      "meaning": "天空",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "云朵": {
-      "meaning": "云朵",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "彩虹": {
-      "meaning": "彩虹",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "自行车": {
-      "meaning": "自行车",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "汽车": {
-      "meaning": "汽车",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "飞机": {
-      "meaning": "飞机",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "火车": {
-      "meaning": "火车",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "图书馆": {
-      "meaning": "图书馆",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "博物馆": {
-      "meaning": "博物馆",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "医院": {
-      "meaning": "医院",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
-    },
-    "商店": {
-      "meaning": "商店",
-      "attempts": 0,
-      "correct": 0,
-      "incorrect": 0,
-      "history": []
+    "第二課": {
+      "詞語": [
+        {
+          "word": "apple",
+          "meaning": "蘋果",
+          "attempts": 0,
+          "correct": 0,
+          "incorrect": 0,
+          "history": []
+        },
+        {
+          "word": "banana",
+          "meaning": "香蕉",
+          "attempts": 0,
+          "correct": 0,
+          "incorrect": 0,
+          "history": []
+        },
+        {
+          "word": "orange",
+          "meaning": "橙子",
+          "attempts": 0,
+          "correct": 0,
+          "incorrect": 0,
+          "history": []
+        },
+        {
+          "word": "grape",
+          "meaning": "葡萄",
+          "attempts": 0,
+          "correct": 0,
+          "incorrect": 0,
+          "history": []
+        },
+        {
+          "word": "watermelon",
+          "meaning": "西瓜",
+          "attempts": 0,
+          "correct": 0,
+          "incorrect": 0,
+          "history": []
+        }
+      ],
+      "段落": [
+        {
+          "title": "At the Market",
+          "sentences": [
+            {
+              "sentence": "There are many fruits at the market.",
+              "attempts": 0,
+              "correct": 0,
+              "incorrect": 0,
+              "history": []
+            },
+            {
+              "sentence": "The red apples look very delicious.",
+              "attempts": 0,
+              "correct": 0,
+              "incorrect": 0,
+              "history": []
+            },
+            {
+              "sentence": "Yellow bananas are also very sweet.",
+              "attempts": 0,
+              "correct": 0,
+              "incorrect": 0,
+              "history": []
+            }
+          ]
+        }
+      ]
     }
   }
 }

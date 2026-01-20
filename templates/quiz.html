@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>听写测试 - {{ lesson_name }} - 词汇学习助手</title>
+    <title>聽寫測試 - {{ lesson_name }} - 詞彙學習助手</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -75,6 +75,12 @@
         .btn-speak:hover {
             background-color: #8e44ad;
         }
+        .btn-replay {
+            background-color: #3498db;
+        }
+        .btn-replay:hover {
+            background-color: #2980b9;
+        }
         .result-container {
             margin: 30px 0;
         }
@@ -107,131 +113,175 @@
 </head>
 <body>
     <div class="container">
-        <h1>✍️ 听写测试</h1>
-        <div class="lesson-title">{{ lesson_name }} (共 {{ word_count }} 个词)</div>
+        <h1>✍️ 聽寫測試</h1>
+        <div class="lesson-title">{{ lesson_name }} (共 {{ word_count }} 個詞)</div>
         
         <div class="progress">
-            当前进度: <span id="current-index">1</span> / {{ word_count }}
+            當前進度: <span id="current-index">1</span> / {{ word_count }}
         </div>
         
         <div class="speak-instruction">
-            <p>点击下面的按钮听词汇发音，然后告诉系统您是否能默写出这个词。</p>
+            <p>🎧 現在開始聽寫。仔細聽每一個詞，然後告訴系統您是否能默寫出來。</p>
         </div>
         
         <div class="word-display" id="word-display">
-            {{ current_word }}
+            <em style="color: #95a5a6; font-size: 1.1em;">準備好了嗎？2秒後開始讀第一個詞...</em>
         </div>
         
         <div id="quiz-area">
-            <button class="btn btn-speak" onclick="speakCurrentWord()">🔊 播放发音</button>
-            <br>
-            <button class="btn btn-known" onclick="recordResult(true)">✅ 我能默写</button>
-            <button class="btn btn-unknown" onclick="recordResult(false)">❌ 默写不出</button>
+            <button class="btn btn-replay" onclick="speakCurrentWord()">🔊 重新聽</button>
+            <button class="btn btn-known" onclick="recordResult(true)">✅ 我能默寫</button>
+            <button class="btn btn-unknown" onclick="recordResult(false)">❌ 默寫不出</button>
         </div>
         
-        <div id="result-area" class="result-container hidden">
-            <h3>测试完成！</h3>
+        <div id="results-display" class="result-container" style="margin-top: 30px; background-color: #f9f9f9; padding: 20px; border-radius: 8px;">
+            <h3>聽寫結果：</h3>
             <div id="results-list"></div>
-            <a href="{{ url_for('vocab_list') }}" class="btn">返回课程列表</a>
         </div>
     </div>
 
     <script>
-        let currentIndex = 0; // 从0开始计数
+        let currentIndex = 0;
         const totalWords = {{ word_count }};
-        let currentWord = '{{ current_word|default("") }}';
+        let allWords = {{ words_json|safe }};  // All words as JSON array
+        let currentWord = allWords[0] || '';
+        let testStarted = false;
+        let results = [];
+        let isProcessing = false;  // Flag to prevent double submission
+        
+        // Extract language and lesson from page content (these are passed from Flask)
+        const lessonName = '{{ lesson_name }}';  // Already formatted as "語言 - 課程"
+        const [language, lesson] = lessonName.split(' - ').map(s => s.trim());
+        const contentType = '{{ content_type }}' || '詞語';  // Content type from Flask
+        
+        console.log('Quiz initialized:', {totalWords, allWords, currentWord, language, lesson, contentType});
+        
+        // Auto-start first word after 2 seconds
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                speakCurrentWord();
+                testStarted = true;
+            }, 2000);
+        });
         
         async function speakCurrentWord() {
-            // 检查当前显示的词汇，如果为空则使用JS中的currentWord变量
-            const wordDisplay = document.getElementById('word-display').textContent.trim();
-            const wordToSpeak = wordDisplay !== '' && wordDisplay !== '(您已掌握)' ? wordDisplay : currentWord;
-            
-            // Play the audio using browser text-to-speech API
+            console.log('Speaking word:', currentWord);
+            // Speak the current word
             if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(wordToSpeak);
-                utterance.lang = 'zh-CN';  // Set language to Chinese
-                utterance.rate = 0.8;  // Slower rate for clarity
-                utterance.pitch = 1;   // Normal pitch
+                const utterance = new SpeechSynthesisUtterance(currentWord);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.8;
+                utterance.pitch = 1;
                 speechSynthesis.speak(utterance);
             } else {
-                // Fallback to server-side TTS if browser doesn't support it
                 try {
-                    await fetch(`/speak_word/${encodeURIComponent(wordToSpeak)}`);
+                    await fetch(`/speak_word/${encodeURIComponent(currentWord)}`);
                 } catch (error) {
                     console.error('Error speaking word:', error);
-                    alert('播放发音时出现问题，请稍后再试');
                 }
             }
         }
 
         async function recordResult(isKnown) {
-            const wordDisplay = document.getElementById('word-display');
-            const quizArea = document.getElementById('quiz-area');
-            
-            // Show the word if the user couldn't write it
-            if (!isKnown) {
-                wordDisplay.textContent = currentWord;
-            } else {
-                wordDisplay.textContent = '(您已掌握)';
+            // Prevent duplicate submissions
+            if (isProcessing) {
+                console.log('Already processing, ignoring click');
+                return;
             }
+            isProcessing = true;
+            
+            const wordDisplay = document.getElementById('word-display');
+            
+            console.log('recordResult called:', {currentIndex, currentWord, isKnown, language, lesson, contentType});
             
             // Disable buttons to prevent double submission
             document.querySelectorAll('.btn').forEach(btn => {
                 btn.disabled = true;
             });
             
-            // Prepare form data
-            const formData = new FormData();
-            formData.append('answer', currentWord);
-            formData.append('is_known', isKnown);
+            // Add result to results list
+            const resultsList = document.getElementById('results-list');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result-item ${isKnown ? 'result-known' : 'result-unknown'}`;
+            resultDiv.innerHTML = `<strong>${currentWord}</strong>: ${isKnown ? '✅ 已掌握' : '❌ 未掌握'}`;
+            resultsList.appendChild(resultDiv);
+            
+            // Store result locally
+            results.push({word: currentWord, known: isKnown});
             
             try {
+                console.log('Sending POST to /submit_answer');
+                const formData = new FormData();
+                formData.append('word', currentWord);
+                formData.append('is_known', isKnown);
+                formData.append('word_index', currentIndex);
+                formData.append('total_words', totalWords);
+                formData.append('language', language);
+                formData.append('lesson', lesson);
+                formData.append('content_type', contentType);
+                
                 const response = await fetch('/submit_answer', {
                     method: 'POST',
                     body: formData
                 });
                 
+                console.log('Response status:', response.status);
                 const data = await response.json();
+                console.log('Response data:', data);
                 
-                if (data.status === 'finished') {
-                    // Show results
-                    document.getElementById('quiz-area').classList.add('hidden');
-                    document.getElementById('result-area').classList.remove('hidden');
-                    
-                    const resultsList = document.getElementById('results-list');
-                    data.results.forEach(result => {
-                        const div = document.createElement('div');
-                        div.className = `result-item ${result.known ? 'result-known' : 'result-unknown'}`;
-                        div.innerHTML = `<strong>${result.word}</strong>: ${result.known ? '✅ 已掌握' : '❌ 未掌握'}`;
-                        resultsList.appendChild(div);
-                    });
-                } else if (data.status === 'continue') {
-                    // Move to next word
-                    currentIndex = data.current_index;
-                    document.getElementById('current-index').textContent = currentIndex + 1;
-                    
-                    // Update the current word variable
-                    currentWord = data.next_word;
-                    
-                    // Update display for next word
-                    wordDisplay.textContent = currentWord;
-                    
-                    // Re-enable buttons
+                if (!response.ok) {
+                    console.error('Response error:', data);
+                    alert('錯誤：' + (data.error || data.debug || '提交答案失敗'));
                     document.querySelectorAll('.btn').forEach(btn => {
                         btn.disabled = false;
                     });
+                    isProcessing = false;
+                    return;
+                }
+                
+                // Check if this was the last word
+                if (currentIndex + 1 >= totalWords) {
+                    console.log('Quiz finished - no more words');
+                    wordDisplay.innerHTML = '<em style="color: #27ae60; font-size: 1.3em; font-weight: bold;">✅ 聽寫測試完成！</em>';
+                    document.querySelectorAll('.btn').forEach(btn => {
+                        btn.classList.add('hidden');
+                    });
                     
-                    // Focus back to speak button
-                    document.querySelector('.btn-speak').focus();
+                    const finishBtn = document.createElement('a');
+                    finishBtn.href = '{{ url_for("vocab_list") }}';
+                    finishBtn.className = 'btn';
+                    finishBtn.style.marginTop = '20px';
+                    finishBtn.textContent = '返回聽寫內容列表';
+                    document.getElementById('quiz-area').appendChild(finishBtn);
+                    isProcessing = false;
+                } else {
+                    console.log('Moving to next word');
+                    setTimeout(() => {
+                        currentIndex++;
+                        if (currentIndex < allWords.length) {
+                            currentWord = allWords[currentIndex];
+                            console.log('Updated to word index', currentIndex, 'word:', currentWord);
+                            
+                            document.getElementById('current-index').textContent = currentIndex + 1;
+                            speakCurrentWord();
+                            wordDisplay.innerHTML = '<em style="color: #95a5a6; font-size: 1.1em;">正在讀第' + (currentIndex + 1) + '個詞...</em>';
+                            
+                            document.querySelectorAll('.btn').forEach(btn => {
+                                btn.disabled = false;
+                            });
+                            
+                            isProcessing = false;
+                            document.querySelector('.btn-known').focus();
+                        }
+                    }, 2000);
                 }
             } catch (error) {
                 console.error('Error submitting answer:', error);
-                alert('提交答案时出现错误，请重试');
-                
-                // Re-enable buttons in case of error
+                alert('提交答案時出現錯誤，請重試：' + error.message);
                 document.querySelectorAll('.btn').forEach(btn => {
                     btn.disabled = false;
                 });
+                isProcessing = false;
             }
         }
     </script>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>編輯聽寫內容 - 詞彙學習助手</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .info-box {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        .content-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        .content-section:last-child {
+            border-bottom: none;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        .section-description {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            background-color: #f0f7ff;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 3px solid #3498db;
+        }
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+        .btn {
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 12px 20px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+            margin-top: 15px;
+        }
+        .btn-save {
+            background-color: #27ae60;
+            color: white;
+        }
+        .btn-save:hover {
+            background-color: #229954;
+        }
+        .btn-cancel {
+            background-color: #95a5a6;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-cancel:hover {
+            background-color: #7f8c8d;
+        }
+        .button-group {
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✏️ 編輯聽寫內容</h1>
+        
+        <div class="info-box">
+            <strong>語言：</strong> {{ language }}<br>
+            <strong>課程：</strong> {{ lesson_number }}
+        </div>
+
+        <form id="editForm" method="POST">
+            <!-- 詞語編輯部分 -->
+            {% if content.詞語 %}
+            <div class="content-section">
+                <div class="section-title">📝 詞語</div>
+                <div class="section-description">
+                    每行一個詞語。按 Enter 換行輸入下一個。
+                </div>
+                <textarea id="words-textarea" name="words" placeholder="輸入詞語（每行一個）">{% for word in content.詞語 %}{{ word.word }}
+{% endfor %}</textarea>
+            </div>
+            {% endif %}
+
+            <!-- 段落編輯部分 -->
+            {% if content.段落 %}
+            <div class="content-section">
+                <div class="section-title">📄 段落</div>
+                <div class="section-description">
+                    格式：【段落標題】<br>
+                    句子1<br>
+                    句子2<br>
+                    ...<br>
+                    <br>
+                    多個段落用空行分隔。
+                </div>
+                <textarea id="paragraphs-textarea" name="paragraphs" placeholder="輸入段落內容">{% for para in content.段落 %}【{{ para.title }}】
+{% for sent in para.sentences %}{{ sent.sentence }}
+{% endfor %}
+{% endfor %}</textarea>
+            </div>
+            {% endif %}
+
+            <div class="button-group">
+                <button type="button" class="btn btn-save" onclick="saveContent()">💾 保存</button>
+                <a href="{{ url_for('vocab_list') }}" class="btn btn-cancel">取消</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        async function saveContent() {
+            const wordsText = document.getElementById('words-textarea')?.value || '';
+            const paragraphsText = document.getElementById('paragraphs-textarea')?.value || '';
+            
+            // Parse words (each line is one word)
+            const words = wordsText
+                .split('\n')
+                .map(w => w.trim())
+                .filter(w => w.length > 0);
+            
+            // Parse paragraphs
+            const paragraphs = [];
+            const paraBlocks = paragraphsText.split('\n\n').filter(b => b.trim());
+            
+            for (const block of paraBlocks) {
+                const lines = block.trim().split('\n').map(l => l.trim()).filter(l => l);
+                if (lines.length === 0) continue;
+                
+                let titleLine = lines[0];
+                // Check if first line is a title (in format 【title】)
+                if (titleLine.startsWith('【') && titleLine.includes('】')) {
+                    const title = titleLine.substring(1, titleLine.indexOf('】'));
+                    const sentences = lines.slice(1);
+                    paragraphs.push({
+                        title: title,
+                        sentences: sentences
+                    });
+                }
+            }
+            
+            console.log('Parsed words:', words);
+            console.log('Parsed paragraphs:', paragraphs);
+            
+            // Send to server
+            try {
+                const response = await fetch('/save_content', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        language: '{{ language }}',
+                        lesson: '{{ lesson_number }}',
+                        words: words,
+                        paragraphs: paragraphs
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.status === 'success') {
+                    alert('內容已保存成功！');
+                    window.location.href = '{{ url_for("vocab_list") }}';
+                } else {
+                    alert('錯誤：' + result.message);
+                }
+            } catch (error) {
+                alert('保存失敗：' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
