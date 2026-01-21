@@ -378,8 +378,8 @@
         "sentences": [
           {
             "sentence": "每個人都有一個夢想在心中。",
-            "attempts": 3,
-            "correct": 3,
+            "attempts": 4,
+            "correct": 4,
             "incorrect": 0,
             "history": [
               {
@@ -393,14 +393,18 @@
               {
                 "timestamp": "2026-01-22 01:02:21",
                 "known": true
+              },
+              {
+                "timestamp": "2026-01-22 01:24:41",
+                "known": true
               }
             ]
           },
           {
             "sentence": "但是成功需要不懈的努力。",
-            "attempts": 3,
+            "attempts": 4,
             "correct": 2,
-            "incorrect": 1,
+            "incorrect": 2,
             "history": [
               {
                 "timestamp": "2026-01-22 00:40:17",
@@ -413,13 +417,17 @@
               {
                 "timestamp": "2026-01-22 01:02:29",
                 "known": true
+              },
+              {
+                "timestamp": "2026-01-22 01:24:47",
+                "known": false
               }
             ]
           },
           {
             "sentence": "永遠不要放棄你的夢想。",
-            "attempts": 3,
-            "correct": 2,
+            "attempts": 4,
+            "correct": 3,
             "incorrect": 1,
             "history": [
               {
@@ -433,13 +441,17 @@
               {
                 "timestamp": "2026-01-22 01:02:36",
                 "known": true
+              },
+              {
+                "timestamp": "2026-01-22 01:24:52",
+                "known": true
               }
             ]
           }
         ],
-        "attempts": 9,
-        "correct": 7,
-        "incorrect": 2,
+        "attempts": 12,
+        "correct": 9,
+        "incorrect": 3,
         "history": [
           {
             "timestamp": "2026-01-22 00:40:02",
@@ -475,6 +487,18 @@
           },
           {
             "timestamp": "2026-01-22 01:02:36",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 01:24:41",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 01:24:47",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 01:24:52",
             "known": true
           }
         ]
