@@ -358,6 +358,8 @@ def quiz_new(language, lesson_num):
     display_name = f"{language} - {lesson_num}"
     return render_template('quiz.html', 
                           lesson_name=display_name, 
+                          language=language,
+                          lesson_num=lesson_num,
                           word_count=len(words_to_practice),
                           current_word=words_to_practice[0] if words_to_practice else None,
                           words_json=words_json,
@@ -440,7 +442,7 @@ def submit_answer():
 
 @app.route('/review/<language>/<lesson_num>')
 def review_new(language, lesson_num):
-    """複習路由"""
+    """複習路由 - 显示词语和段落的复习选项"""
     language = unquote(language)
     lesson_num = unquote(lesson_num)
     
@@ -451,10 +453,17 @@ def review_new(language, lesson_num):
     
     lesson_content = data[language][lesson_num]
     
+    # Collect words needing review
     review_words = []
     if '詞語' in lesson_content:
         for item in lesson_content['詞語']:
-            accuracy = item['attempts'] > 0 and item['correct'] / item['attempts'] or 0
+            if item['attempts'] == 0:
+                accuracy = 0
+                accuracy_display = "未測試"
+            else:
+                accuracy = item['correct'] / item['attempts']
+                accuracy_display = round(accuracy * 100, 1)
+            
             if accuracy < 0.8:
                 review_words.append({
                     'word': item['word'],
@@ -462,19 +471,125 @@ def review_new(language, lesson_num):
                     'attempts': item['attempts'],
                     'correct': item['correct'],
                     'incorrect': item['incorrect'],
-                    'accuracy': round(accuracy * 100, 1)
+                    'accuracy': accuracy,
+                    'accuracy_display': accuracy_display
                 })
     
-    review_words.sort(key=lambda x: x['accuracy'])
+    # Collect paragraphs/sentences needing review
+    review_paragraphs = []
+    if '段落' in lesson_content:
+        for para in lesson_content['段落']:
+            para_info = {
+                'title': para.get('title', ''),
+                'sentences': []
+            }
+            for sent_item in para.get('sentences', []):
+                if sent_item['attempts'] == 0:
+                    accuracy = 0
+                    accuracy_display = "未測試"
+                else:
+                    accuracy = sent_item['correct'] / sent_item['attempts']
+                    accuracy_display = round(accuracy * 100, 1)
+                
+                if accuracy < 0.8:
+                    para_info['sentences'].append({
+                        'sentence': sent_item['sentence'],
+                        'attempts': sent_item['attempts'],
+                        'correct': sent_item['correct'],
+                        'incorrect': sent_item['incorrect'],
+                        'accuracy': accuracy,
+                        'accuracy_display': accuracy_display
+                    })
+            
+            if para_info['sentences']:
+                review_paragraphs.append(para_info)
+    
+    # Sort
+    review_words.sort(key=lambda x: (x['attempts'] > 0, x['accuracy']))
     
     display_name = f"{language} - {lesson_num}"
     return render_template('review.html', 
                           lesson_name=display_name, 
-                          review_words=review_words)
+                          language=language,
+                          lesson_num=lesson_num,
+                          review_words=review_words,
+                          review_paragraphs=review_paragraphs)
+
+@app.route('/review_quiz/<language>/<lesson_num>')
+def review_quiz(language, lesson_num):
+    """複習未掌握內容的聽寫測試 - 支持詞語和段落"""
+    language = unquote(language)
+    lesson_num = unquote(lesson_num)
+    content_type = request.args.get('content_type', '詞語').strip()
+    
+    data = load_data()
+    
+    if language not in data or lesson_num not in data[language]:
+        return "聽寫內容未找到", 404
+    
+    lesson_content = data[language][lesson_num]
+    
+    # Get only items that need review (accuracy < 0.8)
+    items_to_review = []
+    
+    if content_type == '詞語' and '詞語' in lesson_content:
+        for item in lesson_content['詞語']:
+            if item['attempts'] == 0:
+                accuracy = 0
+            else:
+                accuracy = item['correct'] / item['attempts']
+            
+            if accuracy < 0.8:
+                items_to_review.append(item['word'])
+    
+    elif content_type == '段落' and '段落' in lesson_content:
+        for para in lesson_content['段落']:
+            for sent_item in para.get('sentences', []):
+                if sent_item['attempts'] == 0:
+                    accuracy = 0
+                else:
+                    accuracy = sent_item['correct'] / sent_item['attempts']
+                
+                if accuracy < 0.8:
+                    items_to_review.append(sent_item['sentence'])
+    
+    if not items_to_review:
+        return render_template('review.html', 
+                              lesson_name=f"{language} - {lesson_num}",
+                              language=language,
+                              lesson_num=lesson_num,
+                              review_words=[],
+                              review_paragraphs=[],
+                              message=f"所有{content_type}已掌握，無需複習！")
+    
+    session.permanent = True
+    session['current_quiz'] = {
+        'language': language,
+        'lesson': lesson_num,
+        'content_type': content_type,
+        'words': items_to_review,
+        'current_index': 0,
+        'results': [],
+        'is_review': True
+    }
+    
+    import json as json_module
+    items_json = json_module.dumps(items_to_review, ensure_ascii=False)
+    
+    display_name = f"{language} - {lesson_num}"
+    return render_template('quiz.html', 
+                          lesson_name=display_name, 
+                          language=language,
+                          lesson_num=lesson_num,
+                          word_count=len(items_to_review),
+                          current_word=items_to_review[0] if items_to_review else None,
+                          words_json=items_json,
+                          content_type=content_type,
+                          is_review=True)
 
 @app.route('/api/lesson/<language>/<lesson_num>/stats')
-def lesson_stats_new(language, lesson_num):
-    """統計路由"""
+def lesson_stats_api(language, lesson_num):
+    """統計API - 返回JSON"""
     language = unquote(language)
     lesson_num = unquote(lesson_num)
     
@@ -489,14 +604,37 @@ def lesson_stats_new(language, lesson_num):
     mastered = 0
     needs_review = 0
     
+    # Count words (詞語)
     if '詞語' in lesson_content:
         for item in lesson_content['詞語']:
             total_items += 1
-            accuracy = item['attempts'] > 0 and item['correct'] / item['attempts'] or 0
-            if accuracy >= 0.8 and item['attempts'] > 0:
-                mastered += 1
+            
+            # Only count tested words (attempts > 0) for statistics
+            if item['attempts'] > 0:
+                accuracy = item['correct'] / item['attempts']
+                if accuracy >= 0.8:
+                    mastered += 1
+                else:
+                    needs_review += 1
             else:
+                # Untested words are counted in needs_review
                 needs_review += 1
+    
+    # Count sentences in paragraphs (段落)
+    if '段落' in lesson_content:
+        for para in lesson_content['段落']:
+            for sent in para.get('sentences', []):
+                total_items += 1
+                
+                if sent['attempts'] > 0:
+                    accuracy = sent['correct'] / sent['attempts']
+                    if accuracy >= 0.8:
+                        mastered += 1
+                    else:
+                        needs_review += 1
+                else:
+                    # Untested sentences are counted in needs_review
+                    needs_review += 1
     
     return jsonify({
         'total_words': total_items,
@@ -504,6 +642,122 @@ def lesson_stats_new(language, lesson_num):
         'needs_review': needs_review,
         'mastered_percentage': round((mastered / total_items) * 100, 1) if total_items > 0 else 0
     })
+
+@app.route('/stats/<language>/<lesson_num>')
+def lesson_stats_new(language, lesson_num):
+    """統計頁面 - 返回HTML"""
+    language = unquote(language)
+    lesson_num = unquote(lesson_num)
+    
+    data = load_data()
+    
+    if language not in data or lesson_num not in data[language]:
+        return "聽寫內容未找到", 404
+    
+    lesson_content = data[language][lesson_num]
+    
+    # Collect word statistics
+    word_stats = {
+        'total': 0,
+        'mastered': 0,
+        'needs_review': 0,
+        'words': []  # Changed from 'items' to 'words'
+    }
+    
+    if '詞語' in lesson_content:
+        for item in lesson_content['詞語']:
+            word_stats['total'] += 1
+            
+            if item['attempts'] == 0:
+                status = '未測試'
+                accuracy = 0
+                word_stats['needs_review'] += 1
+            else:
+                accuracy = item['correct'] / item['attempts']
+                if accuracy >= 0.8:
+                    status = '已掌握'
+                    word_stats['mastered'] += 1
+                else:
+                    status = '需複習'
+                    word_stats['needs_review'] += 1
+            
+            word_stats['words'].append({
+                'word': item['word'],
+                'meaning': item['meaning'],
+                'attempts': item['attempts'],
+                'correct': item['correct'],
+                'incorrect': item['incorrect'],
+                'accuracy': round(accuracy * 100, 1) if item['attempts'] > 0 else 0,
+                'status': status
+            })
+    
+    # Collect paragraph statistics
+    para_stats = {
+        'total': 0,
+        'mastered': 0,
+        'needs_review': 0,
+        'paragraphs': []
+    }
+    
+    if '段落' in lesson_content:
+        for para in lesson_content['段落']:
+            para_info = {
+                'title': para['title'],
+                'total': 0,
+                'mastered': 0,
+                'needs_review': 0,
+                'sentences': []
+            }
+            
+            for sent in para.get('sentences', []):
+                para_stats['total'] += 1
+                para_info['total'] += 1
+                
+                if sent['attempts'] == 0:
+                    status = '未測試'
+                    accuracy = 0
+                    para_stats['needs_review'] += 1
+                    para_info['needs_review'] += 1
+                else:
+                    accuracy = sent['correct'] / sent['attempts']
+                    if accuracy >= 0.8:
+                        status = '已掌握'
+                        para_stats['mastered'] += 1
+                        para_info['mastered'] += 1
+                    else:
+                        status = '需複習'
+                        para_stats['needs_review'] += 1
+                        para_info['needs_review'] += 1
+                
+                para_info['sentences'].append({
+                    'sentence': sent['sentence'],
+                    'attempts': sent['attempts'],
+                    'correct': sent['correct'],
+                    'incorrect': sent['incorrect'],
+                    'accuracy': round(accuracy * 100, 1) if sent['attempts'] > 0 else 0,
+                    'status': status
+                })
+            
+            para_stats['paragraphs'].append(para_info)
+    
+    # Calculate overall stats
+    total_items = word_stats['total'] + para_stats['total']
+    total_mastered = word_stats['mastered'] + para_stats['mastered']
+    total_needs_review = word_stats['needs_review'] + para_stats['needs_review']
+    overall_percentage = round((total_mastered / total_items) * 100, 1) if total_items > 0 else 0
+    
+    display_name = f"{language} - {lesson_num}"
+    
+    return render_template('stats.html',
+                          lesson_name=display_name,
+                          language=language,
+                          lesson_num=lesson_num,
+                          total_items=total_items,
+                          total_mastered=total_mastered,
+                          total_needs_review=total_needs_review,
+                          overall_percentage=overall_percentage,
+                          word_stats=word_stats,
+                          para_stats=para_stats)
 
 @app.route('/save_content', methods=['POST'])
 def save_content():

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>課程統計 - {{ lesson_name }} - 詞彙學習助手</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .lesson-title {
+            color: #7f8c8d;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+        }
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #3498db;
+        }
+        .card-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .card-label {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .section {
+            margin: 30px 0;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .section-title {
+            background-color: #34495e;
+            color: white;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .section-content {
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #ecf0f1;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        .status-mastered {
+            color: #27ae60;
+            font-weight: bold;
+            background-color: #d5f4e6;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .status-review {
+            color: #e74c3c;
+            font-weight: bold;
+            background-color: #fadbd8;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .status-untested {
+            color: #f39c12;
+            font-weight: bold;
+            background-color: #fdebd0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .accuracy-bar {
+            display: inline-block;
+            width: 80px;
+            height: 20px;
+            background-color: #ecf0f1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .accuracy-fill {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .paragraph-box {
+            background-color: #f9f9f9;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+        .paragraph-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .summary-text {
+            background-color: #eaf2f8;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            margin: 20px 0;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 5px;
+            transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .btn-back {
+            background-color: #95a5a6;
+        }
+        .btn-back:hover {
+            background-color: #7f8c8d;
+        }
+        .button-group {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 課程統計</h1>
+        <div class="lesson-title">{{ lesson_name }}</div>
+        
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-number">{{ total_items }}</div>
+                <div class="card-label">總項目數</div>
+            </div>
+            <div class="card">
+                <div class="card-number" style="color: #27ae60;">{{ total_mastered }}</div>
+                <div class="card-label">已掌握</div>
+            </div>
+            <div class="card">
+                <div class="card-number" style="color: #e74c3c;">{{ total_needs_review }}</div>
+                <div class="card-label">需要複習</div>
+            </div>
+            <div class="card">
+                <div class="card-number" style="color: #3498db;">{{ overall_percentage }}%</div>
+                <div class="card-label">掌握進度</div>
+            </div>
+        </div>
+        
+        {% if word_stats.total > 0 %}
+        <div class="section">
+            <div class="section-title">📝 詞語統計 ({{ word_stats.mastered }}/{{ word_stats.total }} 已掌握)</div>
+            <div class="section-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 20%;">詞語</th>
+                            <th style="width: 20%;">釋義</th>
+                            <th style="width: 15%;">嘗試次數</th>
+                            <th style="width: 15%;">準確率</th>
+                            <th style="width: 30%;">狀態</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for word in word_stats.words %}
+                        <tr>
+                            <td><strong>{{ word.word }}</strong></td>
+                            <td>{{ word.meaning }}</td>
+                            <td>{{ word.attempts }}</td>
+                            <td>
+                                {% if word.accuracy > 0 %}
+                                    <div class="accuracy-bar">
+                                        <div class="accuracy-fill" style="width: {{ word.accuracy }}%; background-color: {% if word.accuracy >= 80 %}#27ae60{% elif word.accuracy >= 50 %}#f39c12{% else %}#e74c3c{% endif %};">
+                                            {{ word.accuracy }}%
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <span style="color: #999;">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if word.status == '已掌握' %}
+                                    <span class="status-mastered">✓ {{ word.status }}</span>
+                                {% elif word.status == '需複習' %}
+                                    <span class="status-review">✗ {{ word.status }}</span>
+                                {% else %}
+                                    <span class="status-untested">⊘ {{ word.status }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if para_stats.total > 0 %}
+        <div class="section">
+            <div class="section-title">📄 段落統計 ({{ para_stats.mastered }}/{{ para_stats.total }} 已掌握)</div>
+            <div class="section-content">
+                {% for para in para_stats.paragraphs %}
+                <div class="paragraph-box">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 50%;">句子</th>
+                                <th style="width: 15%;">嘗試次數</th>
+                                <th style="width: 15%;">準確率</th>
+                                <th style="width: 20%;">狀態</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sent in para.sentences %}
+                            <tr>
+                                <td>{{ sent.sentence }}</td>
+                                <td>{{ sent.attempts }}</td>
+                                <td>
+                                    {% if sent.accuracy > 0 %}
+                                        <div class="accuracy-bar">
+                                            <div class="accuracy-fill" style="width: {{ sent.accuracy }}%; background-color: {% if sent.accuracy >= 80 %}#27ae60{% elif sent.accuracy >= 50 %}#f39c12{% else %}#e74c3c{% endif %};">
+                                                {{ sent.accuracy }}%
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <span style="color: #999;">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if sent.status == '已掌握' %}
+                                        <span class="status-mastered">✓ {{ sent.status }}</span>
+                                    {% elif sent.status == '需複習' %}
+                                        <span class="status-review">✗ {{ sent.status }}</span>
+                                    {% else %}
+                                        <span class="status-untested">⊘ {{ sent.status }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="summary-text">
+            <strong>統計摘要：</strong><br>
+            共 <strong>{{ total_items }}</strong> 個項目，已掌握 <strong>{{ total_mastered }}</strong> 個（<strong>{{ overall_percentage }}%</strong>）。
+            {% if total_needs_review > 0 %}
+                還有 <strong>{{ total_needs_review }}</strong> 個項目需要複習或尚未測試。
+            {% else %}
+                🎉 恭喜！所有項目都已掌握！
+            {% endif %}
+        </div>
+        
+        <div class="button-group">
+            <a href="{{ url_for('quiz_new', language=language, lesson_num=lesson_num) }}?content_type=詞語" class="btn">🎙️ 練習詞語</a>
+            <a href="{{ url_for('quiz_new', language=language, lesson_num=lesson_num) }}?content_type=段落" class="btn">🎙️ 練習段落</a>
+            <a href="{{ url_for('review_new', language=language, lesson_num=lesson_num) }}" class="btn">🔄 查看複習內容</a>
+            <a href="{{ url_for('vocab_list') }}" class="btn btn-back">返回課程列表</a>
+            <a href="{{ url_for('index') }}" class="btn btn-back">返回首頁</a>
+        </div>
+    </div>
+</body>
+</html>

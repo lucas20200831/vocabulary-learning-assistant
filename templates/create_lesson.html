@@ -269,11 +269,7 @@
                 <div id="paragraphs-section" class="hidden">
                     <div class="instructions">
                         <h4>📝 段落輸入說明</h4>
-                        <p>每個段落需要：</p>
-                        <ul>
-                            <li>段落標題（例如：家庭介紹）</li>
-                            <li>句子 - 每行一個句子，系統將逐句進行聽寫</li>
-                        </ul>
+                        <p>輸入段落文本 - 系統會自動根據句號、逗號分句，每句少於5個字會自動併入下一句。</p>
                         <p>您可以添加多個段落，每個段落會分開處理。</p>
                     </div>
                     <div id="paragraphs-list"></div>
@@ -392,14 +388,9 @@
                             return false;
                         }
                         for (let para of paragraphs) {
-                            const title = para.querySelector('input[name="paragraph_title"]').value.trim();
-                            const sentences = para.querySelectorAll('input[name="paragraph_sentence"]');
-                            if (!title) {
-                                alert('請輸入段落標題');
-                                return false;
-                            }
-                            if (sentences.length === 0 || !Array.from(sentences).some(s => s.value.trim())) {
-                                alert('請為每個段落至少輸入一個句子');
+                            const content = para.querySelector('textarea[name="paragraph_content"]').value.trim();
+                            if (!content) {
+                                alert('請輸入段落內容');
                                 return false;
                             }
                         }
@@ -421,45 +412,42 @@
             paragraphDiv.innerHTML = `
                 <h4>段落 ${index + 1}</h4>
                 <div class="form-group">
-                    <label>段落標題:</label>
-                    <input type="text" name="paragraph_title" placeholder="例如：家庭介紹" required>
-                </div>
-                <div class="form-group">
-                    <label>句子:</label>
-                    <div id="sentences-list-${index}"></div>
-                    <button type="button" class="btn" onclick="addSentence(${index})" style="margin-top: 10px;">➕ 添加句子</button>
+                    <label>段落內容 (會自動根據句號或逗號分句):</label>
+                    <textarea name="paragraph_content" placeholder="輸入段落文本，系統會自動分句。每句少於5個字會自動併入下一句。" required></textarea>
                 </div>
                 <button type="button" class="remove-btn" onclick="removeParagraph(${index})">🗑️ 刪除段落</button>
             `;
             
             container.appendChild(paragraphDiv);
-            addSentence(index);
-        }
-
-        function addSentence(paragraphIndex) {
-            const sentenceList = document.getElementById(`sentences-list-${paragraphIndex}`);
-            const sentenceIndex = sentenceList.children.length;
-            
-            const sentenceDiv = document.createElement('div');
-            sentenceDiv.className = 'sentence-input';
-            sentenceDiv.id = `sentence-${paragraphIndex}-${sentenceIndex}`;
-            
-            sentenceDiv.innerHTML = `
-                <div style="display: flex; gap: 10px; margin-bottom: 8px;">
-                    <input type="text" name="paragraph_sentence" placeholder="輸入句子 ${sentenceIndex + 1}" style="flex: 1;" required>
-                    ${sentenceIndex > 0 ? `<button type="button" class="remove-sentence-btn" onclick="removeSentence(${paragraphIndex}, ${sentenceIndex})">✕</button>` : ''}
-                </div>
-            `;
-            
-            sentenceList.appendChild(sentenceDiv);
-        }
-
-        function removeSentence(paragraphIndex, sentenceIndex) {
-            document.getElementById(`sentence-${paragraphIndex}-${sentenceIndex}`).remove();
         }
 
         function removeParagraph(paragraphIndex) {
             document.getElementById(`paragraph-${paragraphIndex}`).remove();
+        }
+
+        // 句子格式化函數
+        function formatSentences(text) {
+            // 按句號或逗號分割
+            let sentences = text
+                .split(/[。，、]/g)
+                .map(s => s.trim())
+                .filter(s => s.length > 0);
+            
+            // 合併少於5個字的句子
+            const result = [];
+            for (let i = 0; i < sentences.length; i++) {
+                if (i === sentences.length - 1) {
+                    // 最後一句
+                    result.push(sentences[i]);
+                } else if (sentences[i].length < 5) {
+                    // 如果少於5個字，與下一句合併
+                    sentences[i + 1] = sentences[i] + sentences[i + 1];
+                } else {
+                    result.push(sentences[i]);
+                }
+            }
+            
+            return result;
         }
 
         function generateSummary() {
@@ -489,10 +477,9 @@
                 const paragraphs = document.querySelectorAll('.paragraph-item');
                 summary += `<p><strong>段落數量：</strong> ${paragraphs.length}</p>`;
                 paragraphs.forEach((para, idx) => {
-                    const title = para.querySelector('input[name="paragraph_title"]').value;
-                    const sentences = para.querySelectorAll('input[name="paragraph_sentence"]');
-                    const sentenceCount = Array.from(sentences).filter(s => s.value.trim()).length;
-                    summary += `<p><strong>段落 ${idx + 1}：${title}</strong> (${sentenceCount} 句)</p>`;
+                    const content = para.querySelector('textarea[name="paragraph_content"]').value;
+                    const sentences = formatSentences(content);
+                    summary += `<p><strong>段落 ${idx + 1}</strong> (${sentences.length} 句)</p>`;
                 });
             }
             
@@ -525,12 +512,16 @@
                 data.words = words;
             } else if (contentType === '段落') {
                 const paragraphs = [];
-                document.querySelectorAll('.paragraph-item').forEach(para => {
-                    const title = para.querySelector('input[name="paragraph_title"]').value;
-                    const sentences = Array.from(para.querySelectorAll('input[name="paragraph_sentence"]'))
-                        .map(s => s.value.trim())
-                        .filter(s => s);
-                    paragraphs.push({ title, sentences });
+                document.querySelectorAll('.paragraph-item').forEach((para, idx) => {
+                    const content = para.querySelector('textarea[name="paragraph_content"]').value.trim();
+                    
+                    if (content) {
+                        // 格式化句子
+                        const sentences = formatSentences(content);
+                        if (sentences.length > 0) {
+                            paragraphs.push({ title: `段落${idx + 1}`, sentences });
+                        }
+                    }
                 });
                 data.paragraphs = paragraphs;
             }

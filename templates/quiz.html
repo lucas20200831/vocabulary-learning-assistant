@@ -149,9 +149,9 @@
         let results = [];
         let isProcessing = false;  // Flag to prevent double submission
         
-        // Extract language and lesson from page content (these are passed from Flask)
-        const lessonName = '{{ lesson_name }}';  // Already formatted as "語言 - 課程"
-        const [language, lesson] = lessonName.split(' - ').map(s => s.trim());
+        // Use language and lesson directly from Flask context
+        const language = '{{ language }}';
+        const lesson = '{{ lesson_num }}';
         const contentType = '{{ content_type }}' || '詞語';  // Content type from Flask
         
         console.log('Quiz initialized:', {totalWords, allWords, currentWord, language, lesson, contentType});

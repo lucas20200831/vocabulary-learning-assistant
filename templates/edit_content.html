@@ -101,6 +101,116 @@
             text-align: center;
             margin-top: 30px;
         }
+        .paragraph-item {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+            position: relative;
+        }
+        .paragraph-item h4 {
+            color: #2c3e50;
+            margin: 0 0 15px 0;
+            font-size: 16px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #34495e;
+            font-size: 14px;
+        }
+        .form-group input[type="text"],
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+        .sentence-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+        .sentence-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 5px;
+            transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .btn-save {
+            background-color: #27ae60;
+            font-size: 16px;
+            padding: 12px 30px;
+        }
+        .btn-save:hover {
+            background-color: #229954;
+        }
+        .btn-cancel {
+            background-color: #95a5a6;
+        }
+        .btn-cancel:hover {
+            background-color: #7f8c8d;
+        }
+        .btn-add-sentence {
+            background-color: #f39c12;
+            padding: 8px 15px;
+            font-size: 13px;
+        }
+        .btn-add-sentence:hover {
+            background-color: #e67e22;
+        }
+        .remove-btn,
+        .remove-sentence-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.3s;
+        }
+        .remove-btn:hover,
+        .remove-sentence-btn:hover {
+            background-color: #c0392b;
+        }
+        .add-paragraph-btn {
+            background-color: #f39c12;
+            margin-top: 15px;
+            font-size: 15px;
+        }
+        .add-paragraph-btn:hover {
+            background-color: #e67e22;
+        }
     </style>
 </head>
 <body>
@@ -129,18 +239,8 @@
             {% if content.段落 %}
             <div class="content-section">
                 <div class="section-title">📄 段落</div>
-                <div class="section-description">
-                    格式：【段落標題】<br>
-                    句子1<br>
-                    句子2<br>
-                    ...<br>
-                    <br>
-                    多個段落用空行分隔。
-                </div>
-                <textarea id="paragraphs-textarea" name="paragraphs" placeholder="輸入段落內容">{% for para in content.段落 %}【{{ para.title }}】
-{% for sent in para.sentences %}{{ sent.sentence }}
-{% endfor %}
-{% endfor %}</textarea>
+                <div id="paragraphs-list"></div>
+                <button type="button" class="btn add-paragraph-btn" onclick="addParagraph()">➕ 添加新段落</button>
             </div>
             {% endif %}
 
@@ -152,9 +252,101 @@
     </div>
 
     <script>
+        let paragraphCount = 0;
+
+        // Initialize paragraphs on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const paragraphsList = document.getElementById('paragraphs-list');
+            if (paragraphsList) {
+                // Load existing paragraphs from template data
+                const existingParagraphs = {{ content.段落|tojson|safe if content.段落 else '[]' }};
+                if (existingParagraphs.length > 0) {
+                    existingParagraphs.forEach((para, index) => {
+                        addParagraphFromData(para, index);
+                    });
+                    paragraphCount = existingParagraphs.length;
+                } else {
+                    addParagraph();
+                }
+            }
+        });
+
+        function addParagraph() {
+            const container = document.getElementById('paragraphs-list');
+            const index = paragraphCount++;
+            
+            const paragraphDiv = document.createElement('div');
+            paragraphDiv.className = 'paragraph-item';
+            paragraphDiv.id = `paragraph-${index}`;
+            
+            paragraphDiv.innerHTML = `
+                <h4>段落 ${index + 1}</h4>
+                <div class="form-group">
+                    <label>段落內容 (會自動根據句號或逗號分句):</label>
+                    <textarea name="paragraph_content" placeholder="輸入段落文本，系統會自動分句。每句少於5個字會自動併入下一句。" required></textarea>
+                </div>
+                <button type="button" class="remove-btn" onclick="removeParagraph(${index})">🗑️ 刪除段落</button>
+            `;
+            
+            container.appendChild(paragraphDiv);
+        }
+
+        function addParagraphFromData(paraData, index) {
+            const container = document.getElementById('paragraphs-list');
+            
+            // 合併句子成原始文本
+            const contentText = paraData.sentences
+                .map(s => s.sentence || s)
+                .join('。');
+            
+            const paragraphDiv = document.createElement('div');
+            paragraphDiv.className = 'paragraph-item';
+            paragraphDiv.id = `paragraph-${index}`;
+            
+            paragraphDiv.innerHTML = `
+                <h4>段落 ${index + 1}</h4>
+                <div class="form-group">
+                    <label>段落內容 (會自動根據句號或逗號分句):</label>
+                    <textarea name="paragraph_content" placeholder="輸入段落文本，系統會自動分句。" required>${contentText}</textarea>
+                </div>
+                <button type="button" class="remove-btn" onclick="removeParagraph(${index})">🗑️ 刪除段落</button>
+            `;
+            
+            container.appendChild(paragraphDiv);
+        }
+
+        function removeParagraph(paragraphIndex) {
+            document.getElementById(`paragraph-${paragraphIndex}`).remove();
+        }
+
+        // 句子格式化函數
+        function formatSentences(text) {
+            // 按句號或逗號分割
+            let sentences = text
+                .split(/[。，、]/g)
+                .map(s => s.trim())
+                .filter(s => s.length > 0);
+            
+            // 合併少於5個字的句子
+            const result = [];
+            for (let i = 0; i < sentences.length; i++) {
+                if (i === sentences.length - 1) {
+                    // 最後一句
+                    result.push(sentences[i]);
+                } else if (sentences[i].length < 5) {
+                    // 如果少於5個字，與下一句合併
+                    sentences[i + 1] = sentences[i] + sentences[i + 1];
+                } else {
+                    result.push(sentences[i]);
+                }
+            }
+            
+            return result;
+        }
+
         async function saveContent() {
             const wordsText = document.getElementById('words-textarea')?.value || '';
-            const paragraphsText = document.getElementById('paragraphs-textarea')?.value || '';
+            const paragraphsList = document.getElementById('paragraphs-list');
             
             // Parse words (each line is one word)
             const words = wordsText
@@ -164,21 +356,26 @@
             
             // Parse paragraphs
             const paragraphs = [];
-            const paraBlocks = paragraphsText.split('\n\n').filter(b => b.trim());
+            const paragraphItems = paragraphsList?.querySelectorAll('.paragraph-item') || [];
             
-            for (const block of paraBlocks) {
-                const lines = block.trim().split('\n').map(l => l.trim()).filter(l => l);
-                if (lines.length === 0) continue;
+            for (const paraItem of paragraphItems) {
+                const contentInput = paraItem.querySelector('textarea[name="paragraph_content"]');
                 
-                let titleLine = lines[0];
-                // Check if first line is a title (in format 【title】)
-                if (titleLine.startsWith('【') && titleLine.includes('】')) {
-                    const title = titleLine.substring(1, titleLine.indexOf('】'));
-                    const sentences = lines.slice(1);
-                    paragraphs.push({
-                        title: title,
-                        sentences: sentences
-                    });
+                if (contentInput) {
+                    const content = contentInput.value.trim();
+                    
+                    if (content) {
+                        // 格式化句子
+                        const sentences = formatSentences(content);
+                        
+                        if (sentences.length > 0) {
+                            const index = paragraphs.length + 1;
+                            paragraphs.push({
+                                title: `段落${index}`,
+                                sentences: sentences
+                            });
+                        }
+                    }
                 }
             }
             

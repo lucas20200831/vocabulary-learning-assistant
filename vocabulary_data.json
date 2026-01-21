@@ -5,56 +5,20 @@
         {
           "word": "媽媽",
           "meaning": "",
-          "attempts": 12,
-          "correct": 12,
+          "attempts": 3,
+          "correct": 3,
           "incorrect": 0,
           "history": [
             {
-              "timestamp": "2026-01-21 01:14:33",
+              "timestamp": "2026-01-21 13:30:12",
               "known": true
             },
             {
-              "timestamp": "2026-01-21 01:17:23",
+              "timestamp": "2026-01-21 13:47:31",
               "known": true
             },
             {
-              "timestamp": "2026-01-21 01:18:52",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:26:07",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:26:17",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:28:20",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:32:21",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:33:05",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:33:33",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:39:37",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:41:48",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:47:03",
+              "timestamp": "2026-01-21 13:49:11",
               "known": true
             }
           ]
@@ -62,56 +26,28 @@
         {
           "word": "爸爸",
           "meaning": "",
-          "attempts": 12,
-          "correct": 11,
-          "incorrect": 1,
+          "attempts": 5,
+          "correct": 2,
+          "incorrect": 3,
           "history": [
             {
-              "timestamp": "2026-01-21 01:14:33",
+              "timestamp": "2026-01-21 13:30:16",
+              "known": false
+            },
+            {
+              "timestamp": "2026-01-21 13:47:34",
+              "known": false
+            },
+            {
+              "timestamp": "2026-01-21 13:49:14",
               "known": true
             },
             {
-              "timestamp": "2026-01-21 01:17:23",
+              "timestamp": "2026-01-21 17:18:35",
               "known": true
             },
             {
-              "timestamp": "2026-01-21 01:18:52",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:26:07",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:26:17",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:28:20",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:32:21",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:33:05",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:33:33",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:39:37",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:41:51",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:47:09",
+              "timestamp": "2026-01-21 17:30:21",
               "known": false
             }
           ]
@@ -119,56 +55,28 @@
         {
           "word": "哥哥",
           "meaning": "",
-          "attempts": 12,
-          "correct": 10,
-          "incorrect": 2,
+          "attempts": 5,
+          "correct": 2,
+          "incorrect": 3,
           "history": [
             {
-              "timestamp": "2026-01-21 01:14:33",
+              "timestamp": "2026-01-21 13:30:19",
               "known": true
             },
             {
-              "timestamp": "2026-01-21 01:17:23",
+              "timestamp": "2026-01-21 13:47:36",
               "known": true
             },
             {
-              "timestamp": "2026-01-21 01:18:52",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:26:07",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:26:17",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:28:20",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:32:21",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:33:05",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:33:33",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:39:37",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:41:54",
+              "timestamp": "2026-01-21 13:49:17",
               "known": false
             },
             {
-              "timestamp": "2026-01-21 01:47:11",
+              "timestamp": "2026-01-21 17:18:40",
+              "known": false
+            },
+            {
+              "timestamp": "2026-01-21 17:30:24",
               "known": false
             }
           ]
@@ -176,67 +84,31 @@
         {
           "word": "妹妹",
           "meaning": "",
-          "attempts": 12,
-          "correct": 12,
-          "incorrect": 0,
+          "attempts": 5,
+          "correct": 3,
+          "incorrect": 2,
           "history": [
             {
-              "timestamp": "2026-01-21 01:14:33",
+              "timestamp": "2026-01-21 13:30:22",
+              "known": false
+            },
+            {
+              "timestamp": "2026-01-21 13:47:39",
               "known": true
             },
             {
-              "timestamp": "2026-01-21 01:17:23",
+              "timestamp": "2026-01-21 13:49:21",
               "known": true
             },
             {
-              "timestamp": "2026-01-21 01:18:52",
+              "timestamp": "2026-01-21 17:18:44",
               "known": true
             },
             {
-              "timestamp": "2026-01-21 01:26:07",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:26:17",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:28:20",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:32:21",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:33:05",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:33:33",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:39:37",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:41:56",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:47:15",
-              "known": true
+              "timestamp": "2026-01-21 17:30:27",
+              "known": false
             }
           ]
-        },
-        {
-          "word": "姐姐",
-          "meaning": "",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
         }
       ],
       "段落": [
@@ -245,84 +117,64 @@
           "sentences": [
             {
               "sentence": "我有一個媽媽和一個爸爸。",
-              "attempts": 5,
-              "correct": 5,
+              "attempts": 2,
+              "correct": 2,
               "incorrect": 0,
               "history": [
                 {
-                  "timestamp": "2026-01-21 01:36:22",
+                  "timestamp": "2026-01-21 17:30:47",
                   "known": true
                 },
                 {
-                  "timestamp": "2026-01-21 01:36:56",
-                  "known": true
-                },
-                {
-                  "timestamp": "2026-01-21 01:37:40",
-                  "known": true
-                },
-                {
-                  "timestamp": "2026-01-21 01:42:05",
-                  "known": true
-                },
-                {
-                  "timestamp": "2026-01-21 01:58:16",
+                  "timestamp": "2026-01-21 17:37:50",
                   "known": true
                 }
               ]
             },
             {
               "sentence": "我還有一個哥哥和一個妹妹。",
-              "attempts": 4,
+              "attempts": 2,
               "correct": 0,
-              "incorrect": 4,
+              "incorrect": 2,
               "history": [
                 {
-                  "timestamp": "2026-01-21 01:36:56",
+                  "timestamp": "2026-01-21 17:30:52",
                   "known": false
                 },
                 {
-                  "timestamp": "2026-01-21 01:38:05",
-                  "known": false
-                },
-                {
-                  "timestamp": "2026-01-21 01:42:08",
-                  "known": false
-                },
-                {
-                  "timestamp": "2026-01-21 01:58:21",
+                  "timestamp": "2026-01-21 17:37:53",
                   "known": false
                 }
               ]
             },
             {
               "sentence": "我們一家人都很快樂。",
-              "attempts": 3,
-              "correct": 3,
-              "incorrect": 0,
+              "attempts": 2,
+              "correct": 0,
+              "incorrect": 2,
               "history": [
                 {
-                  "timestamp": "2026-01-21 01:36:56",
-                  "known": true
+                  "timestamp": "2026-01-21 17:31:00",
+                  "known": false
                 },
                 {
-                  "timestamp": "2026-01-21 01:38:09",
-                  "known": true
-                },
-                {
-                  "timestamp": "2026-01-21 01:42:17",
-                  "known": true
+                  "timestamp": "2026-01-21 17:37:58",
+                  "known": false
                 }
               ]
             },
             {
               "sentence": "你是个坏人。",
-              "attempts": 1,
+              "attempts": 2,
               "correct": 0,
-              "incorrect": 1,
+              "incorrect": 2,
               "history": [
                 {
-                  "timestamp": "2026-01-21 01:42:22",
+                  "timestamp": "2026-01-21 17:31:05",
+                  "known": false
+                },
+                {
+                  "timestamp": "2026-01-21 17:38:01",
                   "known": false
                 }
               ]
@@ -336,87 +188,42 @@
         {
           "word": "書",
           "meaning": "印刷品",
-          "attempts": 2,
-          "correct": 2,
+          "attempts": 0,
+          "correct": 0,
           "incorrect": 0,
-          "history": [
-            {
-              "timestamp": "2026-01-21 01:15:08",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:19:18",
-              "known": true
-            }
-          ]
+          "history": []
         },
         {
           "word": "筆",
           "meaning": "書寫工具",
-          "attempts": 2,
-          "correct": 1,
-          "incorrect": 1,
-          "history": [
-            {
-              "timestamp": "2026-01-21 01:15:17",
-              "known": false
-            },
-            {
-              "timestamp": "2026-01-21 01:19:23",
-              "known": true
-            }
-          ]
+          "attempts": 0,
+          "correct": 0,
+          "incorrect": 0,
+          "history": []
         },
         {
           "word": "桌子",
           "meaning": "家具",
-          "attempts": 2,
-          "correct": 2,
+          "attempts": 0,
+          "correct": 0,
           "incorrect": 0,
-          "history": [
-            {
-              "timestamp": "2026-01-21 01:15:22",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:19:26",
-              "known": true
-            }
-          ]
+          "history": []
         },
         {
           "word": "椅子",
           "meaning": "座椅",
-          "attempts": 2,
-          "correct": 1,
-          "incorrect": 1,
-          "history": [
-            {
-              "timestamp": "2026-01-21 01:15:28",
-              "known": false
-            },
-            {
-              "timestamp": "2026-01-21 01:19:29",
-              "known": true
-            }
-          ]
+          "attempts": 0,
+          "correct": 0,
+          "incorrect": 0,
+          "history": []
         },
         {
           "word": "教室",
           "meaning": "上課的房間",
-          "attempts": 2,
-          "correct": 2,
+          "attempts": 0,
+          "correct": 0,
           "incorrect": 0,
-          "history": [
-            {
-              "timestamp": "2026-01-21 01:15:32",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 01:19:32",
-              "known": true
-            }
-          ]
+          "history": []
         }
       ],
       "段落": [
