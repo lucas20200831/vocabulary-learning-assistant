@@ -74,27 +74,24 @@
     <div class="container">
         <h1>📚 詞彙學習助手</h1>
         
-        <div class="card">
-            <h2>📖 聽寫內容管理</h2>
-            <p>輸入和管理聽寫內容，新增詞語或段落用於聽寫測試。</p>
-            <a href="{{ url_for('create_lesson') }}" class="btn btn-create">輸入新的內容</a>
-            <a href="{{ url_for('vocab_list') }}" class="btn">查看所有聽寫內容</a>
-        </div>
-        
-        <div class="card">
-            <h2>✍️ 聽寫測試</h2>
-            <p>選擇聽寫內容進行測試，檢驗掌握情況。</p>
-            <a href="{{ url_for('vocab_list') }}" class="btn">開始聽寫</a>
-        </div>
-        
-        <div class="card">
-            <h2>🔄 鞏固複習</h2>
-            <p>針對未掌握的項目進行重點複習，提升記憶效果。</p>
-            <a href="{{ url_for('vocab_list') }}" class="btn btn-review">開始複習</a>
-        </div>
-        
-        <div class="nav-links">
-            <a href="{{ url_for('vocab_list') }}" class="btn btn-stats">📊 查看統計</a>
+        <div style="text-align: center; padding: 40px 20px;">
+            <p style="font-size: 18px; color: #555; margin-bottom: 30px;">
+                歡迎使用詞彙學習助手。<br>
+                通過聽寫、統計和複習來鞏固您的詞彙知識。
+            </p>
+            
+            <a href="{{ url_for('vocab_list') }}" class="btn" style="padding: 16px 40px; font-size: 18px; background-color: #3498db;">
+                📖 進入課程列表
+            </a>
+            
+            <p style="margin-top: 40px; color: #999; font-size: 14px;">
+                在課程列表中您可以：<br>
+                • 輸入新的詞語和段落<br>
+                • 進行聽寫練習<br>
+                • 查看學習統計<br>
+                • 複習未掌握的內容<br>
+                • 編輯和刪除課程
+            </p>
         </div>
     </div>
 </body>

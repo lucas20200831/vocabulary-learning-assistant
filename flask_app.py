@@ -1,8 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session, send_file
 from urllib.parse import unquote
 import json
 import os
 from datetime import datetime, timedelta
+import hashlib
+import threading
+from queue import Queue
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
@@ -12,6 +15,58 @@ app.config['SESSION_COOKIE_SECURE'] = False
 app.config['SESSION_COOKIE_HTTPONLY'] = False
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
+
+# Disable auto-reload to prevent duplicate TTS threads
+app.config['ENV'] = 'production'
+
+# 配置静态文件路径
+AUDIO_DIR = os.path.join(os.path.dirname(__file__), 'static', 'audio')
+if not os.path.exists(AUDIO_DIR):
+    os.makedirs(AUDIO_DIR)
+
+# 初始化文字转语音引擎和后台线程
+tts_engine = True  # gTTS 总是可用的（无需初始化）
+tts_queue = Queue()
+tts_thread = None
+
+def init_tts():
+    """初始化 TTS 后台线程"""
+    global tts_thread
+    try:
+        from gtts import gTTS
+        print("[TTS] gTTS library imported successfully")
+        
+        # 启动多个后台 TTS 线程以加速处理
+        def tts_worker():
+            """后台处理 TTS 任务"""
+            while True:
+                try:
+                    word, audio_file = tts_queue.get()
+                    if word is None:  # 停止信号
+                        break
+                    # 检查文件是否已存在
+                    if not os.path.exists(audio_file):
+                        print(f"[TTS] Generating: {word}")
+                        tts = gTTS(text=word, lang='zh-CN', slow=False)
+                        tts.save(audio_file)
+                        print(f"[TTS] Generated: {word}")
+                    tts_queue.task_done()
+                except Exception as e:
+                    print(f"[TTS] Worker Error: {str(e)}")
+                    tts_queue.task_done()
+        
+        # 启动 3 个后台线程，并行生成音频（3倍速度）
+        for i in range(3):
+            tts_thread = threading.Thread(target=tts_worker, daemon=True)
+            tts_thread.start()
+        print("[TTS] Engine initialized with gTTS (3 worker threads)")
+        
+    except ImportError:
+        tts_engine = None
+        print("Warning: gTTS not installed, TTS will be disabled")
+
+# 初始化 TTS
+init_tts()
 
 DATA_FILE = 'vocabulary_data.json'
 
@@ -35,70 +90,89 @@ def index():
 def vocab_list():
     data = load_data()
     # Transform data for template: organize by language and lesson
+    # Support both old structure (language -> lessons) and new structure (direct lessons)
     contents = []
-    for language, lessons in data.items():
-        for lesson_num, lesson_content in lessons.items():
-            # Check if this is new structure (has '詞語' and '段落' keys)
-            if isinstance(lesson_content, dict) and ('詞語' in lesson_content or '段落' in lesson_content):
-                word_count = len(lesson_content.get('詞語', []))
-                para_count = len(lesson_content.get('段落', []))
+    
+    for key, value in data.items():
+        # Determine if this is a language key (with nested lessons) or a lesson key (with content)
+        if isinstance(value, dict):
+            # Check if it looks like a lesson (has '詞語' and/or '段落' keys)
+            if ('詞語' in value or '段落' in value):
+                # This is a new-format lesson (no language hierarchy)
+                word_count = len(value.get('詞語', []))
+                para_count = len(value.get('段落', []))
                 contents.append({
-                    'language': language,
-                    'lesson_number': lesson_num,
+                    'language': '',  # Empty for new format
+                    'lesson_number': key,
                     'word_count': word_count,
                     'para_count': para_count,
-                    'content': lesson_content
+                    'content': value,
+                    'is_simple': True
                 })
-            # Handle old structure for backward compatibility
             else:
-                word_count = len(lesson_content) if isinstance(lesson_content, dict) else 0
-                contents.append({
-                    'language': language,
-                    'lesson_number': lesson_num,
-                    'word_count': word_count,
-                    'para_count': 0,
-                    'content': lesson_content
-                })
+                # This looks like a language key with nested lessons (old format)
+                for lesson_num, lesson_content in value.items():
+                    if isinstance(lesson_content, dict) and ('詞語' in lesson_content or '段落' in lesson_content):
+                        word_count = len(lesson_content.get('詞語', []))
+                        para_count = len(lesson_content.get('段落', []))
+                        contents.append({
+                            'language': key,
+                            'lesson_number': lesson_num,
+                            'word_count': word_count,
+                            'para_count': para_count,
+                            'content': lesson_content,
+                            'is_simple': False
+                        })
+                    else:
+                        word_count = len(lesson_content) if isinstance(lesson_content, dict) else 0
+                        contents.append({
+                            'language': key,
+                            'lesson_number': lesson_num,
+                            'word_count': word_count,
+                            'para_count': 0,
+                            'content': lesson_content,
+                            'is_simple': False
+                        })
     
     return render_template('vocab_list.html', contents=contents)
 
+@app.route('/tts/<word>')
+def generate_tts(word):
+    """获取或生成音频文件 URL"""
+    if not tts_engine:
+        return jsonify({'error': 'TTS engine not available'}), 500
+    
+    try:
+        # 解码 URL 编码的词语
+        word = unquote(word)
+        
+        # 生成文件名（使用MD5哈希避免重复生成）
+        word_hash = hashlib.md5(word.encode('utf-8')).hexdigest()
+        audio_file = os.path.join(AUDIO_DIR, f'{word_hash}.mp3')
+        
+        # 检查缓存中是否已有该音频文件
+        file_exists = os.path.exists(audio_file)
+        
+        if not file_exists:
+            # 将任务加入队列，由后台线程处理
+            tts_queue.put((word, audio_file))
+        
+        audio_url = f'/static/audio/{word_hash}.mp3'
+        
+        # 立即返回 URL，不等待生成完成
+        return jsonify({
+            'success': True,
+            'url': audio_url,
+            'cached': file_exists
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/create_lesson', methods=['GET', 'POST'])
 def create_lesson():
-    """Create new lesson with new data structure"""
-    if request.method == 'POST':
-        language = request.form.get('language', '').strip()
-        lesson_name = request.form.get('lesson_name', '').strip()
-        words_input = request.form.get('words_input', '').strip()
-        
-        if language and lesson_name and words_input:
-            data = load_data()
-            
-            if language not in data:
-                data[language] = {}
-            
-            # Parse words and create new data structure
-            words_list = []
-            for line in words_input.split('\n'):
-                word = line.strip()
-                if word:
-                    words_list.append({
-                        'word': word,
-                        'meaning': '',
-                        'attempts': 0,
-                        'correct': 0,
-                        'incorrect': 0,
-                        'history': []
-                    })
-            
-            data[language][lesson_name] = {
-                '詞語': words_list,
-                '段落': []
-            }
-            save_data(data)
-            
-            return redirect(url_for('vocab_list'))
-    
-    return render_template('create_lesson.html')
+    """顯示簡化的課程創建頁面"""
+    return render_template('create_lesson_new.html')
 
 @app.route('/add_content', methods=['POST'])
 def add_content():
@@ -142,22 +216,19 @@ def add_content():
                     'history': []
                 })
         
-        # 處理段落內容
+        # 處理段落內容 (新結構：每個段落是獨立項)
         elif content_type == '段落':
             paragraphs = req_data.get('paragraphs', [])
-            for para in paragraphs:
+            for idx, para in enumerate(paragraphs):
                 para_obj = {
-                    'title': para.get('title', ''),
-                    'sentences': []
+                    'id': f"para_{idx+1}",
+                    'title': para.get('title', f'段落{idx+1}'),
+                    'sentences': para.get('sentences', []),
+                    'attempts': 0,
+                    'correct': 0,
+                    'incorrect': 0,
+                    'history': []
                 }
-                for sentence in para.get('sentences', []):
-                    para_obj['sentences'].append({
-                        'sentence': sentence,
-                        'attempts': 0,
-                        'correct': 0,
-                        'incorrect': 0,
-                        'history': []
-                    })
                 lesson_data['段落'].append(para_obj)
         
         # 保存到數據文件
@@ -168,6 +239,61 @@ def add_content():
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/create_lesson_simple', methods=['POST'])
+def create_lesson_simple():
+    """簡化的課程創建 - 只需要課程名稱，無需語言和內容類型選擇"""
+    try:
+        req_data = request.get_json()
+        lesson_name = req_data.get('lesson_name', '').strip()
+        
+        if not lesson_name:
+            return jsonify({'error': '課程名稱不能為空'}), 400
+        
+        data = load_data()
+        
+        # 確保根層級存在（不再按語言分類）
+        if not isinstance(data, dict):
+            data = {}
+        
+        # 檢查課程是否已存在
+        if lesson_name in data:
+            return jsonify({'error': '該課程已存在'}), 400
+        
+        # 創建空課程結構
+        lesson_data = {
+            '詞語': [],
+            '段落': []
+        }
+        
+        # 保存到數據文件
+        data[lesson_name] = lesson_data
+        save_data(data)
+        
+        return jsonify({'status': 'success', 'message': '課程已成功創建'}), 201
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/edit_content/<lesson_name>', methods=['GET'])
+def edit_content_simple(lesson_name):
+    """顯示編輯頁面 - 簡化版（新流程）"""
+    # 解碼 URL 參數
+    lesson_name = unquote(lesson_name)
+    
+    data = load_data()
+    
+    if lesson_name not in data:
+        return "課程未找到", 404
+    
+    lesson_content = data[lesson_name]
+    
+    # 使用 edit_content_new.html 模板（如果存在），否則使用改進版的 edit_content.html
+    return render_template('edit_content.html',
+                          language='',  # 新流程不需要語言
+                          lesson_number=lesson_name,
+                          content=lesson_content,
+                          is_simple=True)
 
 @app.route('/edit_content/<language>/<lesson_num>', methods=['GET'])
 def edit_content(language, lesson_num):
@@ -240,41 +366,44 @@ def update_content():
                     'history': []
                 })
         
-        # 更新段落
+        # 更新段落 (新結構)
         updated_paragraphs = []
+        para_id_counter = 1
         for para_data in paragraphs:
-            updated_sentences = []
-            for sent_data in para_data.get('sentences', []):
-                # 查找原有的句子記錄
-                original = None
+            # 查找原有的段落記錄（保留統計數據）
+            original = None
+            original_para_id = para_data.get('id')
+            if original_para_id:
                 for old_para in lesson_content.get('段落', []):
-                    if old_para['title'] == para_data['original_title']:
-                        for old_sent in old_para['sentences']:
-                            if old_sent['sentence'] == sent_data['original_sentence']:
-                                original = old_sent
-                                break
-                
-                if original:
-                    updated_sentences.append({
-                        'sentence': sent_data['sentence'],
-                        'attempts': original.get('attempts', 0),
-                        'correct': original.get('correct', 0),
-                        'incorrect': original.get('incorrect', 0),
-                        'history': original.get('history', [])
-                    })
-                else:
-                    updated_sentences.append({
-                        'sentence': sent_data['sentence'],
-                        'attempts': 0,
-                        'correct': 0,
-                        'incorrect': 0,
-                        'history': []
-                    })
+                    if old_para.get('id') == original_para_id:
+                        original = old_para
+                        break
             
-            updated_paragraphs.append({
-                'title': para_data['title'],
-                'sentences': updated_sentences
-            })
+            if original:
+                # 保留原有的統計數據
+                updated_para = {
+                    'id': original.get('id'),
+                    'title': para_data.get('title', original.get('title', '')),
+                    'sentences': para_data.get('sentences', []),
+                    'attempts': original.get('attempts', 0),
+                    'correct': original.get('correct', 0),
+                    'incorrect': original.get('incorrect', 0),
+                    'history': original.get('history', [])
+                }
+            else:
+                # 新段落
+                updated_para = {
+                    'id': f"para_{para_id_counter}",
+                    'title': para_data.get('title', f'段落{para_id_counter}'),
+                    'sentences': para_data.get('sentences', []),
+                    'attempts': 0,
+                    'correct': 0,
+                    'incorrect': 0,
+                    'history': []
+                }
+                para_id_counter += 1
+            
+            updated_paragraphs.append(updated_para)
         
         # 更新數據
         lesson_content['詞語'] = updated_words
@@ -316,13 +445,91 @@ def delete_content(language, lesson_num):
         # 發生錯誤時也重定向回列表頁面
         return redirect(url_for('vocab_list'))
 
+@app.route('/quiz_simple/<lesson_name>')
+def quiz_simple(lesson_name):
+    """聽寫練習路由 - 新簡化流程，不需要語言參數"""
+    lesson_name = unquote(lesson_name)
+    
+    content_type = request.args.get('content_type', '詞語').strip()
+    paragraph_id = request.args.get('paragraph_id', '').strip()
+    
+    data = load_data()
+    
+    # 查找簡化格式的課程
+    print(f"DEBUG: Looking for lesson_name: {repr(lesson_name)}")
+    print(f"DEBUG: Available keys: {[repr(k) for k in data.keys() if '17' in k]}")
+    
+    if lesson_name not in data:
+        return "聽寫內容未找到", 404
+    
+    lesson_content = data[lesson_name]
+    
+    # 驗證是否為簡化格式（包含詞語或段落）
+    if not isinstance(lesson_content, dict) or ('詞語' not in lesson_content and '段落' not in lesson_content):
+        return "聽寫內容未找到", 404
+    
+    words_to_practice = []
+    if content_type == '詞語' and '詞語' in lesson_content:
+        # 詞語作為整體框，總是聽寫所有詞語
+        words_to_practice = [item['word'] for item in lesson_content['詞語']]
+    elif content_type == '段落' and '段落' in lesson_content:
+        # 如果指定了段落ID，只選擇該段落
+        if paragraph_id:
+            for para in lesson_content['段落']:
+                if para.get('id') == paragraph_id:
+                    for sent_item in para.get('sentences', []):
+                        words_to_practice.append(sent_item.get('sentence') if isinstance(sent_item, dict) else sent_item)
+                    break
+        else:
+            # 沒有指定段落ID，則選擇所有段落
+            for para in lesson_content['段落']:
+                for sent_item in para.get('sentences', []):
+                    words_to_practice.append(sent_item.get('sentence') if isinstance(sent_item, dict) else sent_item)
+    
+    if not words_to_practice:
+        return f"沒有{content_type}可以聽寫", 404
+    
+    # 預先將所有詞語加入 TTS 生成隊列，避免延遲
+    print(f"[QUIZ] Preloading {len(words_to_practice)} words for TTS")
+    for i, word in enumerate(words_to_practice):
+        word_hash = hashlib.md5(word.encode('utf-8')).hexdigest()
+        audio_file = os.path.join(AUDIO_DIR, f'{word_hash}.mp3')
+        if not os.path.exists(audio_file):
+            print(f"[QUIZ] Queuing word {i+1}/{len(words_to_practice)}: {word}")
+            tts_queue.put((word, audio_file))
+        else:
+            print(f"[QUIZ] Already cached: {word}")
+    
+    session.permanent = True
+    session['current_quiz'] = {
+        'language': '',
+        'lesson': lesson_name,
+        'content_type': content_type,
+        'words': words_to_practice,
+        'current_index': 0,
+        'results': [],
+        'is_simple': True
+    }
+    
+    import json as json_module
+    words_json = json_module.dumps(words_to_practice, ensure_ascii=False)
+    
+    return render_template('quiz.html', 
+                          lesson_name=lesson_name, 
+                          language='',
+                          lesson_num=lesson_name,
+                          word_count=len(words_to_practice),
+                          current_word=words_to_practice[0] if words_to_practice else None,
+                          words_json=words_json,
+                          content_type=content_type)
 @app.route('/quiz/<language>/<lesson_num>')
 def quiz_new(language, lesson_num):
-    """聽寫練習路由"""
+    """聽寫練習路由 - 支持選擇特定段落"""
     language = unquote(language)
     lesson_num = unquote(lesson_num)
     
     content_type = request.args.get('content_type', '詞語').strip()
+    paragraph_id = request.args.get('paragraph_id', '').strip()  # 特定段落ID
     
     data = load_data()
     
@@ -333,11 +540,21 @@ def quiz_new(language, lesson_num):
     
     words_to_practice = []
     if content_type == '詞語' and '詞語' in lesson_content:
+        # 詞語作為整體框，總是聽寫所有詞語
         words_to_practice = [item['word'] for item in lesson_content['詞語']]
     elif content_type == '段落' and '段落' in lesson_content:
-        for para in lesson_content['段落']:
-            for sent_item in para.get('sentences', []):
-                words_to_practice.append(sent_item['sentence'])
+        # 如果指定了段落ID，只選擇該段落
+        if paragraph_id:
+            for para in lesson_content['段落']:
+                if para.get('id') == paragraph_id:
+                    for sent_item in para.get('sentences', []):
+                        words_to_practice.append(sent_item.get('sentence') if isinstance(sent_item, dict) else sent_item)
+                    break
+        else:
+            # 沒有指定段落ID，則選擇所有段落
+            for para in lesson_content['段落']:
+                for sent_item in para.get('sentences', []):
+                    words_to_practice.append(sent_item.get('sentence') if isinstance(sent_item, dict) else sent_item)
     
     if not words_to_practice:
         return f"沒有{content_type}可以聽寫", 404
@@ -378,14 +595,22 @@ def submit_answer():
     is_known_str = request.form.get('is_known', 'false')
     is_known = is_known_str.lower() == 'true'
     
-    if not word or not language or not lesson:
+    if not word or not lesson:
         return jsonify({'error': '缺少必要參數'}), 400
     
     # Validate data structure
     try:
-        lesson_data = data[language][lesson]
+        # Support both old format (language/lesson) and new format (direct lesson)
+        if language and language in data and lesson in data[language]:
+            # Old format: language/lesson
+            lesson_data = data[language][lesson]
+        elif not language and lesson in data:
+            # New format: direct lesson
+            lesson_data = data[lesson]
+        else:
+            return jsonify({'error': f'找不到課程: {language or ""}/{lesson}'}), 400
     except KeyError:
-        return jsonify({'error': f'找不到課程: {language}/{lesson}'}), 400
+        return jsonify({'error': f'找不到課程: {language or ""}/{lesson}'}), 400
     
     # Find and update the record based on content type
     word_found = False
@@ -410,22 +635,44 @@ def submit_answer():
                 break
     
     elif content_type == '段落' and '段落' in lesson_data:
-        # Handle paragraph/sentence entries
+        # Handle paragraph/sentence entries (新結構：同時更新段落和句子的統計)
         for para in lesson_data['段落']:
             for sent_item in para.get('sentences', []):
-                if sent_item['sentence'] == word:
-                    sent_item['attempts'] += 1
-                    if is_known:
-                        sent_item['correct'] += 1
-                    else:
-                        sent_item['incorrect'] += 1
+                sent_text = sent_item.get('sentence') if isinstance(sent_item, dict) else sent_item
+                if sent_text == word:
+                    # 更新句子統計
+                    if isinstance(sent_item, dict):
+                        sent_item['attempts'] = sent_item.get('attempts', 0) + 1
+                        if is_known:
+                            sent_item['correct'] = sent_item.get('correct', 0) + 1
+                        else:
+                            sent_item['incorrect'] = sent_item.get('incorrect', 0) + 1
+                        
+                        # Record history for sentence
+                        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        if 'history' not in sent_item:
+                            sent_item['history'] = []
+                        sent_item['history'].append({
+                            "timestamp": timestamp,
+                            "known": is_known
+                        })
                     
-                    # Record history
+                    # 同時更新段落統計 (新結構)
+                    para['attempts'] = para.get('attempts', 0) + 1
+                    if is_known:
+                        para['correct'] = para.get('correct', 0) + 1
+                    else:
+                        para['incorrect'] = para.get('incorrect', 0) + 1
+                    
+                    # Record history for paragraph
                     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    sent_item['history'].append({
+                    if 'history' not in para:
+                        para['history'] = []
+                    para['history'].append({
                         "timestamp": timestamp,
                         "known": is_known
                     })
+                    
                     word_found = True
                     break
             if word_found:
@@ -439,6 +686,50 @@ def submit_answer():
     
     return jsonify({'status': 'success', 'message': f'已保存 {word} 的答題結果'})
 
+
+@app.route('/review_simple/<lesson_name>')
+def review_simple(lesson_name):
+    """複習路由 - 新簡化流程，不需要語言參數"""
+    lesson_name = unquote(lesson_name)
+    
+    data = load_data()
+    
+    if lesson_name not in data:
+        return "聽寫內容未找到", 404
+    
+    lesson_content = data[lesson_name]
+    
+    # Collect words needing review
+    review_words = []
+    if '詞語' in lesson_content:
+        for item in lesson_content['詞語']:
+            if item['attempts'] == 0:
+                accuracy = 0
+                accuracy_display = "未測試"
+            else:
+                accuracy = item['correct'] / item['attempts']
+                accuracy_display = round(accuracy * 100, 1)
+            
+            if accuracy < 0.8:
+                review_words.append({
+                    'word': item['word'],
+                    'meaning': item['meaning'],
+                    'attempts': item['attempts'],
+                    'correct': item['correct'],
+                    'incorrect': item['incorrect'],
+                    'accuracy': accuracy,
+                    'accuracy_display': accuracy_display
+                })
+    
+    # Sort
+    review_words.sort(key=lambda x: (x['attempts'] > 0, x['accuracy']))
+    
+    return render_template('review.html', 
+                          lesson_name=lesson_name, 
+                          language='',
+                          lesson_num=lesson_name,
+                          review_words=review_words,
+                          review_paragraphs=[])
 
 @app.route('/review/<language>/<lesson_num>')
 def review_new(language, lesson_num):
@@ -643,6 +934,64 @@ def lesson_stats_api(language, lesson_num):
         'mastered_percentage': round((mastered / total_items) * 100, 1) if total_items > 0 else 0
     })
 
+@app.route('/stats_simple/<lesson_name>')
+def stats_simple(lesson_name):
+    """統計頁面 - 新簡化流程，不需要語言參數"""
+    lesson_name = unquote(lesson_name)
+    
+    data = load_data()
+    
+    if lesson_name not in data:
+        return "聽寫內容未找到", 404
+    
+    lesson_content = data[lesson_name]
+    
+    # Collect word statistics
+    word_stats = {
+        'total': 0,
+        'mastered': 0,
+        'needs_review': 0,
+        'words': []
+    }
+    
+    if '詞語' in lesson_content:
+        for item in lesson_content['詞語']:
+            word_stats['total'] += 1
+            
+            if item['attempts'] == 0:
+                status = '未測試'
+                accuracy = 0
+                word_stats['needs_review'] += 1
+            else:
+                accuracy = item['correct'] / item['attempts']
+                if accuracy >= 0.8:
+                    status = '已掌握'
+                    word_stats['mastered'] += 1
+                else:
+                    status = '需複習'
+                    word_stats['needs_review'] += 1
+            
+            word_stats['words'].append({
+                'word': item['word'],
+                'meaning': item['meaning'],
+                'attempts': item['attempts'],
+                'correct': item['correct'],
+                'incorrect': item['incorrect'],
+                'accuracy': round(accuracy * 100, 1) if item['attempts'] > 0 else 0,
+                'status': status
+            })
+    
+    # Calculate overall stats (only for words)
+    overall_percentage = round((word_stats['mastered'] / word_stats['total']) * 100, 1) if word_stats['total'] > 0 else 0
+    
+    return render_template('stats.html',
+                          lesson_name=lesson_name,
+                          language='',
+                          lesson_num=lesson_name,
+                          overall_percentage=overall_percentage,
+                          word_stats=word_stats,
+                          para_stats={'total': 0, 'mastered': 0, 'paragraphs': []})
+
 @app.route('/stats/<language>/<lesson_num>')
 def lesson_stats_new(language, lesson_num):
     """統計頁面 - 返回HTML"""
@@ -651,10 +1000,15 @@ def lesson_stats_new(language, lesson_num):
     
     data = load_data()
     
-    if language not in data or lesson_num not in data[language]:
+    # 支持新格式（language 為空）和舊格式
+    if language and language in data and lesson_num in data[language]:
+        # 舊格式：language/lesson
+        lesson_content = data[language][lesson_num]
+    elif not language and lesson_num in data:
+        # 新格式：直接 lesson
+        lesson_content = data[lesson_num]
+    else:
         return "聽寫內容未找到", 404
-    
-    lesson_content = data[language][lesson_num]
     
     # Collect word statistics
     word_stats = {
@@ -701,12 +1055,17 @@ def lesson_stats_new(language, lesson_num):
     
     if '段落' in lesson_content:
         for para in lesson_content['段落']:
+            para_id = para.get('id', '')
             para_info = {
+                'id': para_id,
                 'title': para['title'],
                 'total': 0,
                 'mastered': 0,
                 'needs_review': 0,
-                'sentences': []
+                'sentences': [],
+                'para_attempts': para.get('attempts', 0),
+                'para_correct': para.get('correct', 0),
+                'para_incorrect': para.get('incorrect', 0)
             }
             
             for sent in para.get('sentences', []):
@@ -746,7 +1105,7 @@ def lesson_stats_new(language, lesson_num):
     total_needs_review = word_stats['needs_review'] + para_stats['needs_review']
     overall_percentage = round((total_mastered / total_items) * 100, 1) if total_items > 0 else 0
     
-    display_name = f"{language} - {lesson_num}"
+    display_name = lesson_num if not language else f"{language} - {lesson_num}"
     
     return render_template('stats.html',
                           lesson_name=display_name,
@@ -761,24 +1120,32 @@ def lesson_stats_new(language, lesson_num):
 
 @app.route('/save_content', methods=['POST'])
 def save_content():
-    """Save edited content from textarea format"""
+    """Save edited content from textarea format - 支持新舊流程"""
     try:
         req_data = request.get_json()
         
-        language = req_data.get('language')
+        language = req_data.get('language', '')
         lesson = req_data.get('lesson')
         words = req_data.get('words', [])
         paragraphs = req_data.get('paragraphs', [])
+        is_simple = req_data.get('is_simple', False)
         
-        if not all([language, lesson]):
+        if not lesson:
             return jsonify({'status': 'error', 'message': '缺少必要參數'}), 400
         
         data = load_data()
         
-        if language not in data or lesson not in data[language]:
-            return jsonify({'status': 'error', 'message': '內容未找到'}), 404
-        
-        lesson_content = data[language][lesson]
+        # 支持兩種數據結構：新流程（無語言）和舊流程（有語言）
+        if is_simple or not language:
+            # 新流程：直接在數據根層級查找課程
+            if lesson not in data:
+                return jsonify({'status': 'error', 'message': '課程未找到'}), 404
+            lesson_content = data[lesson]
+        else:
+            # 舊流程：通過語言和課程查找
+            if language not in data or lesson not in data[language]:
+                return jsonify({'status': 'error', 'message': '內容未找到'}), 404
+            lesson_content = data[language][lesson]
         
         # Update words (preserve statistics from existing words)
         if words:
@@ -844,7 +1211,35 @@ def save_content():
         # Save the updated data
         save_data(data)
         
-        return jsonify({'status': 'success', 'message': '內容已保存'})
+        # 保存后，立即生成所有词语和段落的音频
+        print(f"[SAVE] Triggering TTS generation for lesson: {lesson}")
+        
+        # 收集所有需要生成的文本
+        texts_to_generate = []
+        
+        # 添加词语
+        for word_obj in lesson_content.get('詞語', []):
+            text = word_obj.get('word', '')
+            if text:
+                texts_to_generate.append(text)
+        
+        # 添加段落中的句子
+        for para_obj in lesson_content.get('段落', []):
+            for sent_obj in para_obj.get('sentences', []):
+                text = sent_obj.get('sentence', '')
+                if text:
+                    texts_to_generate.append(text)
+        
+        # 将所有文本加入 TTS 生成队列
+        print(f"[SAVE] Queueing {len(texts_to_generate)} texts for TTS generation")
+        for text in texts_to_generate:
+            word_hash = hashlib.md5(text.encode('utf-8')).hexdigest()
+            audio_file = os.path.join(AUDIO_DIR, f'{word_hash}.mp3')
+            # 即使文件已存在也重新加入队列，确保内容更新时重新生成
+            tts_queue.put((text, audio_file))
+            print(f"[SAVE] Queued: {text}")
+        
+        return jsonify({'status': 'success', 'message': '內容已保存，正在生成音频...', 'text_count': len(texts_to_generate)})
     
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500

@@ -146,64 +146,16 @@
             </table>
         {% endif %}
         
-        <!-- 段落復習 -->
-        {% if review_paragraphs %}
-            <h2 style="color: #2c3e50; margin-top: 30px; border-bottom: 2px solid #3498db; padding-bottom: 10px;">📖 段落需要複習</h2>
-            {% for para in review_paragraphs %}
-                <div style="margin: 20px 0; background-color: #f9f9f9; padding: 15px; border-radius: 4px;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>句子</th>
-                                <th>嘗試次數</th>
-                                <th>正確</th>
-                                <th>錯誤</th>
-                                <th>準確率</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for sent in para.sentences %}
-                            <tr>
-                                <td><strong>{{ sent.sentence }}</strong></td>
-                                <td>{{ sent.attempts }}</td>
-                                <td>{{ sent.correct }}</td>
-                                <td>{{ sent.incorrect }}</td>
-                                <td class="
-                                    {% if sent.attempts == 0 %}accuracy-low
-                                    {% elif sent.accuracy >= 0.8 %}accuracy-high
-                                    {% elif sent.accuracy >= 0.5 %}accuracy-medium
-                                    {% else %}accuracy-low
-                                    {% endif %}">
-                                    {% if sent.accuracy_display == "未測試" %}
-                                        <span style="color: #e74c3c; font-weight: bold;">{{ sent.accuracy_display }}</span>
-                                    {% else %}
-                                        {{ sent.accuracy_display }}%
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% endfor %}
-        {% endif %}
-        
         <!-- 如果没有复习项 -->
-        {% if not review_words and not review_paragraphs and not message %}
+        {% if not review_words %}
             <div style="text-align: center; padding: 30px;">
-                <h3>🎉 恭喜！所有項目都已掌握（準確率≥80%）</h3>
+                <h3>🎉 恭喜！所有詞語都已掌握（準確率≥80%）</h3>
                 <p>您可以繼續學習新的聽寫內容，或重新挑戰已完成的內容。</p>
             </div>
         {% endif %}
         
         <div style="text-align: center; margin-top: 30px;">
-            {% if review_words %}
-                <a href="{{ url_for('review_quiz', language=language, lesson_num=lesson_num, content_type='詞語') }}" class="btn btn-quiz">🎙️ 複習未掌握的詞彙</a>
-            {% endif %}
-            {% if review_paragraphs %}
-                <a href="{{ url_for('review_quiz', language=language, lesson_num=lesson_num, content_type='段落') }}" class="btn btn-quiz">🎙️ 複習未掌握的段落</a>
-            {% endif %}
-            <a href="{{ url_for('vocab_list') }}" class="btn">返回聽寫內容列表</a>
+            <button class="btn" onclick="history.back()">返回</button>
             <a href="{{ url_for('index') }}" class="btn btn-back">返回首頁</a>
         </div>
     </div>

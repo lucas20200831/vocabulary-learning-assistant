@@ -140,6 +140,21 @@
         .btn:hover {
             background-color: #2980b9;
         }
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 14px;
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+        .btn-small:hover {
+            background-color: #d35400;
+        }
         .btn-quiz {
             background-color: #f39c12;
         }
@@ -209,11 +224,19 @@
             
             {% set current_language = '' %}
             {% for item in contents %}
-                {% if current_language != item.language %}
+                {# 處理新流程（無語言）和舊流程（有語言）#}
+                {% if item.language == '' %}
+                    {# 新流程：直接顯示課程，無語言分類 #}
                     {% if current_language != '' %}</div>{% endif %}
-                    <div class="language-section">
-                    <div class="language-title">{{ item.language }}</div>
-                    {% set current_language = item.language %}
+                    {% if current_language != item.language %}<div class="language-section">{% set current_language = item.language %}{% endif %}
+                {% else %}
+                    {# 舊流程：按語言分類 #}
+                    {% if current_language != item.language %}
+                        {% if current_language != '' %}</div>{% endif %}
+                        <div class="language-section">
+                        <div class="language-title">{{ item.language }}</div>
+                        {% set current_language = item.language %}
+                    {% endif %}
                 {% endif %}
                 
                 <div class="lesson-card">
@@ -230,7 +253,16 @@
                     <div class="lesson-content" data-language="{{ item.language }}" data-lesson="{{ item.lesson_number }}">
                         {% if item.word_count > 0 %}
                         <div class="content-section">
-                            <h4>📝 詞語 ({{ item.word_count }} 個)</h4>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <h4 style="margin: 0;">📝 詞語 ({{ item.word_count }} 個)</h4>
+                                {% if item.is_simple %}
+                                    {# 新流程：不需要語言參數 #}
+                                    <a href="/quiz_simple/{{ item.lesson_number | urlencode }}?content_type=詞語" onclick="saveExpandedLesson('', '{{ item.lesson_number }}')" class="btn btn-small" style="white-space: nowrap;">🎙️ 聽寫</a>
+                                {% else %}
+                                    {# 舊流程：需要語言參數 #}
+                                    <a href="{{ url_for('quiz_new', language=item.language, lesson_num=item.lesson_number) }}?content_type=詞語" onclick="saveExpandedLesson('{{ item.language }}', '{{ item.lesson_number }}')" class="btn btn-small" style="white-space: nowrap;">🎙️ 聽寫</a>
+                                {% endif %}
+                            </div>
                             <div class="words-list">
                                 {% for word in item.content.get('詞語', []) %}
                                     <div class="word-item">• {{ word.word }}</div>
@@ -245,11 +277,22 @@
                             <div class="paragraphs-list">
                                 {% for para in item.content.get('段落', []) %}
                                     <div class="paragraph-item">
-                                        <div class="paragraph-title">{{ para.title }}</div>
-                                        <div style="font-size: 13px; color: #666;">
-                                            {% for sent in para.sentences %}
-                                                <div style="margin-bottom: 4px;">{{ sent.sentence }}</div>
-                                            {% endfor %}
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <div>
+                                                <div class="paragraph-title">{{ para.title }}</div>
+                                                <div style="font-size: 13px; color: #666;">
+                                                    {% for sent in para.sentences %}
+                                                        <div style="margin-bottom: 4px;">{{ sent.sentence if sent is mapping else sent }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            {% if item.is_simple %}
+                                                {# 新流程 #}
+                                                <a href="/quiz_simple/{{ item.lesson_number | urlencode }}?content_type=段落&paragraph_id={{ para.id }}" onclick="saveExpandedLesson('', '{{ item.lesson_number }}')" class="btn btn-small" style="white-space: nowrap;">🎙️ 聽寫</a>
+                                            {% else %}
+                                                {# 舊流程 #}
+                                                <a href="{{ url_for('quiz_new', language=item.language, lesson_num=item.lesson_number) }}?content_type=段落&paragraph_id={{ para.id }}" onclick="saveExpandedLesson('{{ item.language }}', '{{ item.lesson_number }}')" class="btn btn-small" style="white-space: nowrap;">🎙️ 聽寫</a>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 {% endfor %}
@@ -259,12 +302,19 @@
                         
                         <div class="action-buttons">
                             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                <a href="{{ url_for('quiz_new', language=item.language, lesson_num=item.lesson_number) }}?content_type=詞語" class="btn btn-quiz">🎙️ 聽寫詞語</a>
-                                <a href="{{ url_for('quiz_new', language=item.language, lesson_num=item.lesson_number) }}?content_type=段落" class="btn btn-quiz">🎙️ 聽寫段落</a>
-                                <a href="{{ url_for('review_new', language=item.language, lesson_num=item.lesson_number) }}" class="btn btn-review">🔄 複習未掌握</a>
-                                <a href="{{ url_for('lesson_stats_new', language=item.language, lesson_num=item.lesson_number) }}" class="btn btn-stats">📊 查看統計</a>
-                                <a href="{{ url_for('edit_content', language=item.language, lesson_num=item.lesson_number) }}" class="btn btn-edit">✏️ 編輯</a>
-                                <button type="button" class="btn btn-delete" onclick="showDeleteConfirm('{{ item.language }}', '{{ item.lesson_number }}')">🗑️ 刪除</button>
+                                {% if item.is_simple %}
+                                    {# 新流程：簡化的路由 #}
+                                    <a href="/review_simple/{{ item.lesson_number | urlencode }}" class="btn btn-review">🔄 複習未掌握</a>
+                                    <a href="/stats_simple/{{ item.lesson_number | urlencode }}" class="btn btn-stats">📊 查看統計</a>
+                                    <a href="/edit_content/{{ item.lesson_number | urlencode }}" class="btn btn-edit">✏️ 編輯</a>
+                                    <button type="button" class="btn btn-delete" onclick="showDeleteConfirm('{{ item.lesson_number }}', 'simple')">🗑️ 刪除</button>
+                                {% else %}
+                                    {# 舊流程 #}
+                                    <a href="{{ url_for('review_new', language=item.language, lesson_num=item.lesson_number) }}" class="btn btn-review">🔄 複習未掌握</a>
+                                    <a href="{{ url_for('lesson_stats_new', language=item.language, lesson_num=item.lesson_number) }}" class="btn btn-stats">📊 查看統計</a>
+                                    <a href="{{ url_for('edit_content', language=item.language, lesson_num=item.lesson_number) }}" class="btn btn-edit">✏️ 編輯</a>
+                                    <button type="button" class="btn btn-delete" onclick="showDeleteConfirm('{{ item.language }}', '{{ item.lesson_number }}')">🗑️ 刪除</button>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -279,7 +329,7 @@
         {% endif %}
         
         <div style="text-align: center; margin-top: 30px;">
-            <a href="{{ url_for('create_lesson') }}" class="btn">➕ 輸入新的內容</a>
+            <a href="{{ url_for('create_lesson') }}" class="btn">➕ 添加新的課</a>
             <a href="{{ url_for('index') }}" class="btn back-btn">返回首頁</a>
         </div>
     </div>
@@ -288,12 +338,39 @@
         let deleteLanguage = '';
         let deleteLesson = '';
 
+        // 页面加载时恢复之前展开的课程
+        window.addEventListener('DOMContentLoaded', function() {
+            const expandedLesson = sessionStorage.getItem('expandedLesson');
+            if (expandedLesson) {
+                const lessons = document.querySelectorAll('.lesson-card');
+                lessons.forEach(lesson => {
+                    const header = lesson.querySelector('.lesson-header');
+                    const content = lesson.querySelector('.lesson-content');
+                    const language = content.getAttribute('data-language');
+                    const lessonNum = content.getAttribute('data-lesson');
+                    const lessonKey = language + '|' + lessonNum;
+                    
+                    if (lessonKey === expandedLesson) {
+                        content.classList.add('expanded');
+                        header.querySelector('.lesson-toggle').classList.add('expanded');
+                    }
+                });
+                // 清除saved状态
+                sessionStorage.removeItem('expandedLesson');
+            }
+        });
+
         function toggleLesson(headerElement) {
             const contentElement = headerElement.nextElementSibling;
             const toggleIcon = headerElement.querySelector('.lesson-toggle');
             
             contentElement.classList.toggle('expanded');
             toggleIcon.classList.toggle('expanded');
+        }
+
+        // 在点击听写按钮时保存当前课程信息
+        function saveExpandedLesson(language, lessonNum) {
+            sessionStorage.setItem('expandedLesson', language + '|' + lessonNum);
         }
 
         function showDeleteConfirm(language, lesson) {

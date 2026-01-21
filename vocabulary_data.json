@@ -1,477 +1,484 @@
 {
-  "中文": {
-    "第一課": {
-      "詞語": [
-        {
-          "word": "媽媽",
-          "meaning": "",
-          "attempts": 3,
-          "correct": 3,
-          "incorrect": 0,
-          "history": [
-            {
-              "timestamp": "2026-01-21 13:30:12",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 13:47:31",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 13:49:11",
-              "known": true
-            }
-          ]
-        },
-        {
-          "word": "爸爸",
-          "meaning": "",
-          "attempts": 5,
-          "correct": 2,
-          "incorrect": 3,
-          "history": [
-            {
-              "timestamp": "2026-01-21 13:30:16",
-              "known": false
-            },
-            {
-              "timestamp": "2026-01-21 13:47:34",
-              "known": false
-            },
-            {
-              "timestamp": "2026-01-21 13:49:14",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 17:18:35",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 17:30:21",
-              "known": false
-            }
-          ]
-        },
-        {
-          "word": "哥哥",
-          "meaning": "",
-          "attempts": 5,
-          "correct": 2,
-          "incorrect": 3,
-          "history": [
-            {
-              "timestamp": "2026-01-21 13:30:19",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 13:47:36",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 13:49:17",
-              "known": false
-            },
-            {
-              "timestamp": "2026-01-21 17:18:40",
-              "known": false
-            },
-            {
-              "timestamp": "2026-01-21 17:30:24",
-              "known": false
-            }
-          ]
-        },
-        {
-          "word": "妹妹",
-          "meaning": "",
-          "attempts": 5,
-          "correct": 3,
-          "incorrect": 2,
-          "history": [
-            {
-              "timestamp": "2026-01-21 13:30:22",
-              "known": false
-            },
-            {
-              "timestamp": "2026-01-21 13:47:39",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 13:49:21",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 17:18:44",
-              "known": true
-            },
-            {
-              "timestamp": "2026-01-21 17:30:27",
-              "known": false
-            }
-          ]
-        }
-      ],
-      "段落": [
-        {
-          "title": "家庭介紹",
-          "sentences": [
-            {
-              "sentence": "我有一個媽媽和一個爸爸。",
-              "attempts": 2,
-              "correct": 2,
-              "incorrect": 0,
-              "history": [
-                {
-                  "timestamp": "2026-01-21 17:30:47",
-                  "known": true
-                },
-                {
-                  "timestamp": "2026-01-21 17:37:50",
-                  "known": true
-                }
-              ]
-            },
-            {
-              "sentence": "我還有一個哥哥和一個妹妹。",
-              "attempts": 2,
-              "correct": 0,
-              "incorrect": 2,
-              "history": [
-                {
-                  "timestamp": "2026-01-21 17:30:52",
-                  "known": false
-                },
-                {
-                  "timestamp": "2026-01-21 17:37:53",
-                  "known": false
-                }
-              ]
-            },
-            {
-              "sentence": "我們一家人都很快樂。",
-              "attempts": 2,
-              "correct": 0,
-              "incorrect": 2,
-              "history": [
-                {
-                  "timestamp": "2026-01-21 17:31:00",
-                  "known": false
-                },
-                {
-                  "timestamp": "2026-01-21 17:37:58",
-                  "known": false
-                }
-              ]
-            },
-            {
-              "sentence": "你是个坏人。",
-              "attempts": 2,
-              "correct": 0,
-              "incorrect": 2,
-              "history": [
-                {
-                  "timestamp": "2026-01-21 17:31:05",
-                  "known": false
-                },
-                {
-                  "timestamp": "2026-01-21 17:38:01",
-                  "known": false
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    "第二課": {
-      "詞語": [
-        {
-          "word": "書",
-          "meaning": "印刷品",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
-        },
-        {
-          "word": "筆",
-          "meaning": "書寫工具",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
-        },
-        {
-          "word": "桌子",
-          "meaning": "家具",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
-        },
-        {
-          "word": "椅子",
-          "meaning": "座椅",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
-        },
-        {
-          "word": "教室",
-          "meaning": "上課的房間",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
-        }
-      ],
-      "段落": [
-        {
-          "title": "學校用品",
-          "sentences": [
-            {
-              "sentence": "我在教室裡有一張桌子和一把椅子。",
-              "attempts": 0,
-              "correct": 0,
-              "incorrect": 0,
-              "history": []
-            },
-            {
-              "sentence": "我用筆在書上寫字。",
-              "attempts": 0,
-              "correct": 0,
-              "incorrect": 0,
-              "history": []
-            },
-            {
-              "sentence": "這是我最喜歡的書。",
-              "attempts": 0,
-              "correct": 0,
-              "incorrect": 0,
-              "history": []
-            }
-          ]
-        }
-      ]
-    },
-    "第三課": {
-      "詞語": [
-        {
-          "word": "蘋果",
-          "meaning": "水果",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
-        },
-        {
-          "word": "香蕉",
-          "meaning": "黃色水果",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
-        },
-        {
-          "word": "橙子",
-          "meaning": "橘色水果",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
-        },
-        {
-          "word": "葡萄",
-          "meaning": "紫色水果",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
-        },
-        {
-          "word": "西瓜",
-          "meaning": "綠色水果",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
-        }
-      ],
-      "段落": [
-        {
-          "title": "水果市場",
-          "sentences": [
-            {
-              "sentence": "市場裡有很多新鮮的水果。",
-              "attempts": 0,
-              "correct": 0,
-              "incorrect": 0,
-              "history": []
-            },
-            {
-              "sentence": "我喜歡吃蘋果和香蕉。",
-              "attempts": 0,
-              "correct": 0,
-              "incorrect": 0,
-              "history": []
-            },
-            {
-              "sentence": "這個西瓜看起來很甜。",
-              "attempts": 0,
-              "correct": 0,
-              "incorrect": 0,
-              "history": []
-            }
-          ]
-        }
-      ]
-    }
+  "日常用語": {
+    "詞語": [
+      {
+        "word": "早上好",
+        "meaning": "早上的问候",
+        "attempts": 9,
+        "correct": 9,
+        "incorrect": 0,
+        "history": [
+          {
+            "timestamp": "2026-01-21 23:35:10",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-21 23:47:52",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 00:35:46",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 00:57:09",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 01:10:08",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 01:12:31",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 01:17:46",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 01:19:54",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 01:21:12",
+            "known": true
+          }
+        ]
+      },
+      {
+        "word": "謝謝",
+        "meaning": "感謝別人",
+        "attempts": 9,
+        "correct": 3,
+        "incorrect": 6,
+        "history": [
+          {
+            "timestamp": "2026-01-21 23:35:13",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-21 23:47:55",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 00:35:50",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 00:57:13",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 01:10:13",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 01:12:37",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 01:17:51",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 01:19:58",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 01:21:17",
+            "known": true
+          }
+        ]
+      },
+      {
+        "word": "對不起",
+        "meaning": "道歉用語",
+        "attempts": 9,
+        "correct": 8,
+        "incorrect": 1,
+        "history": [
+          {
+            "timestamp": "2026-01-21 23:35:17",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-21 23:47:58",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 00:35:54",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 00:57:20",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 01:10:17",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 01:12:41",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 01:17:54",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 01:20:03",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 01:21:21",
+            "known": true
+          }
+        ]
+      }
+    ],
+    "段落": [
+      {
+        "id": "para_1",
+        "title": "基本問候",
+        "sentences": [
+          {
+            "sentence": "你好，很高興認識你。",
+            "attempts": 4,
+            "correct": 4,
+            "incorrect": 0,
+            "history": [
+              {
+                "timestamp": "2026-01-21 23:35:21",
+                "known": true
+              },
+              {
+                "timestamp": "2026-01-22 00:36:20",
+                "known": true
+              },
+              {
+                "timestamp": "2026-01-22 00:57:34",
+                "known": true
+              },
+              {
+                "timestamp": "2026-01-22 01:18:00",
+                "known": true
+              }
+            ]
+          },
+          {
+            "sentence": "今天天氣很好。",
+            "attempts": 4,
+            "correct": 2,
+            "incorrect": 2,
+            "history": [
+              {
+                "timestamp": "2026-01-21 23:35:28",
+                "known": false
+              },
+              {
+                "timestamp": "2026-01-22 00:36:59",
+                "known": false
+              },
+              {
+                "timestamp": "2026-01-22 00:57:41",
+                "known": true
+              },
+              {
+                "timestamp": "2026-01-22 01:18:05",
+                "known": true
+              }
+            ]
+          }
+        ],
+        "attempts": 8,
+        "correct": 6,
+        "incorrect": 2,
+        "history": [
+          {
+            "timestamp": "2026-01-21 23:35:21",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-21 23:35:28",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 00:36:20",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 00:36:59",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 00:57:34",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 00:57:41",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 01:18:00",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 01:18:05",
+            "known": true
+          }
+        ]
+      }
+    ]
   },
-  "英文": {
-    "第一課": {
-      "詞語": [
-        {
-          "word": "hello",
-          "meaning": "問候",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
-        },
-        {
-          "word": "goodbye",
-          "meaning": "再見",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
-        },
-        {
-          "word": "please",
-          "meaning": "請",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
-        },
-        {
-          "word": "thank you",
-          "meaning": "謝謝",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
-        },
-        {
-          "word": "sorry",
-          "meaning": "對不起",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
-        }
-      ],
-      "段落": [
-        {
-          "title": "Basic Greetings",
-          "sentences": [
-            {
-              "sentence": "Hello, my name is Tom.",
-              "attempts": 0,
-              "correct": 0,
-              "incorrect": 0,
-              "history": []
-            },
-            {
-              "sentence": "Nice to meet you, please sit down.",
-              "attempts": 0,
-              "correct": 0,
-              "incorrect": 0,
-              "history": []
-            },
-            {
-              "sentence": "Thank you very much, goodbye.",
-              "attempts": 0,
-              "correct": 0,
-              "incorrect": 0,
-              "history": []
-            }
-          ]
-        }
-      ]
-    },
-    "第二課": {
-      "詞語": [
-        {
-          "word": "apple",
-          "meaning": "蘋果",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
-        },
-        {
-          "word": "banana",
-          "meaning": "香蕉",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
-        },
-        {
-          "word": "orange",
-          "meaning": "橙子",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
-        },
-        {
-          "word": "grape",
-          "meaning": "葡萄",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
-        },
-        {
-          "word": "watermelon",
-          "meaning": "西瓜",
-          "attempts": 0,
-          "correct": 0,
-          "incorrect": 0,
-          "history": []
-        }
-      ],
-      "段落": [
-        {
-          "title": "At the Market",
-          "sentences": [
-            {
-              "sentence": "There are many fruits at the market.",
-              "attempts": 0,
-              "correct": 0,
-              "incorrect": 0,
-              "history": []
-            },
-            {
-              "sentence": "The red apples look very delicious.",
-              "attempts": 0,
-              "correct": 0,
-              "incorrect": 0,
-              "history": []
-            },
-            {
-              "sentence": "Yellow bananas are also very sweet.",
-              "attempts": 0,
-              "correct": 0,
-              "incorrect": 0,
-              "history": []
-            }
-          ]
-        }
-      ]
-    }
+  "商務用語": {
+    "詞語": [
+      {
+        "word": "會議",
+        "meaning": "正式的集合討論",
+        "attempts": 1,
+        "correct": 1,
+        "incorrect": 0,
+        "history": [
+          {
+            "timestamp": "2026-01-21 23:35:44",
+            "known": true
+          }
+        ]
+      },
+      {
+        "word": "合約",
+        "meaning": "法律協議",
+        "attempts": 1,
+        "correct": 1,
+        "incorrect": 0,
+        "history": [
+          {
+            "timestamp": "2026-01-21 23:35:46",
+            "known": true
+          }
+        ]
+      },
+      {
+        "word": "預算",
+        "meaning": "計劃支出",
+        "attempts": 1,
+        "correct": 0,
+        "incorrect": 1,
+        "history": [
+          {
+            "timestamp": "2026-01-21 23:35:49",
+            "known": false
+          }
+        ]
+      },
+      {
+        "word": "報告",
+        "meaning": "正式的信息披露",
+        "attempts": 1,
+        "correct": 1,
+        "incorrect": 0,
+        "history": [
+          {
+            "timestamp": "2026-01-21 23:35:52",
+            "known": true
+          }
+        ]
+      }
+    ],
+    "段落": [
+      {
+        "id": "para_1",
+        "title": "會議開始",
+        "sentences": [
+          {
+            "sentence": "請大家準備今天的會議材料。",
+            "attempts": 0,
+            "correct": 0,
+            "incorrect": 0,
+            "history": []
+          },
+          {
+            "sentence": "會議將在上午十點開始。",
+            "attempts": 0,
+            "correct": 0,
+            "incorrect": 0,
+            "history": []
+          },
+          {
+            "sentence": "我們需要討論新的營銷策略。",
+            "attempts": 0,
+            "correct": 0,
+            "incorrect": 0,
+            "history": []
+          }
+        ],
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "id": "para_2",
+        "title": "合約條款",
+        "sentences": [
+          {
+            "sentence": "這份合約的有效期是一年。",
+            "attempts": 0,
+            "correct": 0,
+            "incorrect": 0,
+            "history": []
+          },
+          {
+            "sentence": "雙方都同意遵守所有條款。",
+            "attempts": 0,
+            "correct": 0,
+            "incorrect": 0,
+            "history": []
+          }
+        ],
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      }
+    ]
+  },
+  "文學名句": {
+    "詞語": [
+      {
+        "word": "夢想",
+        "meaning": "美好的期望和目標",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "永恆",
+        "meaning": "不會改變的時間",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "光芒",
+        "meaning": "亮麗的光線",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      }
+    ],
+    "段落": [
+      {
+        "id": "para_1",
+        "title": "夢想與現實",
+        "sentences": [
+          {
+            "sentence": "每個人都有一個夢想在心中。",
+            "attempts": 3,
+            "correct": 3,
+            "incorrect": 0,
+            "history": [
+              {
+                "timestamp": "2026-01-22 00:40:02",
+                "known": true
+              },
+              {
+                "timestamp": "2026-01-22 00:59:30",
+                "known": true
+              },
+              {
+                "timestamp": "2026-01-22 01:02:21",
+                "known": true
+              }
+            ]
+          },
+          {
+            "sentence": "但是成功需要不懈的努力。",
+            "attempts": 3,
+            "correct": 2,
+            "incorrect": 1,
+            "history": [
+              {
+                "timestamp": "2026-01-22 00:40:17",
+                "known": true
+              },
+              {
+                "timestamp": "2026-01-22 00:59:36",
+                "known": false
+              },
+              {
+                "timestamp": "2026-01-22 01:02:29",
+                "known": true
+              }
+            ]
+          },
+          {
+            "sentence": "永遠不要放棄你的夢想。",
+            "attempts": 3,
+            "correct": 2,
+            "incorrect": 1,
+            "history": [
+              {
+                "timestamp": "2026-01-22 00:40:22",
+                "known": false
+              },
+              {
+                "timestamp": "2026-01-22 00:59:42",
+                "known": true
+              },
+              {
+                "timestamp": "2026-01-22 01:02:36",
+                "known": true
+              }
+            ]
+          }
+        ],
+        "attempts": 9,
+        "correct": 7,
+        "incorrect": 2,
+        "history": [
+          {
+            "timestamp": "2026-01-22 00:40:02",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 00:40:17",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 00:40:22",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 00:59:30",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 00:59:36",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 00:59:42",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 01:02:21",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 01:02:29",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 01:02:36",
+            "known": true
+          }
+        ]
+      }
+    ]
   }
 }

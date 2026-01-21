@@ -128,6 +128,8 @@
             <em style="color: #95a5a6; font-size: 1.1em;">準備好了嗎？2秒後開始讀第一個詞...</em>
         </div>
         
+        <audio id="audio-player" style="display: none;"></audio>
+        
         <div id="quiz-area">
             <button class="btn btn-replay" onclick="speakCurrentWord()">🔊 重新聽</button>
             <button class="btn btn-known" onclick="recordResult(true)">✅ 我能默寫</button>
@@ -156,43 +158,45 @@
         
         console.log('Quiz initialized:', {totalWords, allWords, currentWord, language, lesson, contentType});
         
-        // Auto-start first word after 2 seconds
+        // 所有音频已预先生成完毕，页面加载完成后立即播放
         window.addEventListener('load', function() {
-            setTimeout(() => {
-                speakCurrentWord();
-                testStarted = true;
-            }, 2000);
+            speakCurrentWord();
+            testStarted = true;
         });
         
-        async function speakCurrentWord() {
-            console.log('Speaking word:', currentWord);
-            // Speak the current word
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(currentWord);
-                utterance.lang = 'zh-CN';
-                utterance.rate = 0.8;
-                utterance.pitch = 1;
-                speechSynthesis.speak(utterance);
-            } else {
-                try {
-                    await fetch(`/speak_word/${encodeURIComponent(currentWord)}`);
-                } catch (error) {
-                    console.error('Error speaking word:', error);
+        function speakCurrentWord() {
+            // 调用后端端点获取音频 URL（端点立即返回，无需生成）
+            fetch(`/tts/${encodeURIComponent(currentWord)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.url) {
+                        playAudio(data.url);
+                    }
+                })
+                .catch(err => console.error('Error:', err));
+        }
+        
+        function playAudio(url) {
+            try {
+                const audioPlayer = document.getElementById('audio-player');
+                audioPlayer.src = url;
+                const promise = audioPlayer.play();
+                if (promise !== undefined) {
+                    promise.catch(err => console.error('Play error:', err));
                 }
+            } catch (err) {
+                console.error('Error playing audio:', err);
             }
         }
 
         async function recordResult(isKnown) {
             // Prevent duplicate submissions
             if (isProcessing) {
-                console.log('Already processing, ignoring click');
                 return;
             }
             isProcessing = true;
             
             const wordDisplay = document.getElementById('word-display');
-            
-            console.log('recordResult called:', {currentIndex, currentWord, isKnown, language, lesson, contentType});
             
             // Disable buttons to prevent double submission
             document.querySelectorAll('.btn').forEach(btn => {
@@ -210,7 +214,6 @@
             results.push({word: currentWord, known: isKnown});
             
             try {
-                console.log('Sending POST to /submit_answer');
                 const formData = new FormData();
                 formData.append('word', currentWord);
                 formData.append('is_known', isKnown);
@@ -225,9 +228,7 @@
                     body: formData
                 });
                 
-                console.log('Response status:', response.status);
                 const data = await response.json();
-                console.log('Response data:', data);
                 
                 if (!response.ok) {
                     console.error('Response error:', data);
@@ -241,26 +242,30 @@
                 
                 // Check if this was the last word
                 if (currentIndex + 1 >= totalWords) {
-                    console.log('Quiz finished - no more words');
                     wordDisplay.innerHTML = '<em style="color: #27ae60; font-size: 1.3em; font-weight: bold;">✅ 聽寫測試完成！</em>';
                     document.querySelectorAll('.btn').forEach(btn => {
                         btn.classList.add('hidden');
                     });
                     
-                    const finishBtn = document.createElement('a');
-                    finishBtn.href = '{{ url_for("vocab_list") }}';
+                    const finishBtn = document.createElement('button');
                     finishBtn.className = 'btn';
                     finishBtn.style.marginTop = '20px';
-                    finishBtn.textContent = '返回聽寫內容列表';
+                    finishBtn.textContent = '返回';
+                    finishBtn.onclick = function() {
+                        // Try history.back() first, fall back to /vocab_list
+                        if (window.history.length > 1) {
+                            history.back();
+                        } else {
+                            window.location.href = '/vocab_list';
+                        }
+                    };
                     document.getElementById('quiz-area').appendChild(finishBtn);
                     isProcessing = false;
                 } else {
-                    console.log('Moving to next word');
                     setTimeout(() => {
                         currentIndex++;
                         if (currentIndex < allWords.length) {
                             currentWord = allWords[currentIndex];
-                            console.log('Updated to word index', currentIndex, 'word:', currentWord);
                             
                             document.getElementById('current-index').textContent = currentIndex + 1;
                             speakCurrentWord();
