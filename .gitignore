@@ -4,6 +4,31 @@ DEBUGGING*.md
 DEBUG_SESSION_*.md
 DEBUG_SUMMARY_*.md
 
+# 通用调试和日志文件
+*.log
+*.tmp
+*.temp
+*.cache
+*.pid
+*.seed
+*.pid.lock
+
+# 数据文件
+*.db
+*.sqlite
+*.sqlite3
+
+# 用户自定义数据
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# 临时文件
+*.swp
+*.swo
+*~
+
 # 其他忽略规则...
 DEBUG*.md 
 __pycache__/ 
