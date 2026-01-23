@@ -443,7 +443,32 @@
                 });
                 
                 if (response.ok) {
+                    const result = await response.json();
                     showMessage('✓ 課程已成功添加！', true);
+                    
+                    // 記錄新課程到最近訪問
+                    if (result.lesson) {
+                        const lesson = result.lesson;
+                        const recent = JSON.parse(localStorage.getItem('recent_lessons') || '[]');
+                        const item = {
+                            language: lesson.language || '',
+                            lesson_number: lesson.lesson_number,
+                            word_count: lesson.word_count,
+                            para_count: lesson.para_count,
+                            is_simple: lesson.is_simple || false,
+                            timestamp: Date.now()
+                        };
+                        
+                        // 移除重複項
+                        const filtered = recent.filter(r => !(r.language === item.language && r.lesson_number === item.lesson_number));
+                        
+                        // 添加到最前面
+                        filtered.unshift(item);
+                        
+                        // 只保留最多 10 項
+                        localStorage.setItem('recent_lessons', JSON.stringify(filtered.slice(0, 10)));
+                    }
+                    
                     setTimeout(() => {
                         window.location.href = '/vocab_list';
                     }, 1500);

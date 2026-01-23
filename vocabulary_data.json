@@ -1,236 +1,4 @@
 {
-  "日常用語": {
-    "詞語": [
-      {
-        "word": "早上好",
-        "meaning": "早上的问候",
-        "attempts": 9,
-        "correct": 9,
-        "incorrect": 0,
-        "history": [
-          {
-            "timestamp": "2026-01-21 23:35:10",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-21 23:47:52",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 00:35:46",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 00:57:09",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 01:10:08",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 01:12:31",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 01:17:46",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 01:19:54",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 01:21:12",
-            "known": true
-          }
-        ]
-      },
-      {
-        "word": "謝謝",
-        "meaning": "感謝別人",
-        "attempts": 9,
-        "correct": 3,
-        "incorrect": 6,
-        "history": [
-          {
-            "timestamp": "2026-01-21 23:35:13",
-            "known": false
-          },
-          {
-            "timestamp": "2026-01-21 23:47:55",
-            "known": false
-          },
-          {
-            "timestamp": "2026-01-22 00:35:50",
-            "known": false
-          },
-          {
-            "timestamp": "2026-01-22 00:57:13",
-            "known": false
-          },
-          {
-            "timestamp": "2026-01-22 01:10:13",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 01:12:37",
-            "known": false
-          },
-          {
-            "timestamp": "2026-01-22 01:17:51",
-            "known": false
-          },
-          {
-            "timestamp": "2026-01-22 01:19:58",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 01:21:17",
-            "known": true
-          }
-        ]
-      },
-      {
-        "word": "對不起",
-        "meaning": "道歉用語",
-        "attempts": 9,
-        "correct": 8,
-        "incorrect": 1,
-        "history": [
-          {
-            "timestamp": "2026-01-21 23:35:17",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-21 23:47:58",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 00:35:54",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 00:57:20",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 01:10:17",
-            "known": false
-          },
-          {
-            "timestamp": "2026-01-22 01:12:41",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 01:17:54",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 01:20:03",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 01:21:21",
-            "known": true
-          }
-        ]
-      }
-    ],
-    "段落": [
-      {
-        "id": "para_1",
-        "title": "基本問候",
-        "sentences": [
-          {
-            "sentence": "你好，很高興認識你。",
-            "attempts": 4,
-            "correct": 4,
-            "incorrect": 0,
-            "history": [
-              {
-                "timestamp": "2026-01-21 23:35:21",
-                "known": true
-              },
-              {
-                "timestamp": "2026-01-22 00:36:20",
-                "known": true
-              },
-              {
-                "timestamp": "2026-01-22 00:57:34",
-                "known": true
-              },
-              {
-                "timestamp": "2026-01-22 01:18:00",
-                "known": true
-              }
-            ]
-          },
-          {
-            "sentence": "今天天氣很好。",
-            "attempts": 4,
-            "correct": 2,
-            "incorrect": 2,
-            "history": [
-              {
-                "timestamp": "2026-01-21 23:35:28",
-                "known": false
-              },
-              {
-                "timestamp": "2026-01-22 00:36:59",
-                "known": false
-              },
-              {
-                "timestamp": "2026-01-22 00:57:41",
-                "known": true
-              },
-              {
-                "timestamp": "2026-01-22 01:18:05",
-                "known": true
-              }
-            ]
-          }
-        ],
-        "attempts": 8,
-        "correct": 6,
-        "incorrect": 2,
-        "history": [
-          {
-            "timestamp": "2026-01-21 23:35:21",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-21 23:35:28",
-            "known": false
-          },
-          {
-            "timestamp": "2026-01-22 00:36:20",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 00:36:59",
-            "known": false
-          },
-          {
-            "timestamp": "2026-01-22 00:57:34",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 00:57:41",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 01:18:00",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 01:18:05",
-            "known": true
-          }
-        ]
-      }
-    ]
-  },
   "商務用語": {
     "詞語": [
       {
@@ -262,13 +30,25 @@
       {
         "word": "預算",
         "meaning": "計劃支出",
-        "attempts": 1,
-        "correct": 0,
+        "attempts": 4,
+        "correct": 3,
         "incorrect": 1,
         "history": [
           {
             "timestamp": "2026-01-21 23:35:49",
             "known": false
+          },
+          {
+            "timestamp": "2026-01-22 16:00:20",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 16:00:29",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 16:00:32",
+            "known": true
           }
         ]
       },
@@ -349,26 +129,53 @@
       {
         "word": "夢想",
         "meaning": "美好的期望和目標",
-        "attempts": 0,
-        "correct": 0,
-        "incorrect": 0,
-        "history": []
+        "attempts": 2,
+        "correct": 1,
+        "incorrect": 1,
+        "history": [
+          {
+            "timestamp": "2026-01-22 13:20:21",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 16:23:20",
+            "known": false
+          }
+        ]
       },
       {
         "word": "永恆",
         "meaning": "不會改變的時間",
-        "attempts": 0,
+        "attempts": 2,
         "correct": 0,
-        "incorrect": 0,
-        "history": []
+        "incorrect": 2,
+        "history": [
+          {
+            "timestamp": "2026-01-22 13:20:25",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 16:23:23",
+            "known": false
+          }
+        ]
       },
       {
         "word": "光芒",
         "meaning": "亮麗的光線",
-        "attempts": 0,
-        "correct": 0,
-        "incorrect": 0,
-        "history": []
+        "attempts": 2,
+        "correct": 1,
+        "incorrect": 1,
+        "history": [
+          {
+            "timestamp": "2026-01-22 13:20:28",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 16:23:26",
+            "known": false
+          }
+        ]
       }
     ],
     "段落": [
@@ -500,6 +307,337 @@
           {
             "timestamp": "2026-01-22 01:24:52",
             "known": true
+          }
+        ]
+      }
+    ]
+  },
+  "第一课": {
+    "詞語": [
+      {
+        "word": "脚步",
+        "meaning": "",
+        "attempts": 9,
+        "correct": 9,
+        "incorrect": 0,
+        "history": [
+          {
+            "timestamp": "2026-01-22 13:36:36",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 13:42:33",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 13:43:34",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:31:01",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:32:23",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:54:36",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:55:36",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:57:03",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:59:33",
+            "known": true
+          }
+        ]
+      },
+      {
+        "word": "韵律",
+        "meaning": "",
+        "attempts": 9,
+        "correct": 8,
+        "incorrect": 1,
+        "history": [
+          {
+            "timestamp": "2026-01-22 13:36:55",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 13:42:36",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 13:43:36",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:31:05",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 15:32:28",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:54:39",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:55:39",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:57:06",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:59:36",
+            "known": true
+          }
+        ]
+      },
+      {
+        "word": "沙漠",
+        "meaning": "",
+        "attempts": 14,
+        "correct": 11,
+        "incorrect": 3,
+        "history": [
+          {
+            "timestamp": "2026-01-22 13:36:57",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 13:42:39",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 15:31:07",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:32:31",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 15:41:29",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:41:55",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:43:35",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:54:11",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:54:42",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:55:42",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:56:07",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:56:25",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:57:08",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:59:39",
+            "known": true
+          }
+        ]
+      },
+      {
+        "word": "偶然",
+        "meaning": "",
+        "attempts": 14,
+        "correct": 11,
+        "incorrect": 3,
+        "history": [
+          {
+            "timestamp": "2026-01-22 13:37:03",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 13:42:41",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 15:31:22",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:32:35",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:41:32",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 15:41:58",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:43:38",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:54:14",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:54:45",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:55:45",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 15:56:10",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:56:28",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:57:10",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:59:41",
+            "known": true
+          }
+        ]
+      },
+      {
+        "word": "儿子",
+        "meaning": "",
+        "attempts": 14,
+        "correct": 11,
+        "incorrect": 3,
+        "history": [
+          {
+            "timestamp": "2026-01-22 15:32:38",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 15:41:35",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 15:42:01",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:43:41",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:54:17",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:54:48",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:55:48",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:56:13",
+            "known": false
+          },
+          {
+            "timestamp": "2026-01-22 15:56:31",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:56:39",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:56:45",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:56:49",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:57:13",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-22 15:59:43",
+            "known": true
+          }
+        ]
+      }
+    ],
+    "段落": [
+      {
+        "title": "段落1",
+        "sentences": [
+          {
+            "sentence": "暮色笼罩沙漠",
+            "attempts": 0,
+            "correct": 0,
+            "incorrect": 0,
+            "history": []
+          },
+          {
+            "sentence": "脚步在沙丘留下断续印记",
+            "attempts": 0,
+            "correct": 0,
+            "incorrect": 0,
+            "history": []
+          },
+          {
+            "sentence": "远处有瓷器的碎片闪烁微光",
+            "attempts": 0,
+            "correct": 0,
+            "incorrect": 0,
+            "history": []
+          },
+          {
+            "sentence": "寂静吞噬了所有声响",
+            "attempts": 0,
+            "correct": 0,
+            "incorrect": 0,
+            "history": []
+          },
+          {
+            "sentence": "旅人望向星辰升起的方向",
+            "attempts": 0,
+            "correct": 0,
+            "incorrect": 0,
+            "history": []
           }
         ]
       }

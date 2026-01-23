@@ -448,6 +448,32 @@
                 
                 const result = await response.json();
                 if (result.status === 'success') {
+                    // 记录编辑的课程到最近访问
+                    if (result.lesson) {
+                        const lesson = result.lesson;
+                        const recentJson = localStorage.getItem('recent_lessons');
+                        let recent = recentJson ? JSON.parse(recentJson) : [];
+                        
+                        // 移除已存在的相同课程
+                        recent = recent.filter(item => 
+                            !(item.language === lesson.language && item.lesson_number === lesson.lesson_number)
+                        );
+                        
+                        // 添加到最前面
+                        recent.unshift({
+                            language: lesson.language || '',
+                            lesson_number: lesson.lesson_number,
+                            word_count: lesson.word_count,
+                            para_count: lesson.para_count,
+                            is_simple: lesson.is_simple || false,
+                            timestamp: Date.now()
+                        });
+                        
+                        // 保持最多 10 个
+                        recent = recent.slice(0, 10);
+                        localStorage.setItem('recent_lessons', JSON.stringify(recent));
+                    }
+                    
                     const textCount = result.text_count || 0;
                     if (textCount > 0) {
                         showMessage(`內容已保存！正在生成 ${textCount} 个语音文件...`, 'success');

@@ -144,7 +144,7 @@
 
     <script>
         let currentIndex = 0;
-        const totalWords = {{ word_count }};
+        let totalWords = {{ word_count }};
         let allWords = {{ words_json|safe }};  // All words as JSON array
         let currentWord = allWords[0] || '';
         let testStarted = false;
@@ -156,7 +156,30 @@
         const lesson = '{{ lesson_num }}';
         const contentType = '{{ content_type }}' || '詞語';  // Content type from Flask
         
-        console.log('Quiz initialized:', {totalWords, allWords, currentWord, language, lesson, contentType});
+        // 检查是否是复习模式
+        const urlParams = new URLSearchParams(window.location.search);
+        const isReviewMode = urlParams.get('review_mode') === 'true';
+        
+        // 如果是复习模式，从 sessionStorage 读取未掌握单词列表
+        if (isReviewMode) {
+            const reviewWordsStr = sessionStorage.getItem('review_words');
+            if (reviewWordsStr) {
+                try {
+                    const reviewWords = JSON.parse(reviewWordsStr);
+                    // 过滤出只包含未掌握单词的列表
+                    allWords = allWords.filter(word => reviewWords.includes(word));
+                    totalWords = allWords.length;
+                    currentWord = allWords[0] || '';
+                    console.log('Review mode: filtered to', totalWords, 'words');
+                } catch (e) {
+                    console.error('Error parsing review words:', e);
+                }
+                // 清除 sessionStorage
+                sessionStorage.removeItem('review_words');
+            }
+        }
+        
+        console.log('Quiz initialized:', {totalWords, allWords, currentWord, language, lesson, contentType, isReviewMode});
         
         // 所有音频已预先生成完毕，页面加载完成后立即播放
         window.addEventListener('load', function() {
@@ -252,11 +275,22 @@
                     finishBtn.style.marginTop = '20px';
                     finishBtn.textContent = '返回';
                     finishBtn.onclick = function() {
-                        // Try history.back() first, fall back to /vocab_list
-                        if (window.history.length > 1) {
-                            history.back();
+                        // 如果是复习模式，返回复习页面
+                        if (isReviewMode) {
+                            if (language && language !== '') {
+                                // 旧流程
+                                window.location.href = `/review/${encodeURIComponent(language)}/${encodeURIComponent(lesson)}`;
+                            } else {
+                                // 新流程
+                                window.location.href = `/review_simple/${encodeURIComponent(lesson)}`;
+                            }
                         } else {
-                            window.location.href = '/vocab_list';
+                            // 普通模式，使用 history.back()
+                            if (window.history.length > 1) {
+                                history.back();
+                            } else {
+                                window.location.href = '/vocab_list';
+                            }
                         }
                     };
                     document.getElementById('quiz-area').appendChild(finishBtn);

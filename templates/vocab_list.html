@@ -201,6 +201,102 @@
             padding: 40px 20px;
             color: #7f8c8d;
         }
+        .top-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 20px;
+            background-color: #ecf0f1;
+            border-radius: 8px;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            display: flex;
+            gap: 10px;
+        }
+        #searchInput {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        #searchInput:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+        .btn-add-course {
+            background-color: #27ae60;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        .btn-add-course:hover {
+            background-color: #229954;
+        }
+        .search-results {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 4px;
+        }
+        .search-results.show {
+            display: block;
+        }
+        .search-results h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .recent-section {
+            margin-bottom: 30px;
+        }
+        .recent-section h3 {
+            color: #2c3e50;
+            border-bottom: 2px solid #f39c12;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .recent-lessons {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .recent-card {
+            background-color: #fff9e6;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .recent-card:hover {
+            background-color: #fff3cd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .recent-card-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        .recent-card-info {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .recent-card-time {
+            font-size: 11px;
+            color: #999;
+        }
     </style>
 </head>
 <body>
@@ -219,8 +315,31 @@
     <div class="container">
         <h1>📖 聽寫內容列表</h1>
         
+        <!-- 頂部工具欄：新增課程和搜索 -->
+        <div class="top-bar">
+            <a href="{{ url_for('create_lesson') }}" class="btn btn-add-course">➕ 新增課程</a>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索課程標題、詞語或段落...">
+                <button class="btn" onclick="clearSearch()" style="background-color: #95a5a6;">清除</button>
+            </div>
+        </div>
+        
+        <!-- 搜索結果區 -->
+        <div id="searchResults" class="search-results">
+            <h3>🔍 搜索結果</h3>
+            <div id="searchResultsList"></div>
+        </div>
+        
+        <!-- 最近訪問區 -->
+        <div id="recentSection" class="recent-section" style="display: none;">
+            <h3>⭐ 最近訪問</h3>
+            <div id="recentLessons" class="recent-lessons"></div>
+        </div>
+        
         {% if contents %}
-            <p style="color: #666; margin-bottom: 20px;">點擊課程名稱以展開或收起詳細內容</p>
+            <div id="allLessonsSection">
+                <h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 15px;">📚 所有課程</h3>
+                <p style="color: #666; margin-bottom: 20px;">點擊課程名稱以展開或收起詳細內容</p>
             
             {% set current_language = '' %}
             {% for item in contents %}
@@ -255,17 +374,30 @@
                         <div class="content-section">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <h4 style="margin: 0;">📝 詞語 ({{ item.word_count }} 個)</h4>
-                                {% if item.is_simple %}
-                                    {# 新流程：不需要語言參數 #}
-                                    <a href="/quiz_simple/{{ item.lesson_number | urlencode }}?content_type=詞語" onclick="saveExpandedLesson('', '{{ item.lesson_number }}')" class="btn btn-small" style="white-space: nowrap;">🎙️ 聽寫</a>
-                                {% else %}
-                                    {# 舊流程：需要語言參數 #}
-                                    <a href="{{ url_for('quiz_new', language=item.language, lesson_num=item.lesson_number) }}?content_type=詞語" onclick="saveExpandedLesson('{{ item.language }}', '{{ item.lesson_number }}')" class="btn btn-small" style="white-space: nowrap;">🎙️ 聽寫</a>
-                                {% endif %}
+                                <div style="display: flex; gap: 10px;">
+                                    {% if item.is_simple %}
+                                        {# 新流程：不需要語言參數 #}
+                                        <a href="/quiz_simple/{{ item.lesson_number | urlencode }}?content_type=詞語" onclick="saveExpandedLesson('', '{{ item.lesson_number }}', {{ item.word_count }}, {{ item.para_count }}, true)" class="btn btn-small" style="white-space: nowrap;">🎙️ 聽寫</a>
+                                        <a href="/stats_simple/{{ item.lesson_number | urlencode }}" onclick="saveExpandedLesson('', '{{ item.lesson_number }}', {{ item.word_count }}, {{ item.para_count }}, true)" class="btn btn-small" style="white-space: nowrap; background-color: #2ecc71;">📊 查看統計</a>
+                                    {% else %}
+                                        {# 舊流程：需要語言參數 #}
+                                        <a href="{{ url_for('quiz_new', language=item.language, lesson_num=item.lesson_number) }}?content_type=詞語" onclick="saveExpandedLesson('{{ item.language }}', '{{ item.lesson_number }}', {{ item.word_count }}, {{ item.para_count }}, false)" class="btn btn-small" style="white-space: nowrap;">🎙️ 聽寫</a>
+                                        <a href="{{ url_for('lesson_stats_new', language=item.language, lesson_num=item.lesson_number) }}" onclick="saveExpandedLesson('{{ item.language }}', '{{ item.lesson_number }}', {{ item.word_count }}, {{ item.para_count }}, false)" class="btn btn-small" style="white-space: nowrap; background-color: #2ecc71;">📊 查看統計</a>
+                                    {% endif %}
+                                </div>
                             </div>
                             <div class="words-list">
                                 {% for word in item.content.get('詞語', []) %}
-                                    <div class="word-item">• {{ word.word }}</div>
+                                    <div class="word-item">
+                                        {% if word.attempts == 0 %}
+                                            <span style="color: #e74c3c; font-weight: bold;">✗</span>
+                                        {% elif word.correct / word.attempts >= 0.75 %}
+                                            <span style="color: #27ae60; font-weight: bold;">✓</span>
+                                        {% else %}
+                                            <span style="color: #e74c3c; font-weight: bold;">✗</span>
+                                        {% endif %}
+                                        {{ word.word }}
+                                    </div>
                                 {% endfor %}
                             </div>
                         </div>
@@ -288,10 +420,10 @@
                                             </div>
                                             {% if item.is_simple %}
                                                 {# 新流程 #}
-                                                <a href="/quiz_simple/{{ item.lesson_number | urlencode }}?content_type=段落&paragraph_id={{ para.id }}" onclick="saveExpandedLesson('', '{{ item.lesson_number }}')" class="btn btn-small" style="white-space: nowrap;">🎙️ 聽寫</a>
+                                                <a href="/quiz_simple/{{ item.lesson_number | urlencode }}?content_type=段落&paragraph_id={{ para.id }}" onclick="saveExpandedLesson('', '{{ item.lesson_number }}', {{ item.word_count }}, {{ item.para_count }}, true)" class="btn btn-small" style="white-space: nowrap;">🎙️ 聽寫</a>
                                             {% else %}
                                                 {# 舊流程 #}
-                                                <a href="{{ url_for('quiz_new', language=item.language, lesson_num=item.lesson_number) }}?content_type=段落&paragraph_id={{ para.id }}" onclick="saveExpandedLesson('{{ item.language }}', '{{ item.lesson_number }}')" class="btn btn-small" style="white-space: nowrap;">🎙️ 聽寫</a>
+                                                <a href="{{ url_for('quiz_new', language=item.language, lesson_num=item.lesson_number) }}?content_type=段落&paragraph_id={{ para.id }}" onclick="saveExpandedLesson('{{ item.language }}', '{{ item.lesson_number }}', {{ item.word_count }}, {{ item.para_count }}, false)" class="btn btn-small" style="white-space: nowrap;">🎙️ 聽寫</a>
                                             {% endif %}
                                         </div>
                                     </div>
@@ -304,14 +436,10 @@
                             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                                 {% if item.is_simple %}
                                     {# 新流程：簡化的路由 #}
-                                    <a href="/review_simple/{{ item.lesson_number | urlencode }}" class="btn btn-review">🔄 複習未掌握</a>
-                                    <a href="/stats_simple/{{ item.lesson_number | urlencode }}" class="btn btn-stats">📊 查看統計</a>
                                     <a href="/edit_content/{{ item.lesson_number | urlencode }}" class="btn btn-edit">✏️ 編輯</a>
                                     <button type="button" class="btn btn-delete" onclick="showDeleteConfirm('{{ item.lesson_number }}', 'simple')">🗑️ 刪除</button>
                                 {% else %}
                                     {# 舊流程 #}
-                                    <a href="{{ url_for('review_new', language=item.language, lesson_num=item.lesson_number) }}" class="btn btn-review">🔄 複習未掌握</a>
-                                    <a href="{{ url_for('lesson_stats_new', language=item.language, lesson_num=item.lesson_number) }}" class="btn btn-stats">📊 查看統計</a>
                                     <a href="{{ url_for('edit_content', language=item.language, lesson_num=item.lesson_number) }}" class="btn btn-edit">✏️ 編輯</a>
                                     <button type="button" class="btn btn-delete" onclick="showDeleteConfirm('{{ item.language }}', '{{ item.lesson_number }}')">🗑️ 刪除</button>
                                 {% endif %}
@@ -321,25 +449,26 @@
                 </div>
             {% endfor %}
             </div>
+            </div>
         {% else %}
             <div class="empty-message">
                 <p style="font-size: 16px; margin-bottom: 15px;">還沒有輸入任何聽寫內容</p>
                 <a href="{{ url_for('create_lesson') }}" class="btn">點擊這裡輸入第一個內容</a>
             </div>
         {% endif %}
-        
-        <div style="text-align: center; margin-top: 30px;">
-            <a href="{{ url_for('create_lesson') }}" class="btn">➕ 添加新的課</a>
-            <a href="{{ url_for('index') }}" class="btn back-btn">返回首頁</a>
-        </div>
     </div>
 
     <script>
         let deleteLanguage = '';
         let deleteLesson = '';
+        const RECENT_LESSONS_KEY = 'recent_lessons';
+        const MAX_RECENT = 10;
 
-        // 页面加载时恢复之前展开的课程
+        // 頁面加載時初始化
         window.addEventListener('DOMContentLoaded', function() {
+            loadRecentLessons();
+            initSearchListener();
+            
             const expandedLesson = sessionStorage.getItem('expandedLesson');
             if (expandedLesson) {
                 const lessons = document.querySelectorAll('.lesson-card');
@@ -355,10 +484,209 @@
                         header.querySelector('.lesson-toggle').classList.add('expanded');
                     }
                 });
-                // 清除saved状态
                 sessionStorage.removeItem('expandedLesson');
             }
         });
+
+        // 加載並顯示最近訪問的課程
+        function loadRecentLessons() {
+            const recent = JSON.parse(localStorage.getItem(RECENT_LESSONS_KEY) || '[]');
+            
+            if (recent.length === 0) {
+                document.getElementById('recentSection').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('recentSection').style.display = 'block';
+            const recentLessons = document.getElementById('recentLessons');
+            recentLessons.innerHTML = '';
+            
+            recent.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'recent-card';
+                card.onclick = () => openLesson(item.language, item.lesson_number, item.is_simple);
+                
+                const title = document.createElement('div');
+                title.className = 'recent-card-title';
+                title.textContent = item.lesson_number;
+                
+                const info = document.createElement('div');
+                info.className = 'recent-card-info';
+                info.textContent = `詞語: ${item.word_count} 個 | 段落: ${item.para_count} 個`;
+                
+                const time = document.createElement('div');
+                time.className = 'recent-card-time';
+                time.textContent = formatTime(item.timestamp);
+                
+                card.appendChild(title);
+                card.appendChild(info);
+                card.appendChild(time);
+                recentLessons.appendChild(card);
+            });
+        }
+
+        // 格式化時間戳
+        function formatTime(timestamp) {
+            const now = Date.now();
+            const diff = now - timestamp;
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            
+            if (seconds < 60) return '剛剛';
+            if (minutes < 60) return `${minutes}分鐘前`;
+            if (hours < 24) return `${hours}小時前`;
+            if (days < 7) return `${days}天前`;
+            
+            const date = new Date(timestamp);
+            return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+        }
+
+        // 記錄課程訪問時間
+        function recordLessonAccess(language, lesson_number, word_count, para_count, is_simple) {
+            let recent = JSON.parse(localStorage.getItem(RECENT_LESSONS_KEY) || '[]');
+            
+            const item = {
+                language: language || '',
+                lesson_number: lesson_number,
+                word_count: word_count,
+                para_count: para_count,
+                is_simple: is_simple,
+                timestamp: Date.now()
+            };
+            
+            // 移除重複項
+            recent = recent.filter(r => !(r.language === item.language && r.lesson_number === item.lesson_number));
+            
+            // 添加到最前面
+            recent.unshift(item);
+            
+            // 只保留最多 MAX_RECENT 項
+            recent = recent.slice(0, MAX_RECENT);
+            
+            localStorage.setItem(RECENT_LESSONS_KEY, JSON.stringify(recent));
+            loadRecentLessons();
+        }
+
+        // 打開課程
+        function openLesson(language, lesson_number, is_simple) {
+            // 在当前页面找到并展开对应的课程卡片
+            const cards = document.querySelectorAll('.lesson-card');
+            let found = false;
+            
+            for (let card of cards) {
+                const contentDiv = card.querySelector('.lesson-content');
+                const cardLanguage = contentDiv ? contentDiv.getAttribute('data-language') : '';
+                const cardLesson = contentDiv ? contentDiv.getAttribute('data-lesson') : '';
+                
+                // 检查是否是要找的课程
+                if ((is_simple && cardLanguage === '' && cardLesson === lesson_number) ||
+                    (!is_simple && cardLanguage === language && cardLesson === lesson_number)) {
+                    
+                    // 展开课程卡片
+                    const header = card.querySelector('.lesson-header');
+                    if (header) {
+                        const contentElement = header.nextElementSibling;
+                        const toggleIcon = header.querySelector('.lesson-toggle');
+                        
+                        // 如果还没展开，则展开
+                        if (!contentElement.classList.contains('expanded')) {
+                            contentElement.classList.add('expanded');
+                            toggleIcon.classList.add('expanded');
+                        }
+                        
+                        // 滚动到该卡片
+                        setTimeout(() => {
+                            header.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 100);
+                    }
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found) {
+                console.log('课程未找到:', lesson_number);
+            }
+        }
+
+        // 初始化搜索監聽器
+        function initSearchListener() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function() {
+                const keyword = this.value.trim();
+                if (keyword.length === 0) {
+                    clearSearch();
+                    return;
+                }
+                
+                fetch(`/api/search_lessons?keyword=${encodeURIComponent(keyword)}`)
+                    .then(r => r.json())
+                    .then(results => displaySearchResults(results, keyword));
+            });
+        }
+
+        // 顯示搜索結果
+        function displaySearchResults(results, keyword) {
+            const searchResults = document.getElementById('searchResults');
+            const searchResultsList = document.getElementById('searchResultsList');
+            const allLessonsSection = document.getElementById('allLessonsSection');
+            
+            searchResultsList.innerHTML = '';
+            
+            if (results.length === 0) {
+                searchResults.classList.add('show');
+                searchResultsList.innerHTML = '<p style="color: #999;">沒有找到匹配的課程</p>';
+                allLessonsSection.style.display = 'none';
+                return;
+            }
+            
+            searchResults.classList.add('show');
+            allLessonsSection.style.display = 'none';
+            
+            results.forEach(item => {
+                const lessonDiv = createLessonElement(item);
+                searchResultsList.appendChild(lessonDiv);
+            });
+        }
+
+        // 創建課程元素
+        function createLessonElement(item) {
+            const div = document.createElement('div');
+            
+            const titleDiv = document.createElement('div');
+            titleDiv.style.fontWeight = 'bold';
+            titleDiv.style.marginBottom = '10px';
+            titleDiv.style.cursor = 'pointer';
+            titleDiv.style.color = '#2c3e50';
+            titleDiv.textContent = item.lesson_number;
+            titleDiv.onclick = () => {
+                recordLessonAccess(item.language, item.lesson_number, item.word_count, item.para_count, item.is_simple);
+                openLesson(item.language, item.lesson_number, item.is_simple);
+            };
+            
+            const infoDiv = document.createElement('div');
+            infoDiv.style.color = '#666';
+            infoDiv.style.fontSize = '14px';
+            infoDiv.style.marginBottom = '10px';
+            infoDiv.textContent = `詞語: ${item.word_count} 個 | 段落: ${item.para_count} 個`;
+            
+            div.style.padding = '10px';
+            div.style.marginBottom = '10px';
+            div.style.borderBottom = '1px solid #e0e0e0';
+            div.appendChild(titleDiv);
+            div.appendChild(infoDiv);
+            
+            return div;
+        }
+
+        // 清除搜索
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchResults').classList.remove('show');
+            document.getElementById('allLessonsSection').style.display = 'block';
+        }
 
         function toggleLesson(headerElement) {
             const contentElement = headerElement.nextElementSibling;
@@ -369,8 +697,10 @@
         }
 
         // 在点击听写按钮时保存当前课程信息
-        function saveExpandedLesson(language, lessonNum) {
+        function saveExpandedLesson(language, lessonNum, wordCount, paraCount, isSimple) {
             sessionStorage.setItem('expandedLesson', language + '|' + lessonNum);
+            // 记录访问
+            recordLessonAccess(language, lessonNum, wordCount, paraCount, isSimple);
         }
 
         function showDeleteConfirm(language, lesson) {
@@ -379,7 +709,13 @@
             
             const modal = document.getElementById('confirmModal');
             const message = document.getElementById('confirmMessage');
-            message.textContent = `確認要刪除 ${language} - ${lesson} 嗎？此操作不可撤銷！`;
+            
+            // 新流程中，lesson 是 'simple'
+            if (lesson === 'simple') {
+                message.textContent = `確認要刪除 ${language} 嗎？此操作不可撤銷！`;
+            } else {
+                message.textContent = `確認要刪除 ${language} - ${lesson} 嗎？此操作不可撤銷！`;
+            }
             
             modal.style.display = 'flex';
         }
@@ -393,9 +729,18 @@
 
         function confirmDelete() {
             if (deleteLanguage && deleteLesson) {
-                const encodedLanguage = encodeURIComponent(deleteLanguage);
-                const encodedLesson = encodeURIComponent(deleteLesson);
-                const url = `/delete_content/${encodedLanguage}/${encodedLesson}`;
+                let url;
+                
+                // 新流程：deleteLesson 是 'simple'
+                if (deleteLesson === 'simple') {
+                    const encodedLesson = encodeURIComponent(deleteLanguage);
+                    url = `/delete_content/simple/${encodedLesson}`;
+                } else {
+                    // 舊流程
+                    const encodedLanguage = encodeURIComponent(deleteLanguage);
+                    const encodedLesson = encodeURIComponent(deleteLesson);
+                    url = `/delete_content/${encodedLanguage}/${encodedLesson}`;
+                }
                 
                 // 使用表單提交
                 const form = document.createElement('form');

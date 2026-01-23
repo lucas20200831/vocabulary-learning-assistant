@@ -108,10 +108,14 @@
         
         <!-- 詞語復習 -->
         {% if review_words %}
-            <h2 style="color: #2c3e50; margin-top: 30px; border-bottom: 2px solid #3498db; padding-bottom: 10px;">📝 詞語需要複習 ({{ review_words|length }} 項)</h2>
+            <h2 style="color: #2c3e50; margin-top: 30px; border-bottom: 2px solid #3498db; padding-bottom: 10px;">📝 詞語掌握狀態</h2>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <button class="btn" onclick="startReviewQuiz()" style="background-color: #f39c12; display: inline-block; padding: 12px 24px; font-size: 16px;">🎙️ 聽寫未掌握單詞</button>
+            </div>
             <table>
                 <thead>
                     <tr>
+                        <th>狀態</th>
                         <th>詞彙</th>
                         <th>釋義</th>
                         <th>嘗試次數</th>
@@ -123,6 +127,13 @@
                 <tbody>
                     {% for word in review_words %}
                     <tr>
+                        <td style="text-align: center; font-size: 18px; font-weight: bold;">
+                            {% if word.accuracy >= 0.75 %}
+                                <span style="color: #27ae60;">✓</span>
+                            {% else %}
+                                <span style="color: #e74c3c;">✗</span>
+                            {% endif %}
+                        </td>
                         <td><strong>{{ word.word }}</strong></td>
                         <td>{{ word.meaning }}</td>
                         <td>{{ word.attempts }}</td>
@@ -130,7 +141,7 @@
                         <td>{{ word.incorrect }}</td>
                         <td class="
                             {% if word.attempts == 0 %}accuracy-low
-                            {% elif word.accuracy >= 0.8 %}accuracy-high
+                            {% elif word.accuracy >= 0.75 %}accuracy-high
                             {% elif word.accuracy >= 0.5 %}accuracy-medium
                             {% else %}accuracy-low
                             {% endif %}">
@@ -155,9 +166,34 @@
         {% endif %}
         
         <div style="text-align: center; margin-top: 30px;">
-            <button class="btn" onclick="history.back()">返回</button>
-            <a href="{{ url_for('index') }}" class="btn btn-back">返回首頁</a>
+            <a href="{{ url_for('vocab_list') }}" class="btn">返回課程列表</a>
         </div>
     </div>
+
+    <script>
+        function startReviewQuiz() {
+            // 收集所有未掌握单词
+            const words = [
+                {% for word in review_words %}
+                    '{{ word.word }}'{{ "," if not loop.last else "" }}
+                {% endfor %}
+            ];
+            
+            // 保存到 sessionStorage，听写页面会读取
+            sessionStorage.setItem('review_words', JSON.stringify(words));
+            
+            // 跳转到听写页面
+            const lessonName = '{{ lesson_name }}';
+            const language = '{{ language }}';
+            
+            if (!language || language === '') {
+                // 新流程：简化版
+                window.location.href = `/quiz_simple/${encodeURIComponent(lessonName)}?content_type=詞語&review_mode=true`;
+            } else {
+                // 旧流程：需要语言参数
+                window.location.href = `/quiz/${encodeURIComponent(language)}/${encodeURIComponent(lessonName)}?content_type=詞語&review_mode=true`;
+            }
+        }
+    </script>
 </body>
 </html>

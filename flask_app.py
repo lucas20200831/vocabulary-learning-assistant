@@ -16,6 +16,11 @@ app.config['SESSION_COOKIE_HTTPONLY'] = False
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
 
+# Disable Jinja2 caching
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.jinja_env.auto_reload = True
+app.jinja_env.cache = None
+
 # Disable auto-reload to prevent duplicate TTS threads
 app.config['ENV'] = 'production'
 
@@ -28,12 +33,14 @@ if not os.path.exists(AUDIO_DIR):
 tts_engine = True  # gTTS 总是可用的（无需初始化）
 tts_queue = Queue()
 tts_thread = None
+gTTS_lib = None  # 全局 gTTS 引用
 
 def init_tts():
     """初始化 TTS 后台线程"""
-    global tts_thread
+    global tts_thread, tts_engine, gTTS_lib
     try:
         from gtts import gTTS
+        gTTS_lib = gTTS
         print("[TTS] gTTS library imported successfully")
         
         # 启动多个后台 TTS 线程以加速处理
@@ -47,9 +54,11 @@ def init_tts():
                     # 检查文件是否已存在
                     if not os.path.exists(audio_file):
                         print(f"[TTS] Generating: {word}")
-                        tts = gTTS(text=word, lang='zh-CN', slow=False)
+                        tts = gTTS_lib(text=word, lang='zh-CN', slow=False)
                         tts.save(audio_file)
-                        print(f"[TTS] Generated: {word}")
+                        print(f"[TTS] Generated: {word} -> {audio_file}")
+                    else:
+                        print(f"[TTS] Already cached: {word}")
                     tts_queue.task_done()
                 except Exception as e:
                     print(f"[TTS] Worker Error: {str(e)}")
@@ -61,9 +70,10 @@ def init_tts():
             tts_thread.start()
         print("[TTS] Engine initialized with gTTS (3 worker threads)")
         
-    except ImportError:
-        tts_engine = None
-        print("Warning: gTTS not installed, TTS will be disabled")
+    except ImportError as e:
+        tts_engine = False
+        gTTS_lib = None
+        print(f"Warning: gTTS not installed - {str(e)}, TTS will be disabled")
 
 # 初始化 TTS
 init_tts()
@@ -84,7 +94,8 @@ def save_data(data):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # 直接重定向到课程列表，无需首页
+    return redirect(url_for('vocab_list'))
 
 @app.route('/vocab_list')
 def vocab_list():
@@ -135,6 +146,129 @@ def vocab_list():
                         })
     
     return render_template('vocab_list.html', contents=contents)
+
+@app.route('/api/search_lessons')
+def search_lessons():
+    """搜索課程 - 支持按標題和內容搜索"""
+    keyword = request.args.get('keyword', '').strip().lower()
+    
+    if not keyword:
+        return jsonify([])
+    
+    data = load_data()
+    results = []
+    
+    for key, value in data.items():
+        if isinstance(value, dict):
+            if ('詞語' in value or '段落' in value):
+                # 新格式課程
+                lesson_number = key
+                language = ''
+                is_simple = True
+                lesson_content = value
+            else:
+                # 舊格式課程，需要檢查每個lesson
+                for lesson_num, lesson_content in value.items():
+                    if isinstance(lesson_content, dict) and ('詞語' in lesson_content or '段落' in lesson_content):
+                        lesson_number = lesson_num
+                        language = key
+                        is_simple = False
+                        
+                        # 檢查是否匹配
+                        match = False
+                        
+                        # 1. 匹配課程標題
+                        if keyword in lesson_number.lower():
+                            match = True
+                        
+                        # 2. 匹配詞語
+                        if not match:
+                            for word_item in lesson_content.get('詞語', []):
+                                word_text = word_item.get('word', '').lower()
+                                meaning_text = word_item.get('meaning', '').lower()
+                                if keyword in word_text or keyword in meaning_text:
+                                    match = True
+                                    break
+                        
+                        # 3. 匹配段落
+                        if not match:
+                            for para in lesson_content.get('段落', []):
+                                para_title = para.get('title', '').lower()
+                                if keyword in para_title:
+                                    match = True
+                                    break
+                                
+                                for sent in para.get('sentences', []):
+                                    sent_text = sent.get('sentence', '') if isinstance(sent, dict) else sent
+                                    if keyword in sent_text.lower():
+                                        match = True
+                                        break
+                                
+                                if match:
+                                    break
+                        
+                        if match:
+                            word_count = len(lesson_content.get('詞語', []))
+                            para_count = len(lesson_content.get('段落', []))
+                            results.append({
+                                'language': language,
+                                'lesson_number': lesson_number,
+                                'word_count': word_count,
+                                'para_count': para_count,
+                                'is_simple': is_simple
+                            })
+                continue
+            
+            # 新格式課程處理
+            lesson_number = key
+            language = ''
+            is_simple = True
+            
+            # 檢查是否匹配
+            match = False
+            
+            # 1. 匹配課程標題
+            if keyword in lesson_number.lower():
+                match = True
+            
+            # 2. 匹配詞語
+            if not match:
+                for word_item in lesson_content.get('詞語', []):
+                    word_text = word_item.get('word', '').lower()
+                    meaning_text = word_item.get('meaning', '').lower()
+                    if keyword in word_text or keyword in meaning_text:
+                        match = True
+                        break
+            
+            # 3. 匹配段落
+            if not match:
+                for para in lesson_content.get('段落', []):
+                    para_title = para.get('title', '').lower()
+                    if keyword in para_title:
+                        match = True
+                        break
+                    
+                    for sent in para.get('sentences', []):
+                        sent_text = sent.get('sentence', '') if isinstance(sent, dict) else sent
+                        if keyword in sent_text.lower():
+                            match = True
+                            break
+                    
+                    if match:
+                        break
+            
+            if match:
+                word_count = len(lesson_content.get('詞語', []))
+                para_count = len(lesson_content.get('段落', []))
+                results.append({
+                    'language': language,
+                    'lesson_number': lesson_number,
+                    'word_count': word_count,
+                    'para_count': para_count,
+                    'is_simple': is_simple
+                })
+    
+    return jsonify(results)
 
 @app.route('/tts/<word>')
 def generate_tts(word):
@@ -235,7 +369,47 @@ def add_content():
         data[language][lesson_number] = lesson_data
         save_data(data)
         
-        return jsonify({'status': 'success', 'message': '內容已成功添加'}), 201
+        # 計算詞語和段落的數量用於前端記錄
+        word_count = len(lesson_data.get('詞語', []))
+        para_count = len(lesson_data.get('段落', []))
+        
+        # 添加新課程後，立即預生成所有音頻
+        print(f"[ADD_CONTENT] Triggering TTS generation for new lesson: {language}/{lesson_number}")
+        
+        texts_to_generate = []
+        
+        # 收集詞語文本
+        for word_obj in lesson_data.get('詞語', []):
+            text = word_obj.get('word', '')
+            if text:
+                texts_to_generate.append(text)
+        
+        # 收集段落句子文本
+        for para_obj in lesson_data.get('段落', []):
+            for sent_obj in para_obj.get('sentences', []):
+                text = sent_obj.get('sentence', '')
+                if text:
+                    texts_to_generate.append(text)
+        
+        # 將所有文本加入 TTS 生成隊列
+        print(f"[ADD_CONTENT] Queueing {len(texts_to_generate)} texts for TTS generation")
+        for text in texts_to_generate:
+            word_hash = hashlib.md5(text.encode('utf-8')).hexdigest()
+            audio_file = os.path.join(AUDIO_DIR, f'{word_hash}.mp3')
+            tts_queue.put((text, audio_file))
+            print(f"[ADD_CONTENT] Queued: {text}")
+        
+        return jsonify({
+            'status': 'success',
+            'message': '內容已成功添加，正在生成音頻...',
+            'lesson': {
+                'language': language,
+                'lesson_number': lesson_number,
+                'word_count': word_count,
+                'para_count': para_count,
+                'is_simple': False
+            }
+        }), 201
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -270,7 +444,17 @@ def create_lesson_simple():
         data[lesson_name] = lesson_data
         save_data(data)
         
-        return jsonify({'status': 'success', 'message': '課程已成功創建'}), 201
+        return jsonify({
+            'status': 'success', 
+            'message': '課程已成功創建',
+            'lesson': {
+                'language': '',
+                'lesson_number': lesson_name,
+                'word_count': 0,
+                'para_count': 0,
+                'is_simple': True
+            }
+        }), 201
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -426,17 +610,25 @@ def delete_content(language, lesson_num):
         
         data = load_data()
         
-        if language not in data or lesson_num not in data[language]:
-            # 即使未找到，也重定向回列表頁面
-            return redirect(url_for('vocab_list'))
-        
-        del data[language][lesson_num]
-        
-        # 如果語言下沒有課程了，刪除語言
-        if not data[language]:
-            del data[language]
-        
-        save_data(data)
+        # 支持新流程：language 為 'simple' 或空字符串
+        if language == 'simple' or language == '':
+            # 新格式：課程直接存储在數据根級別
+            if lesson_num in data:
+                del data[lesson_num]
+                save_data(data)
+        else:
+            # 舊格式：按语言分类
+            if language not in data or lesson_num not in data[language]:
+                # 即使未找到，也重定向回列表頁面
+                return redirect(url_for('vocab_list'))
+            
+            del data[language][lesson_num]
+            
+            # 如果語言下沒有課程了，刪除語言
+            if not data[language]:
+                del data[language]
+            
+            save_data(data)
         
         # 成功刪除後重定向回列表頁面
         return redirect(url_for('vocab_list'))
@@ -710,7 +902,7 @@ def review_simple(lesson_name):
                 accuracy = item['correct'] / item['attempts']
                 accuracy_display = round(accuracy * 100, 1)
             
-            if accuracy < 0.8:
+            if accuracy < 0.75:
                 review_words.append({
                     'word': item['word'],
                     'meaning': item['meaning'],
@@ -755,7 +947,7 @@ def review_new(language, lesson_num):
                 accuracy = item['correct'] / item['attempts']
                 accuracy_display = round(accuracy * 100, 1)
             
-            if accuracy < 0.8:
+            if accuracy < 0.75:
                 review_words.append({
                     'word': item['word'],
                     'meaning': item['meaning'],
@@ -782,7 +974,7 @@ def review_new(language, lesson_num):
                     accuracy = sent_item['correct'] / sent_item['attempts']
                     accuracy_display = round(accuracy * 100, 1)
                 
-                if accuracy < 0.8:
+                if accuracy < 0.75:
                     para_info['sentences'].append({
                         'sentence': sent_item['sentence'],
                         'attempts': sent_item['attempts'],
@@ -820,7 +1012,7 @@ def review_quiz(language, lesson_num):
     
     lesson_content = data[language][lesson_num]
     
-    # Get only items that need review (accuracy < 0.8)
+    # Get only items that need review (accuracy < 0.75)
     items_to_review = []
     
     if content_type == '詞語' and '詞語' in lesson_content:
@@ -830,7 +1022,7 @@ def review_quiz(language, lesson_num):
             else:
                 accuracy = item['correct'] / item['attempts']
             
-            if accuracy < 0.8:
+            if accuracy < 0.75:
                 items_to_review.append(item['word'])
     
     elif content_type == '段落' and '段落' in lesson_content:
@@ -841,7 +1033,7 @@ def review_quiz(language, lesson_num):
                 else:
                     accuracy = sent_item['correct'] / sent_item['attempts']
                 
-                if accuracy < 0.8:
+                if accuracy < 0.75:
                     items_to_review.append(sent_item['sentence'])
     
     if not items_to_review:
@@ -903,7 +1095,7 @@ def lesson_stats_api(language, lesson_num):
             # Only count tested words (attempts > 0) for statistics
             if item['attempts'] > 0:
                 accuracy = item['correct'] / item['attempts']
-                if accuracy >= 0.8:
+                if accuracy >= 0.75:
                     mastered += 1
                 else:
                     needs_review += 1
@@ -919,7 +1111,7 @@ def lesson_stats_api(language, lesson_num):
                 
                 if sent['attempts'] > 0:
                     accuracy = sent['correct'] / sent['attempts']
-                    if accuracy >= 0.8:
+                    if accuracy >= 0.75:
                         mastered += 1
                     else:
                         needs_review += 1
@@ -964,7 +1156,7 @@ def stats_simple(lesson_name):
                 word_stats['needs_review'] += 1
             else:
                 accuracy = item['correct'] / item['attempts']
-                if accuracy >= 0.8:
+                if accuracy >= 0.75:
                     status = '已掌握'
                     word_stats['mastered'] += 1
                 else:
@@ -1028,7 +1220,7 @@ def lesson_stats_new(language, lesson_num):
                 word_stats['needs_review'] += 1
             else:
                 accuracy = item['correct'] / item['attempts']
-                if accuracy >= 0.8:
+                if accuracy >= 0.75:
                     status = '已掌握'
                     word_stats['mastered'] += 1
                 else:
@@ -1079,7 +1271,7 @@ def lesson_stats_new(language, lesson_num):
                     para_info['needs_review'] += 1
                 else:
                     accuracy = sent['correct'] / sent['attempts']
-                    if accuracy >= 0.8:
+                    if accuracy >= 0.75:
                         status = '已掌握'
                         para_stats['mastered'] += 1
                         para_info['mastered'] += 1
@@ -1211,6 +1403,10 @@ def save_content():
         # Save the updated data
         save_data(data)
         
+        # 计算词语和段落数量
+        word_count = len(lesson_content.get('詞語', []))
+        para_count = len(lesson_content.get('段落', []))
+        
         # 保存后，立即生成所有词语和段落的音频
         print(f"[SAVE] Triggering TTS generation for lesson: {lesson}")
         
@@ -1239,7 +1435,19 @@ def save_content():
             tts_queue.put((text, audio_file))
             print(f"[SAVE] Queued: {text}")
         
-        return jsonify({'status': 'success', 'message': '內容已保存，正在生成音频...', 'text_count': len(texts_to_generate)})
+        # 返回课程元数据供前端记录到最近访问
+        return jsonify({
+            'status': 'success', 
+            'message': '內容已保存，正在生成音频...', 
+            'text_count': len(texts_to_generate),
+            'lesson': {
+                'language': language,
+                'lesson_number': lesson,
+                'word_count': word_count,
+                'para_count': para_count,
+                'is_simple': is_simple
+            }
+        })
     
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
@@ -1248,4 +1456,5 @@ if __name__ == '__main__':
     # Create templates directory if it doesn't exist
     os.makedirs('templates', exist_ok=True)
     
-    app.run(debug=True, host='127.0.0.1', port=5002)  # Changed to port 5002 to avoid conflicts
+    # 禁用自动重加载以防止 TTS 线程重复启动
+    app.run(debug=True, host='127.0.0.1', port=5002, use_reloader=False)
