@@ -144,8 +144,9 @@
 
     <script>
         let currentIndex = 0;
-        let totalWords = {{ word_count }};
         let allWords = {{ words_json|safe }};  // All words as JSON array
+        // 根据实际的allWords数组长度计算totalWords，确保准确性
+        let totalWords = allWords.length;
         let currentWord = allWords[0] || '';
         let testStarted = false;
         let results = [];
@@ -183,6 +184,12 @@
         
         // 所有音频已预先生成完毕，页面加载完成后立即播放
         window.addEventListener('load', function() {
+            // 更新进度显示中的总词数，确保与实际的allWords数组一致
+            document.querySelectorAll('.lesson-title').forEach(el => {
+                el.textContent = el.textContent.replace(/共\s*\d+\s*個詞/, `共 ${totalWords} 個詞`);
+            });
+            document.getElementById('current-index').parentElement.innerHTML = `當前進度: <span id="current-index">1</span> / ${totalWords}`;
+            
             speakCurrentWord();
             testStarted = true;
         });
@@ -270,28 +277,29 @@
                         btn.classList.add('hidden');
                     });
                     
+                    // 计算统计信息
+                    const knownCount = results.filter(r => r.known).length;
+                    const unknownCount = results.filter(r => !r.known).length;
+                    const accuracy = totalWords > 0 ? Math.round(knownCount / totalWords * 100) : 0;
+                    
+                    // 显示完成摘要
+                    const summaryDiv = document.createElement('div');
+                    summaryDiv.style.cssText = 'background-color: #d5f4e6; border-left: 4px solid #27ae60; padding: 20px; border-radius: 4px; margin: 20px 0; text-align: left;';
+                    summaryDiv.innerHTML = `
+                        <h3 style="margin-top: 0; color: #27ae60;">聽寫結果摘要</h3>
+                        <p><strong>總共詞語：</strong> ${totalWords} 個</p>
+                        <p><strong>✅ 能默寫：</strong> ${knownCount} 個</p>
+                        <p><strong>❌ 不能默寫：</strong> ${unknownCount} 個</p>
+                        <p><strong>準確率：</strong> ${accuracy}%</p>
+                    `;
+                    document.getElementById('quiz-area').appendChild(summaryDiv);
+                    
                     const finishBtn = document.createElement('button');
                     finishBtn.className = 'btn';
                     finishBtn.style.marginTop = '20px';
-                    finishBtn.textContent = '返回';
+                    finishBtn.textContent = '返回首頁';
                     finishBtn.onclick = function() {
-                        // 如果是复习模式，返回复习页面
-                        if (isReviewMode) {
-                            if (language && language !== '') {
-                                // 旧流程
-                                window.location.href = `/review/${encodeURIComponent(language)}/${encodeURIComponent(lesson)}`;
-                            } else {
-                                // 新流程
-                                window.location.href = `/review_simple/${encodeURIComponent(lesson)}`;
-                            }
-                        } else {
-                            // 普通模式，使用 history.back()
-                            if (window.history.length > 1) {
-                                history.back();
-                            } else {
-                                window.location.href = '/vocab_list';
-                            }
-                        }
+                        window.location.href = '/vocab_list';
                     };
                     document.getElementById('quiz-area').appendChild(finishBtn);
                     isProcessing = false;

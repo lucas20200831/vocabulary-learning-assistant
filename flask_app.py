@@ -147,6 +147,11 @@ def vocab_list():
     
     return render_template('vocab_list.html', contents=contents)
 
+@app.route('/unmastered_words')
+def unmastered_words():
+    """显示所有未掌握单词的页面"""
+    return render_template('unmastered_words.html')
+
 @app.route('/api/search_lessons')
 def search_lessons():
     """搜索課程 - 支持按標題和內容搜索"""
@@ -269,6 +274,213 @@ def search_lessons():
                 })
     
     return jsonify(results)
+
+@app.route('/api/get_unmastered_words')
+def get_unmastered_words():
+    """获取所有未掌握的单词"""
+    data = load_data()
+    unmastered_words = []
+    
+    # 遍历所有课程
+    for key, value in data.items():
+        if isinstance(value, dict):
+            # 检查是否为新格式课程（直接包含詞語和段落）
+            if '詞語' in value or '段落' in value:
+                # 新格式：课程名为key
+                lesson_name = key
+                language = ''
+                is_simple = True
+                
+                # 提取未掌握的词语
+                if '詞語' in value:
+                    for word_item in value['詞語']:
+                        word = word_item.get('word', '')
+                        attempts = word_item.get('attempts', 0)
+                        correct = word_item.get('correct', 0)
+                        
+                        # 未掌握的标准：尝试次数为0，或正确率低于75%
+                        if attempts == 0 or (attempts > 0 and correct / attempts < 0.75):
+                            unmastered_words.append({
+                                'word': word,
+                                'lesson': lesson_name,
+                                'language': language,
+                                'is_simple': True,
+                                'attempts': attempts,
+                                'accuracy': (correct / attempts * 100) if attempts > 0 else 0
+                            })
+            else:
+                # 旧格式：按语言分类
+                for lesson_num, lesson_content in value.items():
+                    if isinstance(lesson_content, dict) and ('詞語' in lesson_content or '段落' in lesson_content):
+                        language = key
+                        is_simple = False
+                        
+                        # 提取未掌握的词语
+                        if '詞語' in lesson_content:
+                            for word_item in lesson_content['詞語']:
+                                word = word_item.get('word', '')
+                                attempts = word_item.get('attempts', 0)
+                                correct = word_item.get('correct', 0)
+                                
+                                # 未掌握的标准：尝试次数为0，或正确率低于75%
+                                if attempts == 0 or (attempts > 0 and correct / attempts < 0.75):
+                                    unmastered_words.append({
+                                        'word': word,
+                                        'lesson': lesson_num,
+                                        'language': language,
+                                        'is_simple': False,
+                                        'attempts': attempts,
+                                        'accuracy': (correct / attempts * 100) if attempts > 0 else 0
+                                    })
+    
+    # 按准确率排序（准确率低的优先）
+    unmastered_words.sort(key=lambda x: x['accuracy'])
+    
+    return jsonify(unmastered_words)
+
+@app.route('/api/get_all_words')
+def get_all_words():
+    """获取所有词语的统计信息"""
+    data = load_data()
+    total_words = 0
+    mastered_words = 0
+    
+    # 遍历所有课程
+    for key, value in data.items():
+        if isinstance(value, dict):
+            # 检查是否为新格式课程（直接包含詞語和段落）
+            if '詞語' in value:
+                # 新格式：课程名为key
+                for word_item in value['詞語']:
+                    total_words += 1
+                    attempts = word_item.get('attempts', 0)
+                    correct = word_item.get('correct', 0)
+                    
+                    # 已掌握的标准：正确率≥75%
+                    if attempts > 0 and correct / attempts >= 0.75:
+                        mastered_words += 1
+            else:
+                # 旧格式：按语言分类
+                for lesson_num, lesson_content in value.items():
+                    if isinstance(lesson_content, dict) and '詞語' in lesson_content:
+                        for word_item in lesson_content['詞語']:
+                            total_words += 1
+                            attempts = word_item.get('attempts', 0)
+                            correct = word_item.get('correct', 0)
+                            
+                            # 已掌握的标准：正确率≥75%
+                            if attempts > 0 and correct / attempts >= 0.75:
+                                mastered_words += 1
+    
+    return jsonify({
+        'total': total_words,
+        'mastered': mastered_words,
+        'unmastered': total_words - mastered_words
+    })
+
+@app.route('/api/get_lessons_unmastered_counts')
+def get_lessons_unmastered_counts():
+    """获取每个课程的未掌握单词数量"""
+    data = load_data()
+    lesson_counts = {}
+    
+    # 遍历所有课程
+    for key, value in data.items():
+        if isinstance(value, dict):
+            # 检查是否为新格式课程（直接包含詞語和段落）
+            if '詞語' in value:
+                # 新格式：课程名为key
+                unmastered_count = 0
+                for word_item in value['詞語']:
+                    attempts = word_item.get('attempts', 0)
+                    correct = word_item.get('correct', 0)
+                    
+                    # 未掌握的标准：尝试次数为0，或正确率低于75%
+                    if attempts == 0 or (attempts > 0 and correct / attempts < 0.75):
+                        unmastered_count += 1
+                
+                lesson_counts[key] = unmastered_count
+            else:
+                # 旧格式：按语言分类
+                for lesson_num, lesson_content in value.items():
+                    if isinstance(lesson_content, dict) and '詞語' in lesson_content:
+                        unmastered_count = 0
+                        for word_item in lesson_content['詞語']:
+                            attempts = word_item.get('attempts', 0)
+                            correct = word_item.get('correct', 0)
+                            
+                            # 未掌握的标准：尝试次数为0，或正确率低于75%
+                            if attempts == 0 or (attempts > 0 and correct / attempts < 0.75):
+                                unmastered_count += 1
+                        
+                        lesson_key = key + '|' + lesson_num
+                        lesson_counts[lesson_key] = unmastered_count
+    
+    return jsonify(lesson_counts)
+
+@app.route('/quiz_all_unmastered')
+def quiz_all_unmastered():
+    """聽寫所有未掌握的單詞"""
+    data = load_data()
+    
+    # 获取所有未掌握的词语
+    unmastered_words = []
+    for key, value in data.items():
+        if isinstance(value, dict):
+            if '詞語' in value or '段落' in value:
+                # 新格式课程
+                if '詞語' in value:
+                    for word_item in value['詞語']:
+                        word = word_item.get('word', '')
+                        attempts = word_item.get('attempts', 0)
+                        correct = word_item.get('correct', 0)
+                        if attempts == 0 or (attempts > 0 and correct / attempts < 0.75):
+                            unmastered_words.append(word)
+            else:
+                # 旧格式课程
+                for lesson_num, lesson_content in value.items():
+                    if isinstance(lesson_content, dict) and '詞語' in lesson_content:
+                        for word_item in lesson_content['詞語']:
+                            word = word_item.get('word', '')
+                            attempts = word_item.get('attempts', 0)
+                            correct = word_item.get('correct', 0)
+                            if attempts == 0 or (attempts > 0 and correct / attempts < 0.75):
+                                unmastered_words.append(word)
+    
+    if not unmastered_words:
+        return "沒有未掌握的單詞", 404
+    
+    # 预加载TTS
+    print(f"[ALL_UNMASTERED] Preloading {len(unmastered_words)} words for TTS")
+    for i, word in enumerate(unmastered_words):
+        word_hash = hashlib.md5(word.encode('utf-8')).hexdigest()
+        audio_file = os.path.join(AUDIO_DIR, f'{word_hash}.mp3')
+        if not os.path.exists(audio_file):
+            print(f"[ALL_UNMASTERED] Queuing word {i+1}/{len(unmastered_words)}: {word}")
+            tts_queue.put((word, audio_file))
+        else:
+            print(f"[ALL_UNMASTERED] Already cached: {word}")
+    
+    session.permanent = True
+    session['current_quiz'] = {
+        'language': '',
+        'lesson': '所有未掌握單詞',
+        'content_type': '詞語',
+        'words': unmastered_words,
+        'is_all_unmastered': True
+    }
+    
+    import json as json_module
+    words_json = json_module.dumps(unmastered_words, ensure_ascii=False)
+    
+    return render_template('quiz.html', 
+                         lesson_name='所有未掌握單詞',
+                         language='',
+                         lesson_num='所有未掌握單詞',
+                         word_count=len(unmastered_words),
+                         current_word=unmastered_words[0] if unmastered_words else None,
+                         words_json=words_json,
+                         content_type='詞語')
 
 @app.route('/tts/<word>')
 def generate_tts(word):
@@ -790,88 +1002,141 @@ def submit_answer():
     if not word or not lesson:
         return jsonify({'error': '缺少必要參數'}), 400
     
-    # Validate data structure
-    try:
-        # Support both old format (language/lesson) and new format (direct lesson)
-        if language and language in data and lesson in data[language]:
-            # Old format: language/lesson
-            lesson_data = data[language][lesson]
-        elif not language and lesson in data:
-            # New format: direct lesson
-            lesson_data = data[lesson]
-        else:
-            return jsonify({'error': f'找不到課程: {language or ""}/{lesson}'}), 400
-    except KeyError:
-        return jsonify({'error': f'找不到課程: {language or ""}/{lesson}'}), 400
-    
-    # Find and update the record based on content type
-    word_found = False
-    
-    if content_type == '詞語' and '詞語' in lesson_data:
-        # Handle word entries
-        for word_item in lesson_data['詞語']:
-            if word_item['word'] == word:
-                word_item['attempts'] += 1
-                if is_known:
-                    word_item['correct'] += 1
+    # 特殊处理：所有未掌握单词
+    if lesson == '所有未掌握單詞':
+        # 遍历所有课程查找并更新单词
+        word_found = False
+        for key, value in data.items():
+            if isinstance(value, dict):
+                # 新格式课程
+                if '詞語' in value:
+                    for word_item in value['詞語']:
+                        if word_item['word'] == word:
+                            word_item['attempts'] += 1
+                            if is_known:
+                                word_item['correct'] += 1
+                            else:
+                                word_item['incorrect'] += 1
+                            
+                            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                            word_item['history'].append({
+                                "timestamp": timestamp,
+                                "known": is_known
+                            })
+                            word_found = True
+                            break
+                    if word_found:
+                        break
                 else:
-                    word_item['incorrect'] += 1
-                
-                # Record history
-                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                word_item['history'].append({
-                    "timestamp": timestamp,
-                    "known": is_known
-                })
-                word_found = True
-                break
-    
-    elif content_type == '段落' and '段落' in lesson_data:
-        # Handle paragraph/sentence entries (新結構：同時更新段落和句子的統計)
-        for para in lesson_data['段落']:
-            for sent_item in para.get('sentences', []):
-                sent_text = sent_item.get('sentence') if isinstance(sent_item, dict) else sent_item
-                if sent_text == word:
-                    # 更新句子統計
-                    if isinstance(sent_item, dict):
-                        sent_item['attempts'] = sent_item.get('attempts', 0) + 1
-                        if is_known:
-                            sent_item['correct'] = sent_item.get('correct', 0) + 1
-                        else:
-                            sent_item['incorrect'] = sent_item.get('incorrect', 0) + 1
-                        
-                        # Record history for sentence
-                        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                        if 'history' not in sent_item:
-                            sent_item['history'] = []
-                        sent_item['history'].append({
-                            "timestamp": timestamp,
-                            "known": is_known
-                        })
-                    
-                    # 同時更新段落統計 (新結構)
-                    para['attempts'] = para.get('attempts', 0) + 1
+                    # 旧格式课程
+                    for lesson_num, lesson_content in value.items():
+                        if isinstance(lesson_content, dict) and '詞語' in lesson_content:
+                            for word_item in lesson_content['詞語']:
+                                if word_item['word'] == word:
+                                    word_item['attempts'] += 1
+                                    if is_known:
+                                        word_item['correct'] += 1
+                                    else:
+                                        word_item['incorrect'] += 1
+                                    
+                                    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                                    word_item['history'].append({
+                                        "timestamp": timestamp,
+                                        "known": is_known
+                                    })
+                                    word_found = True
+                                    break
+                            if word_found:
+                                break
+                if word_found:
+                    break
+        
+        if not word_found:
+            return jsonify({'error': f'找不到單詞: {word}'}), 400
+    else:
+        # 普通课程处理
+        # Validate data structure
+        try:
+            # Support both old format (language/lesson) and new format (direct lesson)
+            if language and language in data and lesson in data[language]:
+                # Old format: language/lesson
+                lesson_data = data[language][lesson]
+            elif not language and lesson in data:
+                # New format: direct lesson
+                lesson_data = data[lesson]
+            else:
+                return jsonify({'error': f'找不到課程: {language or ""}/{lesson}'}), 400
+        except KeyError:
+            return jsonify({'error': f'找不到課程: {language or ""}/{lesson}'}), 400
+        
+        # Find and update the record based on content type
+        word_found = False
+        
+        if content_type == '詞語' and '詞語' in lesson_data:
+            # Handle word entries
+            for word_item in lesson_data['詞語']:
+                if word_item['word'] == word:
+                    word_item['attempts'] += 1
                     if is_known:
-                        para['correct'] = para.get('correct', 0) + 1
+                        word_item['correct'] += 1
                     else:
-                        para['incorrect'] = para.get('incorrect', 0) + 1
+                        word_item['incorrect'] += 1
                     
-                    # Record history for paragraph
+                    # Record history
                     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    if 'history' not in para:
-                        para['history'] = []
-                    para['history'].append({
+                    word_item['history'].append({
                         "timestamp": timestamp,
                         "known": is_known
                     })
-                    
                     word_found = True
                     break
-            if word_found:
-                break
-    
-    if not word_found:
-        return jsonify({'error': f'找不到內容: {word}'}), 400
+        
+        elif content_type == '段落' and '段落' in lesson_data:
+            # Handle paragraph/sentence entries (新結構：同時更新段落和句子的統計)
+            for para in lesson_data['段落']:
+                for sent_item in para.get('sentences', []):
+                    sent_text = sent_item.get('sentence') if isinstance(sent_item, dict) else sent_item
+                    if sent_text == word:
+                        # 更新句子統計
+                        if isinstance(sent_item, dict):
+                            sent_item['attempts'] = sent_item.get('attempts', 0) + 1
+                            if is_known:
+                                sent_item['correct'] = sent_item.get('correct', 0) + 1
+                            else:
+                                sent_item['incorrect'] = sent_item.get('incorrect', 0) + 1
+                            
+                            # Record history for sentence
+                            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                            if 'history' not in sent_item:
+                                sent_item['history'] = []
+                            sent_item['history'].append({
+                                "timestamp": timestamp,
+                                "known": is_known
+                            })
+                        
+                        # 同時更新段落統計 (新結構)
+                        para['attempts'] = para.get('attempts', 0) + 1
+                        if is_known:
+                            para['correct'] = para.get('correct', 0) + 1
+                        else:
+                            para['incorrect'] = para.get('incorrect', 0) + 1
+                        
+                        # Record history for paragraph
+                        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        if 'history' not in para:
+                            para['history'] = []
+                        para['history'].append({
+                            "timestamp": timestamp,
+                            "known": is_known
+                        })
+                        
+                        word_found = True
+                        break
+                if word_found:
+                    break
+        
+        if not word_found:
+            return jsonify({'error': f'找不到內容: {word}'}), 400
     
     # Save data
     save_data(data)

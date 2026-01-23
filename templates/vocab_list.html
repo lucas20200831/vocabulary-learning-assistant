@@ -96,13 +96,17 @@
             background-color: #f9f9f9;
             padding: 12px;
             border-radius: 4px;
-            max-height: 150px;
-            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
             margin-bottom: 15px;
         }
         .word-item {
-            padding: 5px 0;
+            padding: 8px;
             color: #333;
+            background-color: white;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
         }
         .paragraphs-list {
             background-color: #f9f9f9;
@@ -336,6 +340,23 @@
             <div id="recentLessons" class="recent-lessons"></div>
         </div>
         
+        <!-- 所有未掌握單詞區 -->
+        <div id="unmasteredSection" class="recent-section" style="margin-bottom: 30px;">
+            <div id="unmasteredWordsContainer" style="display: none;">
+                <h3>⚠️ 所有未掌握單詞</h3>
+                <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <p id="unmasteredCount" style="margin: 0; color: #856404; font-weight: bold;">正在加載...</p>
+                        <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">點擊下方按鈕查看詳細信息並進行聽寫練習</p>
+                    </div>
+                    <a href="/unmastered_words" class="btn btn-small" style="white-space: nowrap; background-color: #e74c3c; margin: 0;">📋 查看詳情</a>
+                </div>
+            </div>
+            <div id="noUnmasteredMsg" style="background-color: #d4edda; border-left: 4px solid #28a745; padding: 15px; border-radius: 4px; color: #155724; font-weight: bold; display: none;">
+                🎉 恭喜！所有單詞都已掌握！
+            </div>
+        </div>
+        
         {% if contents %}
             <div id="allLessonsSection">
                 <h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 15px;">📚 所有課程</h3>
@@ -365,6 +386,7 @@
                             <div>
                                 <div style="font-weight: bold; color: #2c3e50;">{{ item.lesson_number }}</div>
                                 <div class="lesson-info">詞語: {{ item.word_count }} 個 | 段落: {{ item.para_count }} 個</div>
+                                <div class="lesson-unmastered" data-language="{{ item.language }}" data-lesson="{{ item.lesson_number }}" style="font-size: 12px; color: #e74c3c; margin-top: 5px; font-weight: bold;">正在檢測...</div>
                             </div>
                         </div>
                     </div>
@@ -467,6 +489,8 @@
         // 頁面加載時初始化
         window.addEventListener('DOMContentLoaded', function() {
             loadRecentLessons();
+            loadUnmasteredWords();
+            loadLessonUnmasteredCounts();
             initSearchListener();
             
             const expandedLesson = sessionStorage.getItem('expandedLesson');
@@ -497,11 +521,25 @@
                 return;
             }
             
-            document.getElementById('recentSection').style.display = 'block';
+            // 验证最近访问的课程是否仍然存在
+            // 从 allLessons 或直接从当前显示的课程中验证
             const recentLessons = document.getElementById('recentLessons');
             recentLessons.innerHTML = '';
             
+            let validRecent = [];
+            
             recent.forEach(item => {
+                // 检查课程是否在当前课程列表中存在
+                const courseCard = document.querySelector(`[data-language="${item.language}"][data-lesson="${item.lesson_number}"]`);
+                
+                // 如果课程卡片不存在，说明该课程已被删除，跳过
+                if (!courseCard && (item.language || item.lesson_number)) {
+                    console.log(`课程已删除，跳过: ${item.lesson_number}`);
+                    return;
+                }
+                
+                validRecent.push(item);
+                
                 const card = document.createElement('div');
                 card.className = 'recent-card';
                 card.onclick = () => openLesson(item.language, item.lesson_number, item.is_simple);
@@ -514,15 +552,36 @@
                 info.className = 'recent-card-info';
                 info.textContent = `詞語: ${item.word_count} 個 | 段落: ${item.para_count} 個`;
                 
+                const unmastered = document.createElement('div');
+                unmastered.className = 'recent-card-unmastered';
+                unmastered.setAttribute('data-language', item.language || '');
+                unmastered.setAttribute('data-lesson', item.lesson_number);
+                unmastered.style.fontSize = '12px';
+                unmastered.style.marginTop = '5px';
+                unmastered.style.fontWeight = 'bold';
+                unmastered.textContent = '正在檢測...';
+                
                 const time = document.createElement('div');
                 time.className = 'recent-card-time';
                 time.textContent = formatTime(item.timestamp);
                 
                 card.appendChild(title);
                 card.appendChild(info);
+                card.appendChild(unmastered);
                 card.appendChild(time);
                 recentLessons.appendChild(card);
             });
+            
+            // 如果没有有效的最近访问课程，隐藏该部分
+            if (validRecent.length === 0) {
+                document.getElementById('recentSection').style.display = 'none';
+                // 清空 localStorage 中的无效记录
+                localStorage.removeItem(RECENT_LESSONS_KEY);
+            } else {
+                document.getElementById('recentSection').style.display = 'block';
+                // 更新 localStorage，只保留有效的课程
+                localStorage.setItem(RECENT_LESSONS_KEY, JSON.stringify(validRecent));
+            }
         }
 
         // 格式化時間戳
@@ -541,6 +600,75 @@
             
             const date = new Date(timestamp);
             return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+        }
+
+        // 加載並顯示所有未掌握的單詞
+        function loadUnmasteredWords() {
+            fetch('/api/get_unmastered_words')
+                .then(response => response.json())
+                .then(words => {
+                    const container = document.getElementById('unmasteredWordsContainer');
+                    const noMsg = document.getElementById('noUnmasteredMsg');
+                    const countMsg = document.getElementById('unmasteredCount');
+                    
+                    if (words.length === 0) {
+                        container.style.display = 'none';
+                        noMsg.style.display = 'block';
+                    } else {
+                        container.style.display = 'block';
+                        noMsg.style.display = 'none';
+                        countMsg.textContent = `共 ${words.length} 個未掌握的單詞`;
+                    }
+                })
+                .catch(error => {
+                    console.error('加載未掌握單詞失敗:', error);
+                    document.getElementById('unmasteredWordsContainer').style.display = 'none';
+                    document.getElementById('noUnmasteredMsg').style.display = 'block';
+                });
+        }
+
+        // 加載每個課程的未掌握單詞數量
+        function loadLessonUnmasteredCounts() {
+            fetch('/api/get_lessons_unmastered_counts')
+                .then(response => response.json())
+                .then(data => {
+                    // 更新主要課程卡片上的未掌握數量
+                    document.querySelectorAll('.lesson-unmastered').forEach(element => {
+                        const language = element.getAttribute('data-language');
+                        const lesson = element.getAttribute('data-lesson');
+                        const key = language ? (language + '|' + lesson) : lesson;
+                        
+                        const count = data[key] || 0;
+                        
+                        if (count > 0) {
+                            element.innerHTML = `⚠️ 未掌握: <strong>${count}</strong> 個單詞`;
+                            element.style.color = '#e74c3c';
+                        } else {
+                            element.innerHTML = '✅ 所有單詞已掌握！';
+                            element.style.color = '#27ae60';
+                        }
+                    });
+                    
+                    // 更新最近訪問卡片上的未掌握數量
+                    document.querySelectorAll('.recent-card-unmastered').forEach(element => {
+                        const language = element.getAttribute('data-language');
+                        const lesson = element.getAttribute('data-lesson');
+                        const key = language ? (language + '|' + lesson) : lesson;
+                        
+                        const count = data[key] || 0;
+                        
+                        if (count > 0) {
+                            element.innerHTML = `⚠️ 未掌握: <strong>${count}</strong> 個`;
+                            element.style.color = '#e74c3c';
+                        } else {
+                            element.innerHTML = '✅ 已掌握';
+                            element.style.color = '#27ae60';
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('加載課程未掌握數量失敗:', error);
+                });
         }
 
         // 記錄課程訪問時間

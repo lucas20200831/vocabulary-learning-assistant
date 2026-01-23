@@ -187,6 +187,12 @@
         .btn-back:hover {
             background-color: #7f8c8d;
         }
+        .btn-quiz {
+            background-color: #f39c12;
+        }
+        .btn-quiz:hover {
+            background-color: #d35400;
+        }
         .button-group {
             text-align: center;
             margin-top: 30px;
@@ -226,18 +232,16 @@
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 20%;">詞語</th>
-                            <th style="width: 20%;">釋義</th>
-                            <th style="width: 15%;">嘗試次數</th>
-                            <th style="width: 15%;">準確率</th>
-                            <th style="width: 30%;">狀態</th>
+                            <th style="width: 25%;">詞語</th>
+                            <th style="width: 20%;">嘗試次數</th>
+                            <th style="width: 20%;">準確率</th>
+                            <th style="width: 35%;">狀態</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for word in word_stats.words %}
                         <tr>
                             <td><strong>{{ word.word }}</strong></td>
-                            <td>{{ word.meaning }}</td>
                             <td>{{ word.attempts }}</td>
                             <td>
                                 {% if word.accuracy > 0 %}
@@ -279,12 +283,11 @@
         
         <div class="button-group">
             {% if language %}
-                <a href="{{ url_for('review_new', language=language, lesson_num=lesson_num) }}" class="btn">🔄 查看複習內容</a>
+                <a href="{{ url_for('review_new', language=language, lesson_num=lesson_num) }}" class="btn btn-quiz">📝 聽寫未掌握單詞</a>
             {% else %}
-                <a href="/review_simple/{{ lesson_num | urlencode }}" class="btn">🔄 查看複習內容</a>
+                <a href="/review_simple/{{ lesson_num | urlencode }}" class="btn btn-quiz">📝 聽寫未掌握單詞</a>
             {% endif %}
             <button class="btn" onclick="history.back()">返回</button>
-            <a href="{{ url_for('vocab_list') }}" class="btn btn-back">返回課程列表</a>
         </div>
     </div>
 </body>

@@ -1,6 +1,6 @@
 {
   // Git 相关设置
-  "git.autorefresh": false,
+  "git.autorefresh": true,
   "git.autofetch": false,
   "git.enableSmartCommit": false,
   "git.confirmSync": false,
