@@ -477,13 +477,15 @@
                     const textCount = result.text_count || 0;
                     if (textCount > 0) {
                         showMessage(`內容已保存！正在生成 ${textCount} 个语音文件...`, 'success');
-                        // 等待 2 秒让后台线程有时间开始处理
+                        // 根据文件数量动态计算等待时间（每个文件约1.5秒）
+                        const waitTime = 2000 + (textCount * 1500);
+                        console.log(`Waiting ${waitTime}ms for ${textCount} audio files to be generated`);
                         setTimeout(() => {
                             showMessage('语音文件生成完成！返回列表...', 'success');
                             setTimeout(() => {
                                 window.location.href = '/vocab_list';
                             }, 1000);
-                        }, 2000 + (textCount * 100));  // 根据文件数量动态延长等待时间
+                        }, waitTime);
                     } else {
                         showMessage('內容已保存成功！', 'success');
                         setTimeout(() => {
