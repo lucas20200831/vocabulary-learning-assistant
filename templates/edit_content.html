@@ -220,6 +220,17 @@
             color: #2c3e50;
             font-size: 14px;
             display: none;
+            animation: slideIn 0.3s ease-in-out;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         .message.success {
             background-color: #d4edda;
@@ -230,6 +241,27 @@
             background-color: #f8d7da;
             border-left-color: #e74c3c;
             color: #721c24;
+        }
+        .message.loading {
+            background-color: #d1ecf1;
+            border-left-color: #0c5460;
+            color: #0c5460;
+            font-weight: 500;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #0c5460;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
         }
     </style>
 </head>
@@ -278,7 +310,14 @@
         // Message display functions
         function showMessage(message, type = 'info') {
             const messageBox = document.getElementById('message-box');
-            messageBox.textContent = message;
+            
+            // 如果是加载状态，添加加载转轮
+            if (type === 'loading') {
+                messageBox.innerHTML = `<span class="loading-spinner"></span>${message}`;
+            } else {
+                messageBox.textContent = message;
+            }
+            
             messageBox.className = `message ${type}`;
             messageBox.style.display = 'block';
             
@@ -404,6 +443,16 @@
         async function saveContent() {
             const wordsText = document.getElementById('words-textarea')?.value || '';
             const paragraphsList = document.getElementById('paragraphs-list');
+            const saveButton = document.querySelector('button[type="submit"]');
+            
+            // 显示加载状态
+            showMessage('⏳ 正在保存並生成語音檔案，請稍候...', 'loading');
+            
+            // 禁用保存按钮，防止重复点击
+            if (saveButton) {
+                saveButton.disabled = true;
+                saveButton.innerHTML = '⏳ 正在保存...';
+            }
             
             // Parse words (each line is one word)
             const words = wordsText
@@ -458,6 +507,24 @@
                 
                 const result = await response.json();
                 if (result.status === 'success') {
+                    // 显示生成进度信息
+                    const textCount = result.text_count || 0;
+                    const generatedCount = result.generated_count || 0;
+                    
+                    // 更新按钮状态
+                    if (saveButton) {
+                        if (generatedCount === textCount && textCount > 0) {
+                            saveButton.innerHTML = '✓ 已保存';
+                            saveButton.style.backgroundColor = '#27ae60';
+                        } else if (generatedCount > 0) {
+                            saveButton.innerHTML = '⚠ 部分生成';
+                            saveButton.style.backgroundColor = '#e67e22';
+                        } else {
+                            saveButton.innerHTML = '✗ 生成失败';
+                            saveButton.style.backgroundColor = '#e74c3c';
+                        }
+                    }
+                    
                     // 记录编辑的课程到最近访问
                     if (result.lesson) {
                         const lesson = result.lesson;
@@ -483,9 +550,6 @@
                         recent = recent.slice(0, 10);
                         localStorage.setItem('recent_lessons', JSON.stringify(recent));
                     }
-                    
-                    const textCount = result.text_count || 0;
-                    const generatedCount = result.generated_count || 0;
                     
                     if (textCount > 0) {
                         if (generatedCount === textCount) {
@@ -515,9 +579,19 @@
                     }
                 } else {
                     showMessage('錯誤：' + result.message, 'error');
+                    // 恢复按钮
+                    if (saveButton) {
+                        saveButton.disabled = false;
+                        saveButton.innerHTML = '✓ 創建課程';
+                    }
                 }
             } catch (error) {
                 showMessage('保存失敗：' + error.message, 'error');
+                // 恢复按钮
+                if (saveButton) {
+                    saveButton.disabled = false;
+                    saveButton.innerHTML = '✓ 創建課程';
+                }
             }
         }
     </script>
