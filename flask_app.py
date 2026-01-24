@@ -61,7 +61,7 @@ def init_tts():
                         break
                     # 检查文件是否已存在
                     if not os.path.exists(audio_file):
-                        max_retries = 3
+                        max_retries = 5  # 增加到 5 次重试
                         retry_count = 0
                         success = False
                         
@@ -74,26 +74,36 @@ def init_tts():
                                 # 验证文件是否真的被创建了
                                 if os.path.exists(audio_file):
                                     file_size = os.path.getsize(audio_file)
-                                    # 确保文件权限正确
-                                    os.chmod(audio_file, 0o644)
-                                    print(f"[TTS] ✓ Generated successfully: {word} -> {audio_file} ({file_size} bytes)")
-                                    success = True
+                                    if file_size > 0:  # 确保不是空文件
+                                        # 确保文件权限正确
+                                        os.chmod(audio_file, 0o644)
+                                        print(f"[TTS] ✓ Generated successfully: {word} -> {audio_file} ({file_size} bytes)")
+                                        success = True
+                                    else:
+                                        print(f"[TTS] ✗ Generated empty file for: {word}")
+                                        retry_count += 1
+                                        if retry_count < max_retries:
+                                            wait_time = 1 + (retry_count * 0.5)  # 1s, 1.5s, 2s, 2.5s, 3s
+                                            print(f"[TTS] Retrying in {wait_time}s...")
+                                            time.sleep(wait_time)
                                 else:
                                     print(f"[TTS] ✗ File was not created after save() call for: {word}")
                                     retry_count += 1
                                     if retry_count < max_retries:
-                                        wait_time = 2 ** retry_count
+                                        wait_time = 1 + (retry_count * 0.5)
                                         print(f"[TTS] Retrying in {wait_time}s...")
                                         time.sleep(wait_time)
                                     
                             except Exception as gen_err:
                                 retry_count += 1
+                                error_type = type(gen_err).__name__
                                 if retry_count < max_retries:
-                                    wait_time = 2 ** retry_count  # 指数退避：2s, 4s, 8s
-                                    print(f"[TTS] ✗ Generation error for '{word}': {str(gen_err)}. Retrying in {wait_time}s...")
+                                    wait_time = 1 + (retry_count * 0.5)  # 更短的延迟
+                                    print(f"[TTS] ✗ {error_type} for '{word}': {str(gen_err)[:100]}")
+                                    print(f"[TTS] Retrying in {wait_time}s (attempt {retry_count}/{max_retries})...")
                                     time.sleep(wait_time)
                                 else:
-                                    print(f"[TTS] ✗ Final generation error for '{word}' after {max_retries} attempts: {str(gen_err)}")
+                                    print(f"[TTS] ✗ Final failure for '{word}' after {max_retries} attempts: {error_type}")
                         
                         if not success:
                             print(f"[TTS] ✗ FAILED to generate audio for: {word}")
@@ -101,14 +111,14 @@ def init_tts():
                         file_size = os.path.getsize(audio_file)
                         print(f"[TTS] ✓ Already cached: {word} ({file_size} bytes)")
                     
-                    # 在两个请求之间添加延迟，避免 gTTS API 限制
-                    time.sleep(1)
+                    # 在两个请求之间添加短延迟（0.5s）以避免 API 限制
+                    time.sleep(0.5)
                     tts_queue.task_done()
                 except Exception as e:
                     print(f"[TTS] ✗ Worker Error: {str(e)}")
                     import traceback
                     traceback.print_exc()
-                    time.sleep(1)
+                    time.sleep(0.5)
                     tts_queue.task_done()
         
         # 启动 1 个后台线程处理 TTS（避免 API 限制导致请求失败）
@@ -1773,13 +1783,15 @@ def save_content():
                     texts_to_generate.append(text)
         
         # 将所有文本加入 TTS 生成队列
-        print(f"[SAVE] Queueing {len(texts_to_generate)} texts for TTS generation")
-        for text in texts_to_generate:
+        print(f"[SAVE] ✓ Queueing {len(texts_to_generate)} texts for TTS generation")
+        for idx, text in enumerate(texts_to_generate, 1):
             word_hash = hashlib.md5(text.encode('utf-8')).hexdigest()
             audio_file = os.path.join(AUDIO_DIR, f'{word_hash}.mp3')
             # 即使文件已存在也重新加入队列，确保内容更新时重新生成
             tts_queue.put((text, audio_file))
-            print(f"[SAVE] Queued: {text}")
+            print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] Queued: '{text}' -> {word_hash}.mp3")
+        
+        print(f"[SAVE] Queue size: {tts_queue.qsize()} items pending")
         
         # 返回课程元数据供前端记录到最近访问
         return jsonify({
