@@ -195,58 +195,37 @@
         });
         
         function speakCurrentWord() {
-            // 调用后端端点获取音频 URL（端点会等待生成文件）
+            // 调用后端端点获取音频 URL
             console.log(`[AUDIO] Requesting audio for: ${currentWord}`);
             fetch(`/tts/${encodeURIComponent(currentWord)}`)
                 .then(response => response.json())
                 .then(data => {
                     console.log(`[AUDIO] Response:`, data);
                     if (data.success && data.url) {
-                        // 确保文件已准备好再播放
-                        if (data.ready || data.cached) {
-                            playAudio(data.url);
-                        } else {
-                            console.warn('[AUDIO] File not ready, waiting for generation...');
-                            // 文件还在生成，需要等待并重试
-                            // 等待最多 15 秒，每 300ms 检查一次（共 50 次）
-                            waitForAudioFile(data.url, 0, 50);
-                        }
+                        // 文件已准备好，直接播放
+                        playAudio(data.url);
                     } else {
-                        console.error('[AUDIO] Failed response:', data);
+                        // 文件不存在 - 显示错误
+                        console.error('[AUDIO] Audio file not found:', data.error || data);
+                        showAudioError(`无法播放音频: ${data.error || '文件不存在'}`);
                     }
                 })
                 .catch(err => {
                     console.error('[AUDIO] Fetch error:', err);
+                    showAudioError(`获取音频失败: ${err.message}`);
                 });
         }
         
-        function waitForAudioFile(url, attempt, maxAttempts) {
-            console.log(`[AUDIO] Checking audio file (attempt ${attempt + 1}/${maxAttempts})...`);
-            
-            // 使用 HEAD 请求检查文件是否存在（不下载文件）
-            fetch(url, { method: 'HEAD' })
-                .then(response => {
-                    if (response.ok) {
-                        console.log(`[AUDIO] File ready after ${(attempt * 300)}ms`);
-                        playAudio(url);
-                    } else if (attempt < maxAttempts - 1) {
-                        console.warn(`[AUDIO] File not ready yet (${response.status}), retrying...`);
-                        setTimeout(() => waitForAudioFile(url, attempt + 1, maxAttempts), 300);
-                    } else {
-                        console.error('[AUDIO] File generation timeout after 15 seconds');
-                        // 仍尝试播放，可能文件在生成中
-                        playAudio(url);
-                    }
-                })
-                .catch(err => {
-                    if (attempt < maxAttempts - 1) {
-                        console.warn(`[AUDIO] Fetch check failed, retrying... (${err.message})`);
-                        setTimeout(() => waitForAudioFile(url, attempt + 1, maxAttempts), 300);
-                    } else {
-                        console.error('[AUDIO] Failed to check audio file after retries');
-                        playAudio(url);
-                    }
-                });
+        function showAudioError(message) {
+            const messageBox = document.getElementById('message-box');
+            if (messageBox) {
+                messageBox.textContent = message;
+                messageBox.style.color = '#721c24';
+                messageBox.style.backgroundColor = '#f8d7da';
+                messageBox.style.display = 'block';
+            } else {
+                console.error('[AUDIO] Error:', message);
+            }
         }
         
         function playAudio(url) {

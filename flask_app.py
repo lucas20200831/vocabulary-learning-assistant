@@ -541,7 +541,7 @@ def quiz_all_unmastered():
 
 @app.route('/tts/<word>')
 def generate_tts(word):
-    """获取或生成音频文件 URL"""
+    """获取已生成的音频文件 URL（只读取不生成）"""
     if not tts_engine:
         print("[TTS] TTS engine not available")
         return jsonify({'error': 'TTS engine not available'}), 500
@@ -551,58 +551,38 @@ def generate_tts(word):
         word = unquote(word)
         print(f"[TTS] Request for: {word}")
         
-        # 生成文件名（使用MD5哈希避免重复生成）
+        # 生成文件名（使用MD5哈希）
         word_hash = hashlib.md5(word.encode('utf-8')).hexdigest()
         audio_file = os.path.join(AUDIO_DIR, f'{word_hash}.mp3')
         
-        # 检查缓存中是否已有该音频文件
-        file_exists = os.path.exists(audio_file)
-        if file_exists:
+        # 检查文件是否存在（不再尝试生成）
+        if os.path.exists(audio_file):
             file_size = os.path.getsize(audio_file)
-            print(f"[TTS] ✓ Cache hit: {word} ({file_size} bytes)")
+            audio_url = f'/static/audio/{word_hash}.mp3?v={int(time.time())}'
+            print(f"[TTS] ✓ Found: '{word}' ({file_size} bytes)")
+            return jsonify({
+                'success': True,
+                'url': audio_url,
+                'cached': True,
+                'ready': True,
+                'word': word,
+                'hash': word_hash
+            })
         else:
-            print(f"[TTS] Cache miss: {word}")
-        
-        if not file_exists:
-            # 将任务加入队列，由后台线程处理
-            print(f"[TTS] Queueing for generation: {word}")
-            tts_queue.put((word, audio_file))
+            # 文件不存在 - 返回错误，不尝试生成
+            print(f"[TTS] ✗ Not found: '{word}' - file was not pre-generated during save")
+            return jsonify({
+                'success': False,
+                'error': f'Audio file not found for: {word}. Please re-save the lesson to generate audio.',
+                'word': word,
+                'hash': word_hash
+            }), 404
             
-            # 给后台线程时间生成文件（最多等待20秒，每200ms检查一次）
-            print(f"[TTS] Waiting for file generation (up to 20s)...")
-            for i in range(100):
-                if os.path.exists(audio_file):
-                    file_size = os.path.getsize(audio_file)
-                    print(f"[TTS] ✓ File generated after {i*200}ms ({file_size} bytes)")
-                    break
-                time.sleep(0.2)
-            
-            if not os.path.exists(audio_file):
-                print(f"[TTS] ✗ Timeout: File still not generated after 20s for: {word}")
-        
-        # 生成绝对路径URL，确保在不同域名下也能工作
-        audio_url = f'/static/audio/{word_hash}.mp3?v={int(time.time())}'
-        
-        # 检查文件是否存在（用于客户端验证）
-        file_ready = os.path.exists(audio_file)
-        
-        if file_ready:
-            file_size = os.path.getsize(audio_file)
-            print(f"[TTS] ✓ Returning URL: {word} (ready={file_ready}, size={file_size} bytes)")
-        else:
-            print(f"[TTS] ⚠ Returning URL but file not ready: {word}")
-        
-        return jsonify({
-            'success': True,
-            'url': audio_url,
-            'cached': file_exists,
-            'ready': file_ready,
-            'word': word,
-            'hash': word_hash
-        })
     except Exception as e:
         print(f"[TTS] ✗ Error: {str(e)}")
         import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
@@ -1763,9 +1743,6 @@ def save_content():
         word_count = len(lesson_content.get('詞語', []))
         para_count = len(lesson_content.get('段落', []))
         
-        # 保存后，立即生成所有词语和段落的音频
-        print(f"[SAVE] Triggering TTS generation for lesson: {lesson}")
-        
         # 收集所有需要生成的文本
         texts_to_generate = []
         
@@ -1782,22 +1759,73 @@ def save_content():
                 if text:
                     texts_to_generate.append(text)
         
-        # 将所有文本加入 TTS 生成队列
-        print(f"[SAVE] ✓ Queueing {len(texts_to_generate)} texts for TTS generation")
+        # ✓ 同步生成音频：阻塞等待所有文件生成完成，确保可靠性
+        print(f"[SAVE] Starting synchronous TTS generation for lesson: {lesson}")
+        print(f"[SAVE] Generating {len(texts_to_generate)} audio files...")
+        
+        generated_count = 0
+        failed_texts = []
+        
         for idx, text in enumerate(texts_to_generate, 1):
             word_hash = hashlib.md5(text.encode('utf-8')).hexdigest()
             audio_file = os.path.join(AUDIO_DIR, f'{word_hash}.mp3')
-            # 即使文件已存在也重新加入队列，确保内容更新时重新生成
-            tts_queue.put((text, audio_file))
-            print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] Queued: '{text}' -> {word_hash}.mp3")
+            
+            # 检查文件是否已存在且有效
+            if os.path.exists(audio_file) and os.path.getsize(audio_file) > 0:
+                file_size = os.path.getsize(audio_file)
+                print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] ✓ Cached: '{text}' ({file_size} bytes)")
+                generated_count += 1
+                continue
+            
+            # 生成新文件
+            print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] Generating: '{text}'...")
+            max_retries = 5
+            success = False
+            
+            for attempt in range(1, max_retries + 1):
+                try:
+                    tts = gTTS_lib(text=text, lang='zh-CN', slow=False)
+                    tts.save(audio_file)
+                    
+                    # 验证文件
+                    if os.path.exists(audio_file):
+                        file_size = os.path.getsize(audio_file)
+                        if file_size > 0:
+                            os.chmod(audio_file, 0o644)
+                            print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] ✓ Generated: '{text}' ({file_size} bytes)")
+                            generated_count += 1
+                            success = True
+                            break
+                        else:
+                            print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] ⚠ Empty file for: '{text}'")
+                    else:
+                        print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] ⚠ File not created for: '{text}'")
+                    
+                except Exception as e:
+                    error_type = type(e).__name__
+                    print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] ✗ Attempt {attempt}/{max_retries} failed ({error_type}): {str(e)[:80]}")
+                
+                # 如果不是最后一次尝试，等待后重试
+                if attempt < max_retries and not success:
+                    wait_time = 0.5 * attempt  # 0.5s, 1s, 1.5s, 2s, 2.5s
+                    print(f"[SAVE]      Retrying in {wait_time}s...")
+                    time.sleep(wait_time)
+            
+            if not success:
+                print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] ✗ FAILED: '{text}'")
+                failed_texts.append(text)
         
-        print(f"[SAVE] Queue size: {tts_queue.qsize()} items pending")
+        print(f"[SAVE] ✓ Generation complete: {generated_count}/{len(texts_to_generate)} successful")
+        if failed_texts:
+            print(f"[SAVE] ⚠ Failed files: {failed_texts}")
         
         # 返回课程元数据供前端记录到最近访问
         return jsonify({
             'status': 'success', 
-            'message': '內容已保存，正在生成音频...', 
+            'message': f'內容已保存！{generated_count}/{len(texts_to_generate)} 个音频文件已生成。',
             'text_count': len(texts_to_generate),
+            'generated_count': generated_count,
+            'failed_texts': failed_texts,
             'lesson': {
                 'language': language,
                 'lesson_number': lesson,
