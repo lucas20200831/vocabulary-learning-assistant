@@ -384,14 +384,14 @@
                 .map(s => s.trim())
                 .filter(s => s.length > 0);
             
-            // 合併少於5個字的句子（包括标点）
+            // 合併少於15個字的句子（包括标点）
             const result = [];
             for (let i = 0; i < sentences.length; i++) {
                 if (i === sentences.length - 1) {
                     // 最後一句
                     result.push(sentences[i]);
-                } else if (sentences[i].length < 5) {
-                    // 如果少於5個字，與下一句合併（保留所有标点）
+                } else if (sentences[i].length < 15) {
+                    // 如果少於15個字，與下一句合併（保留所有标点）
                     sentences[i + 1] = sentences[i] + sentences[i + 1];
                 } else {
                     result.push(sentences[i]);
