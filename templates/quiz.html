@@ -206,9 +206,10 @@
                         if (data.ready || data.cached) {
                             playAudio(data.url);
                         } else {
-                            console.warn('[AUDIO] File not ready, retrying...');
-                            // 文件还在生成，500ms后重试
-                            setTimeout(() => playAudio(data.url), 500);
+                            console.warn('[AUDIO] File not ready, waiting for generation...');
+                            // 文件还在生成，需要等待并重试
+                            // 等待最多 15 秒，每 300ms 检查一次（共 50 次）
+                            waitForAudioFile(data.url, 0, 50);
                         }
                     } else {
                         console.error('[AUDIO] Failed response:', data);
@@ -216,6 +217,35 @@
                 })
                 .catch(err => {
                     console.error('[AUDIO] Fetch error:', err);
+                });
+        }
+        
+        function waitForAudioFile(url, attempt, maxAttempts) {
+            console.log(`[AUDIO] Checking audio file (attempt ${attempt + 1}/${maxAttempts})...`);
+            
+            // 使用 HEAD 请求检查文件是否存在（不下载文件）
+            fetch(url, { method: 'HEAD' })
+                .then(response => {
+                    if (response.ok) {
+                        console.log(`[AUDIO] File ready after ${(attempt * 300)}ms`);
+                        playAudio(url);
+                    } else if (attempt < maxAttempts - 1) {
+                        console.warn(`[AUDIO] File not ready yet (${response.status}), retrying...`);
+                        setTimeout(() => waitForAudioFile(url, attempt + 1, maxAttempts), 300);
+                    } else {
+                        console.error('[AUDIO] File generation timeout after 15 seconds');
+                        // 仍尝试播放，可能文件在生成中
+                        playAudio(url);
+                    }
+                })
+                .catch(err => {
+                    if (attempt < maxAttempts - 1) {
+                        console.warn(`[AUDIO] Fetch check failed, retrying... (${err.message})`);
+                        setTimeout(() => waitForAudioFile(url, attempt + 1, maxAttempts), 300);
+                    } else {
+                        console.error('[AUDIO] Failed to check audio file after retries');
+                        playAudio(url);
+                    }
                 });
         }
         

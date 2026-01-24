@@ -70,29 +70,44 @@ def init_tts():
                                 print(f"[TTS] Generating: {word} (attempt {retry_count + 1}/{max_retries})")
                                 tts = gTTS_lib(text=word, lang='zh-CN', slow=False)
                                 tts.save(audio_file)
-                                # 确保文件权限正确
-                                os.chmod(audio_file, 0o644)
-                                print(f"[TTS] Generated: {word} -> {audio_file}")
-                                success = True
+                                
+                                # 验证文件是否真的被创建了
+                                if os.path.exists(audio_file):
+                                    file_size = os.path.getsize(audio_file)
+                                    # 确保文件权限正确
+                                    os.chmod(audio_file, 0o644)
+                                    print(f"[TTS] ✓ Generated successfully: {word} -> {audio_file} ({file_size} bytes)")
+                                    success = True
+                                else:
+                                    print(f"[TTS] ✗ File was not created after save() call for: {word}")
+                                    retry_count += 1
+                                    if retry_count < max_retries:
+                                        wait_time = 2 ** retry_count
+                                        print(f"[TTS] Retrying in {wait_time}s...")
+                                        time.sleep(wait_time)
+                                    
                             except Exception as gen_err:
                                 retry_count += 1
                                 if retry_count < max_retries:
                                     wait_time = 2 ** retry_count  # 指数退避：2s, 4s, 8s
-                                    print(f"[TTS] Generation error for '{word}': {str(gen_err)}. Retrying in {wait_time}s...")
+                                    print(f"[TTS] ✗ Generation error for '{word}': {str(gen_err)}. Retrying in {wait_time}s...")
                                     time.sleep(wait_time)
                                 else:
-                                    print(f"[TTS] Final generation error for '{word}' after {max_retries} attempts: {str(gen_err)}")
+                                    print(f"[TTS] ✗ Final generation error for '{word}' after {max_retries} attempts: {str(gen_err)}")
                         
                         if not success:
-                            print(f"[TTS] Failed to generate audio for: {word}")
+                            print(f"[TTS] ✗ FAILED to generate audio for: {word}")
                     else:
-                        print(f"[TTS] Already cached: {word}")
+                        file_size = os.path.getsize(audio_file)
+                        print(f"[TTS] ✓ Already cached: {word} ({file_size} bytes)")
                     
                     # 在两个请求之间添加延迟，避免 gTTS API 限制
                     time.sleep(1)
                     tts_queue.task_done()
                 except Exception as e:
-                    print(f"[TTS] Worker Error: {str(e)}")
+                    print(f"[TTS] ✗ Worker Error: {str(e)}")
+                    import traceback
+                    traceback.print_exc()
                     time.sleep(1)
                     tts_queue.task_done()
         
@@ -532,24 +547,40 @@ def generate_tts(word):
         
         # 检查缓存中是否已有该音频文件
         file_exists = os.path.exists(audio_file)
-        print(f"[TTS] File exists: {file_exists} - {audio_file}")
+        if file_exists:
+            file_size = os.path.getsize(audio_file)
+            print(f"[TTS] ✓ Cache hit: {word} ({file_size} bytes)")
+        else:
+            print(f"[TTS] Cache miss: {word}")
         
         if not file_exists:
             # 将任务加入队列，由后台线程处理
-            print(f"[TTS] Queueing: {word}")
+            print(f"[TTS] Queueing for generation: {word}")
             tts_queue.put((word, audio_file))
-            # 给后台线程时间生成文件（最多等待10秒，每0.2秒检查一次）
-            for i in range(50):
+            
+            # 给后台线程时间生成文件（最多等待20秒，每200ms检查一次）
+            print(f"[TTS] Waiting for file generation (up to 20s)...")
+            for i in range(100):
                 if os.path.exists(audio_file):
-                    print(f"[TTS] File generated after {i*200}ms")
+                    file_size = os.path.getsize(audio_file)
+                    print(f"[TTS] ✓ File generated after {i*200}ms ({file_size} bytes)")
                     break
                 time.sleep(0.2)
+            
+            if not os.path.exists(audio_file):
+                print(f"[TTS] ✗ Timeout: File still not generated after 20s for: {word}")
         
         # 生成绝对路径URL，确保在不同域名下也能工作
         audio_url = f'/static/audio/{word_hash}.mp3?v={int(time.time())}'
         
         # 检查文件是否存在（用于客户端验证）
         file_ready = os.path.exists(audio_file)
+        
+        if file_ready:
+            file_size = os.path.getsize(audio_file)
+            print(f"[TTS] ✓ Returning URL: {word} (ready={file_ready}, size={file_size} bytes)")
+        else:
+            print(f"[TTS] ⚠ Returning URL but file not ready: {word}")
         
         return jsonify({
             'success': True,
@@ -560,7 +591,9 @@ def generate_tts(word):
             'hash': word_hash
         })
     except Exception as e:
-        print(f"[TTS] Error: {str(e)}")
+        print(f"[TTS] ✗ Error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
 @app.route('/create_lesson', methods=['GET', 'POST'])
