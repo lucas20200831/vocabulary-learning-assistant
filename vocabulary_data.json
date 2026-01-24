@@ -1,451 +1,225 @@
 {
-  "商務用語": {
+  "一、參觀": {
     "詞語": [
       {
-        "word": "會議",
-        "meaning": "正式的集合討論",
-        "attempts": 1,
-        "correct": 1,
-        "incorrect": 0,
-        "history": [
-          {
-            "timestamp": "2026-01-21 23:35:44",
-            "known": true
-          }
-        ]
-      },
-      {
-        "word": "合約",
-        "meaning": "法律協議",
-        "attempts": 1,
-        "correct": 1,
-        "incorrect": 0,
-        "history": [
-          {
-            "timestamp": "2026-01-21 23:35:46",
-            "known": true
-          }
-        ]
-      },
-      {
-        "word": "預算",
-        "meaning": "計劃支出",
-        "attempts": 4,
+        "word": "青馬大橋",
+        "meaning": "",
+        "attempts": 3,
         "correct": 3,
-        "incorrect": 1,
+        "incorrect": 0,
         "history": [
           {
-            "timestamp": "2026-01-21 23:35:49",
-            "known": false
-          },
-          {
-            "timestamp": "2026-01-22 16:00:20",
+            "timestamp": "2026-01-24 05:15:18",
             "known": true
           },
           {
-            "timestamp": "2026-01-22 16:00:29",
+            "timestamp": "2026-01-24 05:18:06",
             "known": true
           },
           {
-            "timestamp": "2026-01-22 16:00:32",
+            "timestamp": "2026-01-24 13:42:42",
             "known": true
           }
         ]
       },
       {
-        "word": "報告",
-        "meaning": "正式的信息披露",
-        "attempts": 1,
+        "word": "疾馳",
+        "meaning": "",
+        "attempts": 2,
+        "correct": 2,
+        "incorrect": 0,
+        "history": [
+          {
+            "timestamp": "2026-01-24 05:15:29",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-24 13:42:46",
+            "known": true
+          }
+        ]
+      },
+      {
+        "word": "遠眺",
+        "meaning": "",
+        "attempts": 2,
         "correct": 1,
-        "incorrect": 0,
-        "history": [
-          {
-            "timestamp": "2026-01-21 23:35:52",
-            "known": true
-          }
-        ]
-      }
-    ],
-    "段落": [
-      {
-        "id": "para_1",
-        "title": "會議開始",
-        "sentences": [
-          {
-            "sentence": "請大家準備今天的會議材料。",
-            "attempts": 0,
-            "correct": 0,
-            "incorrect": 0,
-            "history": []
-          },
-          {
-            "sentence": "會議將在上午十點開始。",
-            "attempts": 0,
-            "correct": 0,
-            "incorrect": 0,
-            "history": []
-          },
-          {
-            "sentence": "我們需要討論新的營銷策略。",
-            "attempts": 0,
-            "correct": 0,
-            "incorrect": 0,
-            "history": []
-          }
-        ],
-        "attempts": 0,
-        "correct": 0,
-        "incorrect": 0,
-        "history": []
-      },
-      {
-        "id": "para_2",
-        "title": "合約條款",
-        "sentences": [
-          {
-            "sentence": "這份合約的有效期是一年。",
-            "attempts": 0,
-            "correct": 0,
-            "incorrect": 0,
-            "history": []
-          },
-          {
-            "sentence": "雙方都同意遵守所有條款。",
-            "attempts": 0,
-            "correct": 0,
-            "incorrect": 0,
-            "history": []
-          }
-        ],
-        "attempts": 0,
-        "correct": 0,
-        "incorrect": 0,
-        "history": []
-      }
-    ]
-  },
-  "第一课": {
-    "詞語": [
-      {
-        "word": "脚步",
-        "meaning": "",
-        "attempts": 9,
-        "correct": 9,
-        "incorrect": 0,
-        "history": [
-          {
-            "timestamp": "2026-01-22 13:36:36",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 13:42:33",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 13:43:34",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:31:01",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:32:23",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:54:36",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:55:36",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:57:03",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:59:33",
-            "known": true
-          }
-        ]
-      },
-      {
-        "word": "韵律",
-        "meaning": "",
-        "attempts": 9,
-        "correct": 8,
         "incorrect": 1,
         "history": [
           {
-            "timestamp": "2026-01-22 13:36:55",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 13:42:36",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 13:43:36",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:31:05",
+            "timestamp": "2026-01-24 05:15:33",
             "known": false
           },
           {
-            "timestamp": "2026-01-22 15:32:28",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:54:39",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:55:39",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:57:06",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:59:36",
+            "timestamp": "2026-01-24 13:42:50",
             "known": true
           }
         ]
       },
       {
-        "word": "沙漠",
+        "word": "橫卧",
         "meaning": "",
-        "attempts": 14,
-        "correct": 11,
-        "incorrect": 3,
+        "attempts": 2,
+        "correct": 1,
+        "incorrect": 1,
         "history": [
           {
-            "timestamp": "2026-01-22 13:36:57",
+            "timestamp": "2026-01-24 05:15:39",
             "known": false
           },
           {
-            "timestamp": "2026-01-22 13:42:39",
-            "known": false
-          },
-          {
-            "timestamp": "2026-01-22 15:31:07",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:32:31",
-            "known": false
-          },
-          {
-            "timestamp": "2026-01-22 15:41:29",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:41:55",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:43:35",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:54:11",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:54:42",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:55:42",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:56:07",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:56:25",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:57:08",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:59:39",
+            "timestamp": "2026-01-24 13:42:53",
             "known": true
           }
         ]
       },
       {
-        "word": "偶然",
+        "word": "映照",
         "meaning": "",
-        "attempts": 14,
-        "correct": 11,
-        "incorrect": 3,
+        "attempts": 2,
+        "correct": 1,
+        "incorrect": 1,
         "history": [
           {
-            "timestamp": "2026-01-22 13:37:03",
+            "timestamp": "2026-01-24 05:15:43",
             "known": true
           },
           {
-            "timestamp": "2026-01-22 13:42:41",
+            "timestamp": "2026-01-24 13:42:57",
+            "known": false
+          }
+        ]
+      },
+      {
+        "word": "镀上",
+        "meaning": "",
+        "attempts": 2,
+        "correct": 1,
+        "incorrect": 1,
+        "history": [
+          {
+            "timestamp": "2026-01-24 05:15:46",
             "known": false
           },
           {
-            "timestamp": "2026-01-22 15:31:22",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:32:35",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:41:32",
-            "known": false
-          },
-          {
-            "timestamp": "2026-01-22 15:41:58",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:43:38",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:54:14",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:54:45",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:55:45",
-            "known": false
-          },
-          {
-            "timestamp": "2026-01-22 15:56:10",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:56:28",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:57:10",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:59:41",
+            "timestamp": "2026-01-24 13:43:01",
             "known": true
           }
         ]
       },
       {
-        "word": "儿子",
+        "word": "彷佛",
         "meaning": "",
-        "attempts": 14,
-        "correct": 11,
-        "incorrect": 3,
+        "attempts": 2,
+        "correct": 1,
+        "incorrect": 1,
         "history": [
           {
-            "timestamp": "2026-01-22 15:32:38",
+            "timestamp": "2026-01-24 05:15:49",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-24 13:43:05",
+            "known": false
+          }
+        ]
+      },
+      {
+        "word": "異口同聲",
+        "meaning": "",
+        "attempts": 2,
+        "correct": 2,
+        "incorrect": 0,
+        "history": [
+          {
+            "timestamp": "2026-01-24 05:15:51",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-24 13:43:08",
+            "known": true
+          }
+        ]
+      },
+      {
+        "word": "雄偉壯麗",
+        "meaning": "",
+        "attempts": 2,
+        "correct": 1,
+        "incorrect": 1,
+        "history": [
+          {
+            "timestamp": "2026-01-24 05:15:54",
             "known": false
           },
           {
-            "timestamp": "2026-01-22 15:41:35",
+            "timestamp": "2026-01-24 13:43:11",
+            "known": true
+          }
+        ]
+      },
+      {
+        "word": "引以為傲",
+        "meaning": "",
+        "attempts": 2,
+        "correct": 2,
+        "incorrect": 0,
+        "history": [
+          {
+            "timestamp": "2026-01-24 05:15:57",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-24 13:43:15",
+            "known": true
+          }
+        ]
+      },
+      {
+        "word": "夜幕低垂",
+        "meaning": "",
+        "attempts": 2,
+        "correct": 2,
+        "incorrect": 0,
+        "history": [
+          {
+            "timestamp": "2026-01-24 05:16:01",
+            "known": true
+          },
+          {
+            "timestamp": "2026-01-24 13:43:19",
+            "known": true
+          }
+        ]
+      },
+      {
+        "word": "燦爛奪目",
+        "meaning": "",
+        "attempts": 2,
+        "correct": 1,
+        "incorrect": 1,
+        "history": [
+          {
+            "timestamp": "2026-01-24 05:16:06",
             "known": false
           },
           {
-            "timestamp": "2026-01-22 15:42:01",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:43:41",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:54:17",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:54:48",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:55:48",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:56:13",
-            "known": false
-          },
-          {
-            "timestamp": "2026-01-22 15:56:31",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:56:39",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:56:45",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:56:49",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:57:13",
-            "known": true
-          },
-          {
-            "timestamp": "2026-01-22 15:59:43",
+            "timestamp": "2026-01-24 13:43:23",
             "known": true
           }
         ]
       }
     ],
+    "段落": []
+  },
+  "三、登鸕鷀樓": {
+    "詞語": [],
     "段落": [
       {
         "title": "段落1",
         "sentences": [
           {
-            "sentence": "暮色笼罩沙漠",
-            "attempts": 0,
-            "correct": 0,
-            "incorrect": 0,
-            "history": []
-          },
-          {
-            "sentence": "脚步在沙丘留下断续印记",
-            "attempts": 0,
-            "correct": 0,
-            "incorrect": 0,
-            "history": []
-          },
-          {
-            "sentence": "远处有瓷器的碎片闪烁微光",
-            "attempts": 0,
-            "correct": 0,
-            "incorrect": 0,
-            "history": []
-          },
-          {
-            "sentence": "寂静吞噬了所有声响",
-            "attempts": 0,
-            "correct": 0,
-            "incorrect": 0,
-            "history": []
-          },
-          {
-            "sentence": "旅人望向星辰升起的方向",
+            "sentence": "登鸕鷀樓\n王之渙\n白日依山盡\n黃河入海流\n欲窮千里目\n更上一層樓",
             "attempts": 0,
             "correct": 0,
             "incorrect": 0,
@@ -454,5 +228,199 @@
         ]
       }
     ]
+  },
+  "五、杜萍萍和宋婆婆": {
+    "詞語": [
+      {
+        "word": "姿勢",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "扭傷",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "除非",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "燒飯",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "咦",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "需要",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "關心",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "僅量",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "嗯",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "使勁",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "一拐一拐",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      }
+    ],
+    "段落": []
+  },
+  "七、玩跳棋": {
+    "詞語": [
+      {
+        "word": "一副",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "嚷",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "適合",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "建議",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "擺放",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "相應",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "優勝",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "越過",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "設法",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "阻止",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "噢",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "應該",
+        "meaning": "",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      }
+    ],
+    "段落": []
   }
 }

@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, send_file
+from flask_cors import CORS
 from urllib.parse import unquote
 import json
 import os
@@ -6,9 +7,16 @@ from datetime import datetime, timedelta
 import hashlib
 import threading
 from queue import Queue
+import time
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
+
+# 启用 CORS 支持（生产环境需要）
+CORS(app, resources={
+    r"/tts/*": {"origins": "*"},
+    r"/static/*": {"origins": "*"}
+})
 
 # Session configuration for better browser compatibility
 app.config['SESSION_COOKIE_SECURE'] = False
@@ -53,10 +61,15 @@ def init_tts():
                         break
                     # 检查文件是否已存在
                     if not os.path.exists(audio_file):
-                        print(f"[TTS] Generating: {word}")
-                        tts = gTTS_lib(text=word, lang='zh-CN', slow=False)
-                        tts.save(audio_file)
-                        print(f"[TTS] Generated: {word} -> {audio_file}")
+                        try:
+                            print(f"[TTS] Generating: {word}")
+                            tts = gTTS_lib(text=word, lang='zh-CN', slow=False)
+                            tts.save(audio_file)
+                            # 确保文件权限正确
+                            os.chmod(audio_file, 0o644)
+                            print(f"[TTS] Generated: {word} -> {audio_file}")
+                        except Exception as gen_err:
+                            print(f"[TTS] Generation error for '{word}': {str(gen_err)}")
                     else:
                         print(f"[TTS] Already cached: {word}")
                     tts_queue.task_done()
@@ -486,11 +499,13 @@ def quiz_all_unmastered():
 def generate_tts(word):
     """获取或生成音频文件 URL"""
     if not tts_engine:
+        print("[TTS] TTS engine not available")
         return jsonify({'error': 'TTS engine not available'}), 500
     
     try:
         # 解码 URL 编码的词语
         word = unquote(word)
+        print(f"[TTS] Request for: {word}")
         
         # 生成文件名（使用MD5哈希避免重复生成）
         word_hash = hashlib.md5(word.encode('utf-8')).hexdigest()
@@ -498,21 +513,35 @@ def generate_tts(word):
         
         # 检查缓存中是否已有该音频文件
         file_exists = os.path.exists(audio_file)
+        print(f"[TTS] File exists: {file_exists} - {audio_file}")
         
         if not file_exists:
             # 将任务加入队列，由后台线程处理
+            print(f"[TTS] Queueing: {word}")
             tts_queue.put((word, audio_file))
+            # 给后台线程一点时间生成文件（最多等待3秒）
+            for i in range(30):
+                if os.path.exists(audio_file):
+                    print(f"[TTS] File generated after {i*100}ms")
+                    break
+                time.sleep(0.1)
         
-        audio_url = f'/static/audio/{word_hash}.mp3'
+        # 生成绝对路径URL，确保在不同域名下也能工作
+        audio_url = f'/static/audio/{word_hash}.mp3?v={int(time.time())}'
         
-        # 立即返回 URL，不等待生成完成
+        # 检查文件是否存在（用于客户端验证）
+        file_ready = os.path.exists(audio_file)
+        
         return jsonify({
             'success': True,
             'url': audio_url,
-            'cached': file_exists
+            'cached': file_exists,
+            'ready': file_ready,
+            'word': word,
+            'hash': word_hash
         })
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"[TTS] Error: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/create_lesson', methods=['GET', 'POST'])

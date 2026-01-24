@@ -195,27 +195,57 @@
         });
         
         function speakCurrentWord() {
-            // 调用后端端点获取音频 URL（端点立即返回，无需生成）
+            // 调用后端端点获取音频 URL（端点会等待生成文件）
+            console.log(`[AUDIO] Requesting audio for: ${currentWord}`);
             fetch(`/tts/${encodeURIComponent(currentWord)}`)
                 .then(response => response.json())
                 .then(data => {
+                    console.log(`[AUDIO] Response:`, data);
                     if (data.success && data.url) {
-                        playAudio(data.url);
+                        // 确保文件已准备好再播放
+                        if (data.ready || data.cached) {
+                            playAudio(data.url);
+                        } else {
+                            console.warn('[AUDIO] File not ready, retrying...');
+                            // 文件还在生成，500ms后重试
+                            setTimeout(() => playAudio(data.url), 500);
+                        }
+                    } else {
+                        console.error('[AUDIO] Failed response:', data);
                     }
                 })
-                .catch(err => console.error('Error:', err));
+                .catch(err => {
+                    console.error('[AUDIO] Fetch error:', err);
+                });
         }
         
         function playAudio(url) {
             try {
+                console.log(`[AUDIO] Playing: ${url}`);
                 const audioPlayer = document.getElementById('audio-player');
                 audioPlayer.src = url;
+                
+                // 添加事件监听器用于调试
+                audioPlayer.onerror = () => {
+                    console.error(`[AUDIO] Failed to load: ${url}`);
+                };
+                audioPlayer.onloadstart = () => {
+                    console.log(`[AUDIO] Loading: ${url}`);
+                };
+                audioPlayer.oncanplay = () => {
+                    console.log(`[AUDIO] Ready to play: ${url}`);
+                };
+                
                 const promise = audioPlayer.play();
                 if (promise !== undefined) {
-                    promise.catch(err => console.error('Play error:', err));
+                    promise.then(() => {
+                        console.log(`[AUDIO] Playing successfully`);
+                    }).catch(err => {
+                        console.error('[AUDIO] Play error:', err);
+                    });
                 }
             } catch (err) {
-                console.error('Error playing audio:', err);
+                console.error('[AUDIO] Error playing audio:', err);
             }
         }
 
