@@ -407,37 +407,147 @@
         }
 
         // 句子格式化函數
-        function formatSentences(text) {
-            // 保留原始标点符号，不删除任何标点
-            // 只按句號、逗號、顿号分割，但保留标点作为句子的一部分
-            
+        // 计算只含汉字的长度
+        function getChineseCharCount(text) {
+            if (!text) return 0;
+            const chineseChars = text.match(/[\u4e00-\u9fff]/g);
+            return chineseChars ? chineseChars.length : 0;
+        }
+
+        // 第一步：按指定标点分割
+        function splitByPunctuation(text) {
             if (!text || text.trim().length === 0) {
                 return [];
             }
             
-            // 使用正则表达式分割，同时保留标点符号
-            const parts = text.split(/(?<=[。，、])/);
+            // 分割标点集合：。？；：，
+            const punctuationPattern = /(?<=[。？；：，])/;
             
-            // 清理和过滤
-            let sentences = parts
+            // 按标点分割，保留标点
+            const parts = text.split(punctuationPattern);
+            
+            // 清理空白
+            const sentences = parts
                 .map(s => s.trim())
                 .filter(s => s.length > 0);
             
-            // 合併少於15個字的句子（包括标点）
+            return sentences;
+        }
+
+        // 第二步：长度检查与拆分
+        function splitLongSentences(sentences) {
             const result = [];
-            for (let i = 0; i < sentences.length; i++) {
-                if (i === sentences.length - 1) {
-                    // 最後一句
-                    result.push(sentences[i]);
-                } else if (sentences[i].length < 15) {
-                    // 如果少於15個字，與下一句合併（保留所有标点）
-                    sentences[i + 1] = sentences[i] + sentences[i + 1];
+            
+            for (const sentence of sentences) {
+                const chineseCount = getChineseCharCount(sentence);
+                
+                if (chineseCount <= 15) {
+                    // 汉字数 ≤ 15：直接采用
+                    result.push(sentence);
                 } else {
-                    result.push(sentences[i]);
+                    // 汉字数 > 15：进入拆分流程
+                    const splits = splitLongSentence(sentence);
+                    result.push(...splits);
                 }
             }
             
             return result;
+        }
+
+        // 递归拆分长句
+        function splitLongSentence(sentence) {
+            const chineseCount = getChineseCharCount(sentence);
+            
+            if (chineseCount <= 15) {
+                return [sentence];
+            }
+            
+            // 找到标点位置（用于提取最后的标点）
+            const lastPunctuationMatch = sentence.match(/[。？；：，](?!.*[。？；：，])/);
+            let finalPunctuation = '';
+            let textWithoutFinalPunct = sentence;
+            
+            if (lastPunctuationMatch) {
+                const punctIndex = sentence.lastIndexOf(lastPunctuationMatch[0]);
+                finalPunctuation = lastPunctuationMatch[0];
+                textWithoutFinalPunct = sentence.substring(0, punctIndex);
+            }
+            
+            // 寻找拆分点（优先在完整词语后面，其次在15字附近）
+            const splitPoint = findSplitPoint(textWithoutFinalPunct);
+            
+            if (splitPoint <= 0 || splitPoint >= textWithoutFinalPunct.length) {
+                // 无法拆分，返回原句（即使超过15字也返回）
+                console.warn(`[WARNING] Cannot split sentence: "${sentence.substring(0, 30)}..."`)
+                return [sentence];
+            }
+            
+            // 拆分为两部分
+            const part1 = textWithoutFinalPunct.substring(0, splitPoint);
+            const part2Prefix = textWithoutFinalPunct.substring(splitPoint);
+            const part2 = part2Prefix + finalPunctuation;
+            
+            // 检查两部分的汉字数
+            const part1ChineseCount = getChineseCharCount(part1);
+            const part2ChineseCount = getChineseCharCount(part2Prefix);
+            
+            // 确保两部分都 ≥ 5 个字
+            if (part1ChineseCount < 5 || part2ChineseCount < 5) {
+                console.warn(`[WARNING] Cannot maintain minimum 5-char constraint. Part1: ${part1ChineseCount}, Part2: ${part2ChineseCount}`);
+                return [sentence];
+            }
+            
+            // 递归处理第二部分（如果仍 > 15 字）
+            if (part2ChineseCount > 15) {
+                const part2Splits = splitLongSentence(part2);
+                return [part1, ...part2Splits];
+            } else {
+                return [part1, part2];
+            }
+        }
+
+        // 寻找最佳拆分点
+        function findSplitPoint(text) {
+            const targetCount = 15;
+            let currentChineseCount = 0;
+            
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                const isChineseChar = /[\u4e00-\u9fff]/.test(char);
+                
+                if (isChineseChar) {
+                    currentChineseCount++;
+                }
+                
+                // 当达到接近目标汉字数时，找到最近的"安全位置"
+                if (currentChineseCount >= targetCount - 2 && currentChineseCount <= targetCount + 2) {
+                    // 尝试在当前位置或之后找到合适的拆分点
+                    // 优先选择空格、标点或其他分隔符
+                    for (let j = i; j < Math.min(i + 10, text.length); j++) {
+                        const nextChar = text[j];
+                        // 在这些位置拆分较为自然：标点后、空格后、中文字后
+                        if (j === i || /[\s、，；。！？]/.test(nextChar)) {
+                            return j + 1;
+                        }
+                    }
+                    // 如果没找到更好的位置，就在当前位置拆分
+                    return i + 1;
+                }
+            }
+            
+            // 如果没有找到合适的拆分点，在中点拆分
+            return Math.floor(text.length / 2);
+        }
+
+        // 新的段落格式化函数
+        function formatSentences(text) {
+            // 第一步：按指定标点分割
+            const sentencesByPunct = splitByPunctuation(text);
+            
+            // 第二步：处理长句拆分
+            const finalSentences = splitLongSentences(sentencesByPunct);
+            
+            return finalSentences;
         }
 
         async function saveContent() {

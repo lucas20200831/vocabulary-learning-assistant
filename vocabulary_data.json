@@ -220,10 +220,23 @@
         "sentences": [
           {
             "sentence": "登鸕鷀樓\n王之渙\n白日依山盡\n黃河入海流\n欲窮千里目\n更上一層樓",
-            "attempts": 0,
-            "correct": 0,
+            "attempts": 1,
+            "correct": 1,
             "incorrect": 0,
-            "history": []
+            "history": [
+              {
+                "timestamp": "2026-02-05 16:26:06",
+                "known": true
+              }
+            ]
+          }
+        ],
+        "attempts": 1,
+        "correct": 1,
+        "history": [
+          {
+            "timestamp": "2026-02-05 16:26:06",
+            "known": true
           }
         ]
       }
@@ -422,5 +435,208 @@
       }
     ],
     "段落": []
+  },
+  "测试课程_拆分功能": {
+    "詞語": [
+      {
+        "word": "青马大桥",
+        "meaning": "香港跨海大桥",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "疾驰",
+        "meaning": "快速行驶",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      },
+      {
+        "word": "壮观",
+        "meaning": "景象气势宏大",
+        "attempts": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "history": []
+      }
+    ],
+    "段落": [
+      {
+        "title": "短句示例",
+        "sentences": [
+          {
+            "sentence": "青马大桥很壮观。",
+            "attempts": 1,
+            "correct": 1,
+            "incorrect": 0,
+            "history": [
+              {
+                "timestamp": "2026-02-05 18:42:01",
+                "known": true
+              }
+            ]
+          },
+          {
+            "sentence": "我们乘坐快速列车。",
+            "attempts": 1,
+            "correct": 0,
+            "incorrect": 1,
+            "history": [
+              {
+                "timestamp": "2026-02-05 18:42:06",
+                "known": false
+              }
+            ]
+          }
+        ],
+        "attempts": 2,
+        "correct": 1,
+        "history": [
+          {
+            "timestamp": "2026-02-05 18:42:01",
+            "known": true
+          },
+          {
+            "timestamp": "2026-02-05 18:42:06",
+            "known": false
+          }
+        ],
+        "incorrect": 1
+      },
+      {
+        "title": "中等长句",
+        "sentences": [
+          {
+            "sentence": "我们乘坐着快速列车，",
+            "attempts": 2,
+            "correct": 0,
+            "incorrect": 2,
+            "history": [
+              {
+                "timestamp": "2026-02-05 18:42:12",
+                "known": false
+              },
+              {
+                "timestamp": "2026-02-05 18:42:29",
+                "known": false
+              }
+            ]
+          },
+          {
+            "sentence": "沿着青马大桥向前疾驰而去。",
+            "attempts": 1,
+            "correct": 1,
+            "incorrect": 0,
+            "history": [
+              {
+                "timestamp": "2026-02-05 18:42:16",
+                "known": true
+              }
+            ]
+          },
+          {
+            "sentence": "壮观的景色展现在我们眼前。",
+            "attempts": 1,
+            "correct": 1,
+            "incorrect": 0,
+            "history": [
+              {
+                "timestamp": "2026-02-05 18:42:20",
+                "known": true
+              }
+            ]
+          }
+        ],
+        "attempts": 4,
+        "incorrect": 2,
+        "history": [
+          {
+            "timestamp": "2026-02-05 18:42:12",
+            "known": false
+          },
+          {
+            "timestamp": "2026-02-05 18:42:16",
+            "known": true
+          },
+          {
+            "timestamp": "2026-02-05 18:42:20",
+            "known": true
+          },
+          {
+            "timestamp": "2026-02-05 18:42:29",
+            "known": false
+          }
+        ],
+        "correct": 2
+      },
+      {
+        "title": "混合标点示例",
+        "sentences": [
+          {
+            "sentence": "青马大桥向前延伸，",
+            "attempts": 1,
+            "correct": 0,
+            "incorrect": 1,
+            "history": [
+              {
+                "timestamp": "2026-02-05 18:42:23",
+                "known": false
+              }
+            ]
+          },
+          {
+            "sentence": "疾驰而去。",
+            "attempts": 1,
+            "correct": 1,
+            "incorrect": 0,
+            "history": [
+              {
+                "timestamp": "2026-02-05 18:42:26",
+                "known": true
+              }
+            ]
+          },
+          {
+            "sentence": "我们乘坐着快速列车，",
+            "attempts": 0,
+            "correct": 0,
+            "incorrect": 0,
+            "history": []
+          },
+          {
+            "sentence": "感受着壮观的景色。",
+            "attempts": 1,
+            "correct": 1,
+            "incorrect": 0,
+            "history": [
+              {
+                "timestamp": "2026-02-05 18:42:34",
+                "known": true
+              }
+            ]
+          }
+        ],
+        "attempts": 3,
+        "incorrect": 1,
+        "history": [
+          {
+            "timestamp": "2026-02-05 18:42:23",
+            "known": false
+          },
+          {
+            "timestamp": "2026-02-05 18:42:26",
+            "known": true
+          },
+          {
+            "timestamp": "2026-02-05 18:42:34",
+            "known": true
+          }
+        ],
+        "correct": 2
+      }
+    ]
   }
 }

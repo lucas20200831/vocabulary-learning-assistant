@@ -1057,6 +1057,157 @@ def quiz_new(language, lesson_num):
                           words_json=words_json,
                           content_type=content_type)
 
+def normalize_text(text):
+    """Normalize text for comparison - removes extra whitespace and normalizes newlines"""
+    if not isinstance(text, str):
+        return ""
+    # Convert all types of newlines and extra whitespace to single spaces
+    normalized = ' '.join(text.split())
+    return normalized
+
+def get_chinese_char_count(text):
+    """计算仅汉字的字数（不计标点、数字、英文）"""
+    if not text:
+        return 0
+    # 统计汉字 \u4e00-\u9fff
+    count = 0
+    for char in text:
+        if '\u4e00' <= char <= '\u9fff':
+            count += 1
+    return count
+
+def split_by_punctuation(text):
+    """第一步：按指定标点分割。分割标点：。？；：，"""
+    import re
+    if not text or not text.strip():
+        return []
+    
+    # 按分割标点 。？；：， 进行分割（保留标点）
+    # 使用正向后瞻保留标点在前一句末尾
+    parts = re.split(r'(?<=[。？；：，])', text)
+    
+    # 清理空白
+    sentences = [s.strip() for s in parts if s.strip()]
+    return sentences
+
+def find_best_split_point(text):
+    """寻找最佳拆分点（在15个汉字处拆分）"""
+    target_count = 15
+    current_chinese_count = 0
+    
+    for i, char in enumerate(text):
+        # 检查是否为汉字
+        if '\u4e00' <= char <= '\u9fff':
+            current_chinese_count += 1
+            # 当达到恰好15个汉字时，返回当前位置后面的位置
+            if current_chinese_count == target_count:
+                return i + 1
+        
+        # 如果已经超过目标，返回当前位置
+        if current_chinese_count > target_count:
+            return i
+    
+    # 如果文本中汉字数少于等于15，返回中点
+    return len(text) // 2
+
+
+def split_long_sentence(sentence):
+    """递归拆分超过15个汉字的句子"""
+    chinese_count = get_chinese_char_count(sentence)
+    
+    if chinese_count <= 15:
+        return [sentence]
+    
+    # 找到最后的标点符号（仅在末尾查找）
+    final_punctuation = ''
+    text_to_split = sentence
+    
+    # 只在句子末尾寻找标点
+    for punct in ['。', '？', '；', '：', '，']:
+        if sentence.endswith(punct):
+            final_punctuation = punct
+            text_to_split = sentence[:-1]
+            break
+    
+    # 如果没有末尾标点，就用原句子
+    if not final_punctuation:
+        text_to_split = sentence
+    
+    # 寻找最优的拆分点
+    # 尝试在15个汉字处拆分，如果Part2太短，就向前调整
+    split_point = find_best_split_point(text_to_split)
+    
+    if split_point <= 0 or split_point >= len(text_to_split):
+        # 无法找到合适的拆分点
+        return [sentence]
+    
+    # 拆分为两部分
+    part1 = text_to_split[:split_point]
+    part2_body = text_to_split[split_point:]
+    
+    # 检查两部分的汉字数
+    part1_chinese_count = get_chinese_char_count(part1)
+    part2_chinese_count = get_chinese_char_count(part2_body)
+    
+    # 如果Part2太短（<5字），向前调整拆分点
+    if part2_chinese_count < 5 and part1_chinese_count > 10:
+        # 尝试向前移动拆分点，确保Part2至少有5个汉字
+        # 逆向查找找到倒数第5个汉字后的位置
+        chinese_count_from_start = 0
+        target_count = part1_chinese_count - 5  # 保留5个汉字给Part2
+        
+        for i, char in enumerate(text_to_split):
+            if '\u4e00' <= char <= '\u9fff':
+                chinese_count_from_start += 1
+                if chinese_count_from_start == target_count:
+                    split_point = i + 1
+                    part1 = text_to_split[:split_point]
+                    part2_body = text_to_split[split_point:]
+                    part1_chinese_count = chinese_count_from_start
+                    part2_chinese_count = get_chinese_char_count(part2_body)
+                    break
+    
+    # 再次检查最小限制
+    if part1_chinese_count < 5 or part2_chinese_count < 5:
+        # 仍然无法满足，返回原句
+        return [sentence]
+    
+    # 第二部分：只在最后一部分添加标点
+    part2_with_punct = part2_body + final_punctuation
+    
+    # 递归处理第二部分（如果仍 > 15 字）
+    if part2_chinese_count > 15:
+        part2_splits = split_long_sentence(part2_with_punct)
+        return [part1] + part2_splits
+    else:
+        return [part1, part2_with_punct]
+
+
+def split_long_sentences(sentences):
+    """第二步：对所有句子进行长度检查与拆分"""
+    result = []
+    for sentence in sentences:
+        chinese_count = get_chinese_char_count(sentence)
+        if chinese_count <= 15:
+            # 汉字数 ≤ 15：直接采用
+            result.append(sentence)
+        else:
+            # 汉字数 > 15：进入拆分流程
+            splits = split_long_sentence(sentence)
+            result.extend(splits)
+    
+    return result
+
+def format_sentences_new(text):
+    """新的段落格式化函数"""
+    # 第一步：按指定标点分割
+    sentences_by_punct = split_by_punctuation(text)
+    
+    # 第二步：处理长句拆分
+    final_sentences = split_long_sentences(sentences_by_punct)
+    
+    return final_sentences
+
 @app.route('/submit_answer', methods=['POST'])
 def submit_answer():
     """Handle quiz answer submission - works with or without session"""
@@ -1072,6 +1223,9 @@ def submit_answer():
     
     if not word or not lesson:
         return jsonify({'error': '缺少必要參數'}), 400
+    
+    # Normalize word for comparison (especially for paragraphs with newlines)
+    word_normalized = normalize_text(word)
     
     # 特殊处理：所有未掌握单词
     if lesson == '所有未掌握單詞':
@@ -1167,7 +1321,9 @@ def submit_answer():
             for para in lesson_data['段落']:
                 for sent_item in para.get('sentences', []):
                     sent_text = sent_item.get('sentence') if isinstance(sent_item, dict) else sent_item
-                    if sent_text == word:
+                    # Normalize both texts for comparison (handles newlines and whitespace differences)
+                    sent_text_normalized = normalize_text(sent_text)
+                    if sent_text_normalized == word_normalized or sent_text == word:
                         # 更新句子統計
                         if isinstance(sent_item, dict):
                             sent_item['attempts'] = sent_item.get('attempts', 0) + 1
@@ -1651,6 +1807,7 @@ def save_content():
     """Save edited content from textarea format - 支持新舊流程"""
     try:
         req_data = request.get_json()
+        print(f"[SAVE] Received request: {type(req_data)}")
         
         language = req_data.get('language', '')
         lesson = req_data.get('lesson')
@@ -1658,10 +1815,14 @@ def save_content():
         paragraphs = req_data.get('paragraphs', [])
         is_simple = req_data.get('is_simple', False)
         
+        print(f"[SAVE] Lesson: {lesson}, Language: {language}, Is_simple: {is_simple}")
+        print(f"[SAVE] Words: {len(words)}, Paragraphs: {len(paragraphs)}")
+        
         if not lesson:
             return jsonify({'status': 'error', 'message': '缺少必要參數'}), 400
         
         data = load_data()
+        print(f"[SAVE] Data loaded, total lessons: {len(data)}")
         
         # 支持兩種數據結構：新流程（無語言）和舊流程（有語言）
         if is_simple or not language:
@@ -1716,6 +1877,16 @@ def save_content():
                     existing_sentences = {s['sentence']: s for s in existing_para.get('sentences', [])}
                 
                 for sent_text in sentences_text:
+                    # 检查和清理空白文本
+                    if not sent_text or not isinstance(sent_text, str):
+                        print(f"[SAVE] ⚠ Skipping invalid sentence: {repr(sent_text)}")
+                        continue
+                    
+                    sent_text = sent_text.strip()
+                    if not sent_text:
+                        print(f"[SAVE] ⚠ Skipping empty sentence after strip")
+                        continue
+                    
                     if sent_text in existing_sentences:
                         # Keep existing sentence with statistics
                         updated_sentences.append(existing_sentences[sent_text])
@@ -1773,7 +1944,7 @@ def save_content():
             # 检查文件是否已存在且有效
             if os.path.exists(audio_file) and os.path.getsize(audio_file) > 0:
                 file_size = os.path.getsize(audio_file)
-                print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] ✓ Cached: '{text}' ({file_size} bytes)")
+                print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] [OK] Cached: '{text}' ({file_size} bytes)")
                 generated_count += 1
                 continue
             
@@ -1792,18 +1963,18 @@ def save_content():
                         file_size = os.path.getsize(audio_file)
                         if file_size > 0:
                             os.chmod(audio_file, 0o644)
-                            print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] ✓ Generated: '{text}' ({file_size} bytes)")
+                            print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] [OK] Generated: '{text}' ({file_size} bytes)")
                             generated_count += 1
                             success = True
                             break
                         else:
-                            print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] ⚠ Empty file for: '{text}'")
+                            print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] [WARN] Empty file for: '{text}'")
                     else:
-                        print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] ⚠ File not created for: '{text}'")
+                        print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] [WARN] File not created for: '{text}'")
                     
                 except Exception as e:
                     error_type = type(e).__name__
-                    print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] ✗ Attempt {attempt}/{max_retries} failed ({error_type}): {str(e)[:80]}")
+                    print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] [FAIL] Attempt {attempt}/{max_retries} failed ({error_type}): {str(e)[:80]}")
                 
                 # 如果不是最后一次尝试，等待后重试
                 if attempt < max_retries and not success:
@@ -1812,12 +1983,12 @@ def save_content():
                     time.sleep(wait_time)
             
             if not success:
-                print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] ✗ FAILED: '{text}'")
+                print(f"[SAVE]   [{idx}/{len(texts_to_generate)}] [FAIL] FAILED: '{text}'")
                 failed_texts.append(text)
         
-        print(f"[SAVE] ✓ Generation complete: {generated_count}/{len(texts_to_generate)} successful")
+        print(f"[SAVE] [OK] Generation complete: {generated_count}/{len(texts_to_generate)} successful")
         if failed_texts:
-            print(f"[SAVE] ⚠ Failed files: {failed_texts}")
+            print(f"[SAVE] [WARN] Failed files: {failed_texts}")
         
         # 返回课程元数据供前端记录到最近访问
         return jsonify({
@@ -1836,11 +2007,34 @@ def save_content():
         })
     
     except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+        import traceback
+        error_traceback = traceback.format_exc()
+        print(f"\n[SAVE] [ERROR] ERROR occurred:")
+        print(f"[SAVE] Error type: {type(e).__name__}")
+        print(f"[SAVE] Error message: {str(e)}")
+        print(f"[SAVE] Full traceback:")
+        print(error_traceback)
+        print(f"[SAVE] END OF TRACEBACK\n")
+        
+        return jsonify({
+            'status': 'error', 
+            'message': f'{type(e).__name__}: {str(e)}',
+            'traceback': error_traceback
+        }), 500
 
 if __name__ == '__main__':
     # Create templates directory if it doesn't exist
     os.makedirs('templates', exist_ok=True)
     
+    print("\n[STARTUP] Starting Flask app...")
+    print("[STARTUP] TTS engine ready")
+    print("[STARTUP] Loading data...")
+    try:
+        data = load_data()
+        print(f"[STARTUP] Data loaded: {len(data)} courses")
+    except Exception as e:
+        print(f"[STARTUP] Error loading data: {e}")
+    
     # 禁用自动重加载以防止 TTS 线程重复启动
+    print("[STARTUP] Starting Flask on http://127.0.0.1:5002")
     app.run(debug=True, host='127.0.0.1', port=5002, use_reloader=False)
