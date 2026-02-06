@@ -151,11 +151,14 @@
         let testStarted = false;
         let results = [];
         let isProcessing = false;  // Flag to prevent double submission
+        let originalAllWords = [...allWords];  // 保存原始单词列表
+        let currentToOriginalIndexMap = Array.from({length: allWords.length}, (_, i) => i);  // 当前allWords中每个单词对应原始allWords中的索引
         
         // Use language and lesson directly from Flask context
         const language = '{{ language }}';
         const lesson = '{{ lesson_num }}';
         const contentType = '{{ content_type }}' || '詞語';  // Content type from Flask
+        const returnTo = '{{ return_to }}' || '/vocab_list';  // Where to return after quiz
         
         // 检查是否是复习模式
         const urlParams = new URLSearchParams(window.location.search);
@@ -171,6 +174,9 @@
                     allWords = allWords.filter(word => reviewWords.includes(word));
                     totalWords = allWords.length;
                     currentWord = allWords[0] || '';
+                    // 在复习模式下，更新 originalAllWords 为复习单词列表
+                    originalAllWords = [...allWords];
+                    currentToOriginalIndexMap = Array.from({length: allWords.length}, (_, i) => i);
                     console.log('Review mode: filtered to', totalWords, 'words');
                 } catch (e) {
                     console.error('Error parsing review words:', e);
@@ -214,6 +220,137 @@
                     console.error('[AUDIO] Fetch error:', err);
                     showAudioError(`获取音频失败: ${err.message}`);
                 });
+        }
+        
+        function restartQuizForErrors() {
+            // 还原 isProcessing flag，清空 results，且准备 allWords 仅包含错误的单词
+            const errorIndices = [];
+            const errorWords = [];
+            
+            // 遍历 results，找出错误的单词和它们在原始列表中的索引
+            results.forEach((result, idx) => {
+                if (!result.known) {
+                    // Find the original index of this word
+                    const originalIndex = currentToOriginalIndexMap[idx];
+                    errorIndices.push(originalIndex);
+                    errorWords.push(originalAllWords[originalIndex]);
+                }
+            });
+            
+            if (errorWords.length === 0) {
+                alert('没有错误的单词');
+                return;
+            }
+            
+            // 更新 allWords 和索引映射
+            allWords = [...errorWords];
+            currentToOriginalIndexMap = [...errorIndices];  // 新的映射：当前错误列表中的索引 -> 原始列表的索引
+            totalWords = allWords.length;
+            currentIndex = 0;
+            currentWord = allWords[0] || '';
+            results = [];
+            isProcessing = false;
+            
+            // 清空现有内容和结果列表
+            document.getElementById('quiz-area').innerHTML = '';
+            document.getElementById('results-list').innerHTML = '';
+            
+            // 重新创建进度显示
+            const progressDiv = document.createElement('div');
+            progressDiv.className = 'progress';
+            progressDiv.innerHTML = `當前進度: <span id="current-index">1</span> / ${totalWords}`;
+            document.getElementById('quiz-area').appendChild(progressDiv);
+            
+            // 重新创建单词显示（重要：必须有id="word-display"）
+            const wordDisplay = document.createElement('div');
+            wordDisplay.id = 'word-display';
+            wordDisplay.className = 'word-display';
+            wordDisplay.textContent = '正在加載...';
+            document.getElementById('quiz-area').appendChild(wordDisplay);
+            
+            // 重新创建按钮
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.cssText = 'display: flex; gap: 10px; justify-content: center;';
+            
+            const knownBtn = document.createElement('button');
+            knownBtn.className = 'btn btn-known';
+            knownBtn.textContent = '✅ 能默寫';
+            knownBtn.onclick = () => recordResult(true);
+            buttonContainer.appendChild(knownBtn);
+            
+            const unknownBtn = document.createElement('button');
+            unknownBtn.className = 'btn btn-unknown';
+            unknownBtn.textContent = '❌ 不能默寫';
+            unknownBtn.onclick = () => recordResult(false);
+            buttonContainer.appendChild(unknownBtn);
+            
+            const replayBtn = document.createElement('button');
+            replayBtn.className = 'btn btn-replay';
+            replayBtn.textContent = '🔊 再聽一遍';
+            replayBtn.onclick = speakCurrentWord;
+            buttonContainer.appendChild(replayBtn);
+            
+            document.getElementById('quiz-area').appendChild(buttonContainer);
+            
+            // 开始播放
+            testStarted = true;
+            speakCurrentWord();
+        }
+        
+        function restartQuizForAll() {
+            // 重听所有单词
+            allWords = [...originalAllWords];
+            currentToOriginalIndexMap = Array.from({length: allWords.length}, (_, i) => i);  // 重置为恒等映射
+            totalWords = allWords.length;
+            currentIndex = 0;
+            currentWord = allWords[0] || '';
+            results = [];
+            isProcessing = false;
+            
+            // 清空现有内容和结果列表
+            document.getElementById('quiz-area').innerHTML = '';
+            document.getElementById('results-list').innerHTML = '';
+            
+            // 重新创建进度显示
+            const progressDiv = document.createElement('div');
+            progressDiv.className = 'progress';
+            progressDiv.innerHTML = `當前進度: <span id="current-index">1</span> / ${totalWords}`;
+            document.getElementById('quiz-area').appendChild(progressDiv);
+            
+            // 重新创建单词显示（重要：必须有id="word-display"）
+            const wordDisplay = document.createElement('div');
+            wordDisplay.id = 'word-display';
+            wordDisplay.className = 'word-display';
+            wordDisplay.textContent = '正在加載...';
+            document.getElementById('quiz-area').appendChild(wordDisplay);
+            
+            // 重新创建按钮
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.cssText = 'display: flex; gap: 10px; justify-content: center;';
+            
+            const knownBtn = document.createElement('button');
+            knownBtn.className = 'btn btn-known';
+            knownBtn.textContent = '✅ 能默寫';
+            knownBtn.onclick = () => recordResult(true);
+            buttonContainer.appendChild(knownBtn);
+            
+            const unknownBtn = document.createElement('button');
+            unknownBtn.className = 'btn btn-unknown';
+            unknownBtn.textContent = '❌ 不能默寫';
+            unknownBtn.onclick = () => recordResult(false);
+            buttonContainer.appendChild(unknownBtn);
+            
+            const replayBtn = document.createElement('button');
+            replayBtn.className = 'btn btn-replay';
+            replayBtn.textContent = '🔊 再聽一遍';
+            replayBtn.onclick = speakCurrentWord;
+            buttonContainer.appendChild(replayBtn);
+            
+            document.getElementById('quiz-area').appendChild(buttonContainer);
+            
+            // 开始播放
+            testStarted = true;
+            speakCurrentWord();
         }
         
         function showAudioError(message) {
@@ -333,14 +470,43 @@
                     `;
                     document.getElementById('quiz-area').appendChild(summaryDiv);
                     
+                    // 创建按钮容器
+                    const buttonContainer = document.createElement('div');
+                    buttonContainer.style.cssText = 'display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px;';
+                    
+                    // 只听写错误按钮
+                    if (unknownCount > 0) {
+                        const retryErrorsBtn = document.createElement('button');
+                        retryErrorsBtn.className = 'btn';
+                        retryErrorsBtn.style.backgroundColor = '#e67e22';
+                        retryErrorsBtn.textContent = `🔁 只聽寫錯誤 (${unknownCount}個)`;
+                        retryErrorsBtn.onclick = function() {
+                            restartQuizForErrors();
+                        };
+                        buttonContainer.appendChild(retryErrorsBtn);
+                    }
+                    
+                    // 全部重听按钮
+                    const retryAllBtn = document.createElement('button');
+                    retryAllBtn.className = 'btn';
+                    retryAllBtn.style.backgroundColor = '#3498db';
+                    retryAllBtn.textContent = '↻ 全部重聽';
+                    retryAllBtn.onclick = function() {
+                        restartQuizForAll();
+                    };
+                    buttonContainer.appendChild(retryAllBtn);
+                    
+                    // 返回上一頁按钮
                     const finishBtn = document.createElement('button');
                     finishBtn.className = 'btn';
-                    finishBtn.style.marginTop = '20px';
-                    finishBtn.textContent = '返回首頁';
+                    finishBtn.style.backgroundColor = '#95a5a6';
+                    finishBtn.textContent = '返回上一頁';
                     finishBtn.onclick = function() {
-                        window.location.href = '/vocab_list';
+                        window.location.href = returnTo;
                     };
-                    document.getElementById('quiz-area').appendChild(finishBtn);
+                    buttonContainer.appendChild(finishBtn);
+                    
+                    document.getElementById('quiz-area').appendChild(buttonContainer);
                     isProcessing = false;
                 } else {
                     setTimeout(() => {

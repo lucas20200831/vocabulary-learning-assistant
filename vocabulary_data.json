@@ -4,8 +4,8 @@
       {
         "word": "青馬大橋",
         "meaning": "",
-        "attempts": 3,
-        "correct": 3,
+        "attempts": 5,
+        "correct": 5,
         "incorrect": 0,
         "history": [
           {
@@ -19,14 +19,22 @@
           {
             "timestamp": "2026-01-24 13:42:42",
             "known": true
+          },
+          {
+            "timestamp": "2026-02-07 01:11:54",
+            "known": true
+          },
+          {
+            "timestamp": "2026-02-07 01:26:05",
+            "known": true
           }
         ]
       },
       {
         "word": "疾馳",
         "meaning": "",
-        "attempts": 2,
-        "correct": 2,
+        "attempts": 4,
+        "correct": 4,
         "incorrect": 0,
         "history": [
           {
@@ -36,14 +44,22 @@
           {
             "timestamp": "2026-01-24 13:42:46",
             "known": true
+          },
+          {
+            "timestamp": "2026-02-07 01:11:57",
+            "known": true
+          },
+          {
+            "timestamp": "2026-02-07 01:26:07",
+            "known": true
           }
         ]
       },
       {
         "word": "遠眺",
         "meaning": "",
-        "attempts": 2,
-        "correct": 1,
+        "attempts": 4,
+        "correct": 3,
         "incorrect": 1,
         "history": [
           {
@@ -53,14 +69,22 @@
           {
             "timestamp": "2026-01-24 13:42:50",
             "known": true
+          },
+          {
+            "timestamp": "2026-02-07 01:11:59",
+            "known": true
+          },
+          {
+            "timestamp": "2026-02-07 01:26:10",
+            "known": true
           }
         ]
       },
       {
         "word": "橫卧",
         "meaning": "",
-        "attempts": 2,
-        "correct": 1,
+        "attempts": 4,
+        "correct": 3,
         "incorrect": 1,
         "history": [
           {
@@ -70,15 +94,23 @@
           {
             "timestamp": "2026-01-24 13:42:53",
             "known": true
+          },
+          {
+            "timestamp": "2026-02-07 01:12:02",
+            "known": true
+          },
+          {
+            "timestamp": "2026-02-07 01:26:20",
+            "known": true
           }
         ]
       },
       {
         "word": "映照",
         "meaning": "",
-        "attempts": 2,
+        "attempts": 4,
         "correct": 1,
-        "incorrect": 1,
+        "incorrect": 3,
         "history": [
           {
             "timestamp": "2026-01-24 05:15:43",
@@ -87,15 +119,23 @@
           {
             "timestamp": "2026-01-24 13:42:57",
             "known": false
+          },
+          {
+            "timestamp": "2026-02-07 01:12:05",
+            "known": false
+          },
+          {
+            "timestamp": "2026-02-07 01:26:22",
+            "known": false
           }
         ]
       },
       {
         "word": "镀上",
         "meaning": "",
-        "attempts": 2,
-        "correct": 1,
-        "incorrect": 1,
+        "attempts": 4,
+        "correct": 2,
+        "incorrect": 2,
         "history": [
           {
             "timestamp": "2026-01-24 05:15:46",
@@ -104,15 +144,23 @@
           {
             "timestamp": "2026-01-24 13:43:01",
             "known": true
+          },
+          {
+            "timestamp": "2026-02-07 01:12:08",
+            "known": true
+          },
+          {
+            "timestamp": "2026-02-07 01:26:26",
+            "known": false
           }
         ]
       },
       {
         "word": "彷佛",
         "meaning": "",
-        "attempts": 2,
+        "attempts": 4,
         "correct": 1,
-        "incorrect": 1,
+        "incorrect": 3,
         "history": [
           {
             "timestamp": "2026-01-24 05:15:49",
@@ -121,15 +169,23 @@
           {
             "timestamp": "2026-01-24 13:43:05",
             "known": false
+          },
+          {
+            "timestamp": "2026-02-07 01:12:11",
+            "known": false
+          },
+          {
+            "timestamp": "2026-02-07 01:26:29",
+            "known": false
           }
         ]
       },
       {
         "word": "異口同聲",
         "meaning": "",
-        "attempts": 2,
-        "correct": 2,
-        "incorrect": 0,
+        "attempts": 4,
+        "correct": 3,
+        "incorrect": 1,
         "history": [
           {
             "timestamp": "2026-01-24 05:15:51",
@@ -138,15 +194,23 @@
           {
             "timestamp": "2026-01-24 13:43:08",
             "known": true
+          },
+          {
+            "timestamp": "2026-02-07 01:12:13",
+            "known": false
+          },
+          {
+            "timestamp": "2026-02-07 01:26:33",
+            "known": true
           }
         ]
       },
       {
         "word": "雄偉壯麗",
         "meaning": "",
-        "attempts": 2,
-        "correct": 1,
-        "incorrect": 1,
+        "attempts": 4,
+        "correct": 2,
+        "incorrect": 2,
         "history": [
           {
             "timestamp": "2026-01-24 05:15:54",
@@ -155,15 +219,23 @@
           {
             "timestamp": "2026-01-24 13:43:11",
             "known": true
+          },
+          {
+            "timestamp": "2026-02-07 01:12:16",
+            "known": true
+          },
+          {
+            "timestamp": "2026-02-07 01:26:37",
+            "known": false
           }
         ]
       },
       {
         "word": "引以為傲",
         "meaning": "",
-        "attempts": 2,
-        "correct": 2,
-        "incorrect": 0,
+        "attempts": 4,
+        "correct": 3,
+        "incorrect": 1,
         "history": [
           {
             "timestamp": "2026-01-24 05:15:57",
@@ -172,15 +244,23 @@
           {
             "timestamp": "2026-01-24 13:43:15",
             "known": true
+          },
+          {
+            "timestamp": "2026-02-07 01:12:20",
+            "known": false
+          },
+          {
+            "timestamp": "2026-02-07 01:26:40",
+            "known": true
           }
         ]
       },
       {
         "word": "夜幕低垂",
         "meaning": "",
-        "attempts": 2,
+        "attempts": 4,
         "correct": 2,
-        "incorrect": 0,
+        "incorrect": 2,
         "history": [
           {
             "timestamp": "2026-01-24 05:16:01",
@@ -189,15 +269,23 @@
           {
             "timestamp": "2026-01-24 13:43:19",
             "known": true
+          },
+          {
+            "timestamp": "2026-02-07 01:12:25",
+            "known": false
+          },
+          {
+            "timestamp": "2026-02-07 01:26:46",
+            "known": false
           }
         ]
       },
       {
         "word": "燦爛奪目",
         "meaning": "",
-        "attempts": 2,
-        "correct": 1,
-        "incorrect": 1,
+        "attempts": 4,
+        "correct": 2,
+        "incorrect": 2,
         "history": [
           {
             "timestamp": "2026-01-24 05:16:06",
@@ -206,6 +294,14 @@
           {
             "timestamp": "2026-01-24 13:43:23",
             "known": true
+          },
+          {
+            "timestamp": "2026-02-07 01:12:29",
+            "known": true
+          },
+          {
+            "timestamp": "2026-02-07 01:26:52",
+            "known": false
           }
         ]
       }
@@ -238,7 +334,8 @@
             "timestamp": "2026-02-05 16:26:06",
             "known": true
           }
-        ]
+        ],
+        "id": "para_1"
       }
     ]
   },
@@ -435,208 +532,5 @@
       }
     ],
     "段落": []
-  },
-  "测试课程_拆分功能": {
-    "詞語": [
-      {
-        "word": "青马大桥",
-        "meaning": "香港跨海大桥",
-        "attempts": 0,
-        "correct": 0,
-        "incorrect": 0,
-        "history": []
-      },
-      {
-        "word": "疾驰",
-        "meaning": "快速行驶",
-        "attempts": 0,
-        "correct": 0,
-        "incorrect": 0,
-        "history": []
-      },
-      {
-        "word": "壮观",
-        "meaning": "景象气势宏大",
-        "attempts": 0,
-        "correct": 0,
-        "incorrect": 0,
-        "history": []
-      }
-    ],
-    "段落": [
-      {
-        "title": "短句示例",
-        "sentences": [
-          {
-            "sentence": "青马大桥很壮观。",
-            "attempts": 1,
-            "correct": 1,
-            "incorrect": 0,
-            "history": [
-              {
-                "timestamp": "2026-02-05 18:42:01",
-                "known": true
-              }
-            ]
-          },
-          {
-            "sentence": "我们乘坐快速列车。",
-            "attempts": 1,
-            "correct": 0,
-            "incorrect": 1,
-            "history": [
-              {
-                "timestamp": "2026-02-05 18:42:06",
-                "known": false
-              }
-            ]
-          }
-        ],
-        "attempts": 2,
-        "correct": 1,
-        "history": [
-          {
-            "timestamp": "2026-02-05 18:42:01",
-            "known": true
-          },
-          {
-            "timestamp": "2026-02-05 18:42:06",
-            "known": false
-          }
-        ],
-        "incorrect": 1
-      },
-      {
-        "title": "中等长句",
-        "sentences": [
-          {
-            "sentence": "我们乘坐着快速列车，",
-            "attempts": 2,
-            "correct": 0,
-            "incorrect": 2,
-            "history": [
-              {
-                "timestamp": "2026-02-05 18:42:12",
-                "known": false
-              },
-              {
-                "timestamp": "2026-02-05 18:42:29",
-                "known": false
-              }
-            ]
-          },
-          {
-            "sentence": "沿着青马大桥向前疾驰而去。",
-            "attempts": 1,
-            "correct": 1,
-            "incorrect": 0,
-            "history": [
-              {
-                "timestamp": "2026-02-05 18:42:16",
-                "known": true
-              }
-            ]
-          },
-          {
-            "sentence": "壮观的景色展现在我们眼前。",
-            "attempts": 1,
-            "correct": 1,
-            "incorrect": 0,
-            "history": [
-              {
-                "timestamp": "2026-02-05 18:42:20",
-                "known": true
-              }
-            ]
-          }
-        ],
-        "attempts": 4,
-        "incorrect": 2,
-        "history": [
-          {
-            "timestamp": "2026-02-05 18:42:12",
-            "known": false
-          },
-          {
-            "timestamp": "2026-02-05 18:42:16",
-            "known": true
-          },
-          {
-            "timestamp": "2026-02-05 18:42:20",
-            "known": true
-          },
-          {
-            "timestamp": "2026-02-05 18:42:29",
-            "known": false
-          }
-        ],
-        "correct": 2
-      },
-      {
-        "title": "混合标点示例",
-        "sentences": [
-          {
-            "sentence": "青马大桥向前延伸，",
-            "attempts": 1,
-            "correct": 0,
-            "incorrect": 1,
-            "history": [
-              {
-                "timestamp": "2026-02-05 18:42:23",
-                "known": false
-              }
-            ]
-          },
-          {
-            "sentence": "疾驰而去。",
-            "attempts": 1,
-            "correct": 1,
-            "incorrect": 0,
-            "history": [
-              {
-                "timestamp": "2026-02-05 18:42:26",
-                "known": true
-              }
-            ]
-          },
-          {
-            "sentence": "我们乘坐着快速列车，",
-            "attempts": 0,
-            "correct": 0,
-            "incorrect": 0,
-            "history": []
-          },
-          {
-            "sentence": "感受着壮观的景色。",
-            "attempts": 1,
-            "correct": 1,
-            "incorrect": 0,
-            "history": [
-              {
-                "timestamp": "2026-02-05 18:42:34",
-                "known": true
-              }
-            ]
-          }
-        ],
-        "attempts": 3,
-        "incorrect": 1,
-        "history": [
-          {
-            "timestamp": "2026-02-05 18:42:23",
-            "known": false
-          },
-          {
-            "timestamp": "2026-02-05 18:42:26",
-            "known": true
-          },
-          {
-            "timestamp": "2026-02-05 18:42:34",
-            "known": true
-          }
-        ],
-        "correct": 2
-      }
-    ]
   }
 }

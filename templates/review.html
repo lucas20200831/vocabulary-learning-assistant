@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>複習未掌握內容 - {{ lesson_name }} - 詞彙學習助手</title>
+    <title>複習單詞 - {{ lesson_name }} - 詞彙學習助手</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -97,7 +97,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🔄 複習未掌握內容</h1>
+        <h1>🔄 複習單詞</h1>
         <div class="lesson-title">{{ lesson_name }}</div>
         
         {% if message %}
@@ -110,7 +110,7 @@
         {% if review_words %}
             <h2 style="color: #2c3e50; margin-top: 30px; border-bottom: 2px solid #3498db; padding-bottom: 10px;">📝 詞語掌握狀態</h2>
             <div style="text-align: center; margin-bottom: 20px;">
-                <button class="btn" onclick="startReviewQuiz()" style="background-color: #f39c12; display: inline-block; padding: 12px 24px; font-size: 16px;">🎙️ 聽寫未掌握單詞</button>
+                <button class="btn" onclick="startReviewQuiz()" style="background-color: #f39c12; display: inline-block; padding: 12px 24px; font-size: 16px;">🎙️ 聽寫單詞</button>
             </div>
             <table>
                 <thead>

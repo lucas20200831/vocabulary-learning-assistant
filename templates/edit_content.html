@@ -473,11 +473,11 @@
                 textWithoutFinalPunct = sentence.substring(0, punctIndex);
             }
             
-            // 寻找拆分点（优先在完整词语后面，其次在15字附近）
+            // 寻找拆分点（在15字附近）
             const splitPoint = findSplitPoint(textWithoutFinalPunct);
             
             if (splitPoint <= 0 || splitPoint >= textWithoutFinalPunct.length) {
-                // 无法拆分，返回原句（即使超过15字也返回）
+                // 无法拆分，返回原句
                 console.warn(`[WARNING] Cannot split sentence: "${sentence.substring(0, 30)}..."`)
                 return [sentence];
             }
@@ -491,9 +491,17 @@
             const part1ChineseCount = getChineseCharCount(part1);
             const part2ChineseCount = getChineseCharCount(part2Prefix);
             
-            // 确保两部分都 ≥ 5 个字
-            if (part1ChineseCount < 5 || part2ChineseCount < 5) {
-                console.warn(`[WARNING] Cannot maintain minimum 5-char constraint. Part1: ${part1ChineseCount}, Part2: ${part2ChineseCount}`);
+            // 不再强制要求Part2>=5个字
+            // 这确保任何超过15字的句子都能被拆分
+            // 只要Part2不为空（>=1字）就允许拆分
+            
+            if (part1ChineseCount < 1 || part1ChineseCount > 15) {
+                console.warn(`[WARNING] Part1 length invalid: ${part1ChineseCount}`);
+                return [sentence];
+            }
+            
+            if (part2ChineseCount < 1) {
+                console.warn(`[WARNING] Part2 is empty`);
                 return [sentence];
             }
             
@@ -517,25 +525,19 @@
                 
                 if (isChineseChar) {
                     currentChineseCount++;
+                    // 当达到第15个汉字时，返回其后的位置作为拆分点
+                    if (currentChineseCount === targetCount) {
+                        return i + 1;
+                    }
                 }
                 
-                // 当达到接近目标汉字数时，找到最近的"安全位置"
-                if (currentChineseCount >= targetCount - 2 && currentChineseCount <= targetCount + 2) {
-                    // 尝试在当前位置或之后找到合适的拆分点
-                    // 优先选择空格、标点或其他分隔符
-                    for (let j = i; j < Math.min(i + 10, text.length); j++) {
-                        const nextChar = text[j];
-                        // 在这些位置拆分较为自然：标点后、空格后、中文字后
-                        if (j === i || /[\s、，；。！？]/.test(nextChar)) {
-                            return j + 1;
-                        }
-                    }
-                    // 如果没找到更好的位置，就在当前位置拆分
-                    return i + 1;
+                // 如果已经超过目标，立即返回当前位置
+                if (currentChineseCount > targetCount) {
+                    return i;
                 }
             }
             
-            // 如果没有找到合适的拆分点，在中点拆分
+            // 如果文本中汉字数少于等于15，返回中点
             return Math.floor(text.length / 2);
         }
 
@@ -548,6 +550,32 @@
             const finalSentences = splitLongSentences(sentencesByPunct);
             
             return finalSentences;
+        }
+
+        async function formatSentencesWithServer(text) {
+            // 调用服务器API进行智能拆分（使用jieba）
+            try {
+                const response = await fetch('/api/split_sentences', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: text
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.status === 'success') {
+                    return result.sentences || [];
+                } else {
+                    console.warn('Server split failed, falling back to client-side:', result.message);
+                    return formatSentences(text);
+                }
+            } catch (error) {
+                console.warn('Server split error, falling back to client-side:', error);
+                return formatSentences(text);
+            }
         }
 
         async function saveContent() {
@@ -583,8 +611,8 @@
                     const content = contentInput.value.trim();
                     
                     if (content) {
-                        // 格式化句子
-                        const sentences = formatSentences(content);
+                        // 使用服务器API进行智能拆分（jieba）
+                        const sentences = await formatSentencesWithServer(content);
                         
                         if (sentences.length > 0) {
                             paragraphs.push({

@@ -29,6 +29,9 @@ DEBUG_SUMMARY_*.md
 *.swo
 *~
 
+# 生成的音频文件（TTS缓存）
+static/audio/*.mp3
+
 # 其他忽略规则...
 DEBUG*.md 
 __pycache__/ 

@@ -273,19 +273,71 @@
         
         <div class="summary-text">
             <strong>統計摘要：</strong><br>
-            共 <strong>{{ word_stats.total }}</strong> 個詞語，已掌握 <strong>{{ word_stats.mastered }}</strong> 個（<strong>{{ overall_percentage }}%</strong>）。
+            共 <strong>{{ word_stats.total }}</strong> 個詞語，已掌握 <strong>{{ word_stats.mastered }}</strong> 個（<strong>{% if word_stats.total > 0 %}{{ (word_stats.mastered / word_stats.total * 100) | round | int }}%{% else %}0%{% endif %}</strong>）。
             {% if word_stats.needs_review > 0 %}
                 還有 <strong>{{ word_stats.needs_review }}</strong> 個詞語需要複習或尚未測試。
             {% else %}
-                🎉 恭喜！所有詞語都已掌握！
+                {% if word_stats.total > 0 %}🎉 所有詞語都已掌握！{% endif %}
+            {% endif %}
+        </div>
+        
+        {% if para_stats.total > 0 %}
+        <div class="section">
+            <div class="section-title">📄 段落統計 ({{ para_stats.mastered }}/{{ para_stats.total }} 已掌握)</div>
+            <div class="section-content">
+                {% for para in para_stats.paragraphs %}
+                <div class="paragraph-box">
+                    <div class="paragraph-title">{{ para.title }}</div>
+                    <p style="margin: 5px 0; color: #666; font-size: 14px;">
+                        句子總數: <strong>{{ para.total }}</strong> | 已掌握: <strong style="color: #27ae60;">{{ para.mastered }}</strong> | 需複習: <strong style="color: #e74c3c;">{{ para.needs_review }}</strong>
+                    </p>
+                    <table style="margin-top: 10px;">
+                        <thead>
+                            <tr style="background-color: #f5f5f5;">
+                                <th style="width: 60%;">句子</th>
+                                <th style="width: 15%;">嘗試次數</th>
+                                <th style="width: 25%;">狀態</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sent in para.sentences %}
+                            <tr>
+                                <td>{{ sent.sentence | replace('\n', ' ') }}</td>
+                                <td>{{ sent.attempts }}</td>
+                                <td>
+                                    {% if sent.status == '已掌握' %}
+                                        <span class="status-mastered">✓ {{ sent.status }}</span>
+                                    {% elif sent.status == '需複習' %}
+                                        <span class="status-review">✗ {{ sent.status }}</span>
+                                    {% else %}
+                                        <span class="status-untested">⊘ {{ sent.status }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="summary-text">
+            <strong>課程統計摘要：</strong><br>
+            總共 <strong>{{ total_items }}</strong> 個單詞，已掌握 <strong>{{ total_mastered }}</strong> 個，整體掌握進度：<strong>{{ overall_percentage }}%</strong>。
+            {% if total_needs_review > 0 %}
+                還有 <strong>{{ total_needs_review }}</strong> 個單詞需要複習或尚未測試。
+            {% else %}
+                {% if total_items > 0 %}🎉 恭喜！全部內容都已掌握！{% endif %}
             {% endif %}
         </div>
         
         <div class="button-group">
             {% if language %}
-                <a href="{{ url_for('review_new', language=language, lesson_num=lesson_num) }}" class="btn btn-quiz">📝 聽寫未掌握單詞</a>
+                <a href="{{ url_for('review_new', language=language, lesson_num=lesson_num) }}" class="btn btn-quiz">📝 單詞復習</a>
             {% else %}
-                <a href="/review_simple/{{ lesson_num | urlencode }}" class="btn btn-quiz">📝 聽寫未掌握單詞</a>
+                <a href="/review_simple/{{ lesson_num | urlencode }}" class="btn btn-quiz">📝 單詞復習</a>
             {% endif %}
             <button class="btn" onclick="history.back()">返回</button>
         </div>

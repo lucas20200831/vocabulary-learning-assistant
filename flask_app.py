@@ -475,6 +475,27 @@ def get_lessons_unmastered_counts():
     
     return jsonify(lesson_counts)
 
+@app.route('/api/split_sentences', methods=['POST'])
+def api_split_sentences():
+    """API: 使用jieba进行智能拆分（在词语边界处拆分）"""
+    try:
+        req_data = request.get_json()
+        text = req_data.get('text', '').strip()
+        
+        if not text:
+            return jsonify({'status': 'error', 'message': '文本为空'}), 400
+        
+        # 调用拆分函数
+        sentences_by_punct = split_by_punctuation(text)
+        final_sentences = split_long_sentences(sentences_by_punct)
+        
+        return jsonify({
+            'status': 'success',
+            'sentences': final_sentences
+        }), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 @app.route('/quiz_all_unmastered')
 def quiz_all_unmastered():
     """聽寫所有未掌握的單詞"""
@@ -537,7 +558,8 @@ def quiz_all_unmastered():
                          word_count=len(unmastered_words),
                          current_word=unmastered_words[0] if unmastered_words else None,
                          words_json=words_json,
-                         content_type='詞語')
+                         content_type='詞語',
+                         return_to='/unmastered_words')
 
 @app.route('/tts/<word>')
 def generate_tts(word):
@@ -948,24 +970,22 @@ def quiz_simple(lesson_name):
         # 詞語作為整體框，總是聽寫所有詞語
         words_to_practice = [item['word'] for item in lesson_content['詞語']]
     elif content_type == '段落' and '段落' in lesson_content:
-        # 如果指定了段落ID，只選擇該段落
-        if paragraph_id:
-            for para in lesson_content['段落']:
-                if para.get('id') == paragraph_id:
-                    for sent_item in para.get('sentences', []):
-                        words_to_practice.append(sent_item.get('sentence') if isinstance(sent_item, dict) else sent_item)
-                    break
-        else:
-            # 沒有指定段落ID，則選擇所有段落
-            for para in lesson_content['段落']:
+        # 段落必須指定ID，不允許一次聽寫所有段落
+        if not paragraph_id:
+            return "❌ 錯誤：請選擇要聽寫的特定段落", 400
+        
+        # 查找指定的段落
+        for para in lesson_content['段落']:
+            if para.get('id') == paragraph_id:
                 for sent_item in para.get('sentences', []):
                     words_to_practice.append(sent_item.get('sentence') if isinstance(sent_item, dict) else sent_item)
+                break
     
     if not words_to_practice:
-        return f"沒有{content_type}可以聽寫", 404
+        return f"❌ 沒有{content_type}可以聽寫。請選擇正確的段落或課程。", 404
     
-    # 預先將所有詞語加入 TTS 生成隊列，避免延遲
-    print(f"[QUIZ] Preloading {len(words_to_practice)} words for TTS")
+    # 預先將所有詞語/句子加入 TTS 生成隊列，避免延遲
+    print(f"[QUIZ_SIMPLE] Preloading {len(words_to_practice)} items for TTS (content_type={content_type})")
     for i, word in enumerate(words_to_practice):
         word_hash = hashlib.md5(word.encode('utf-8')).hexdigest()
         audio_file = os.path.join(AUDIO_DIR, f'{word_hash}.mp3')
@@ -1005,6 +1025,7 @@ def quiz_new(language, lesson_num):
     
     content_type = request.args.get('content_type', '詞語').strip()
     paragraph_id = request.args.get('paragraph_id', '').strip()  # 特定段落ID
+    print(f"[QUIZ] content_type={content_type}, paragraph_id={paragraph_id}")
     
     data = load_data()
     
@@ -1018,18 +1039,16 @@ def quiz_new(language, lesson_num):
         # 詞語作為整體框，總是聽寫所有詞語
         words_to_practice = [item['word'] for item in lesson_content['詞語']]
     elif content_type == '段落' and '段落' in lesson_content:
-        # 如果指定了段落ID，只選擇該段落
-        if paragraph_id:
-            for para in lesson_content['段落']:
-                if para.get('id') == paragraph_id:
-                    for sent_item in para.get('sentences', []):
-                        words_to_practice.append(sent_item.get('sentence') if isinstance(sent_item, dict) else sent_item)
-                    break
-        else:
-            # 沒有指定段落ID，則選擇所有段落
-            for para in lesson_content['段落']:
+        # 段落必須指定ID，不允許一次聽寫所有段落
+        if not paragraph_id:
+            return "❌ 錯誤：請選擇要聽寫的特定段落", 400
+        
+        # 查找指定的段落
+        for para in lesson_content['段落']:
+            if para.get('id') == paragraph_id:
                 for sent_item in para.get('sentences', []):
                     words_to_practice.append(sent_item.get('sentence') if isinstance(sent_item, dict) else sent_item)
+                break
     
     if not words_to_practice:
         return f"沒有{content_type}可以聽寫", 404
@@ -1090,29 +1109,72 @@ def split_by_punctuation(text):
     sentences = [s.strip() for s in parts if s.strip()]
     return sentences
 
-def find_best_split_point(text):
-    """寻找最佳拆分点（在15个汉字处拆分）"""
+def split_long_sentence_by_words(sentence):
+    """使用jieba分词后在词语边界处拆分长句子"""
+    try:
+        import jieba
+    except ImportError:
+        # 如果jieba未安装，回退到原始拆分方法
+        return split_long_sentence_fallback(sentence)
+    
+    chinese_count = get_chinese_char_count(sentence)
+    
+    if chinese_count <= 15:
+        return [sentence]
+    
+    # 提取末尾标点
+    final_punctuation = ''
+    text_to_split = sentence
+    
+    for punct in ['。', '？', '；', '：', '，']:
+        if sentence.endswith(punct):
+            final_punctuation = punct
+            text_to_split = sentence[:-1]
+            break
+    
+    # 使用jieba进行分词
+    tokens = list(jieba.cut(text_to_split))
+    
+    # 在词组边界处拆分，目标是保持每部分在15字以内
+    result = []
+    current_part = ''
+    current_count = 0
     target_count = 15
-    current_chinese_count = 0
     
-    for i, char in enumerate(text):
-        # 检查是否为汉字
-        if '\u4e00' <= char <= '\u9fff':
-            current_chinese_count += 1
-            # 当达到恰好15个汉字时，返回当前位置后面的位置
-            if current_chinese_count == target_count:
-                return i + 1
+    for token in tokens:
+        token_count = get_chinese_char_count(token)
         
-        # 如果已经超过目标，返回当前位置
-        if current_chinese_count > target_count:
-            return i
+        # 如果加上当前token会超过15字，就拆分
+        if current_count + token_count > target_count and current_count > 0:
+            # 当前部分已经有内容，保存它
+            result.append(current_part)
+            current_part = token
+            current_count = token_count
+        else:
+            # 继续累积
+            current_part += token
+            current_count += token_count
     
-    # 如果文本中汉字数少于等于15，返回中点
-    return len(text) // 2
+    # 添加最后一部分
+    if current_part:
+        # 最后一部分需要添加标点
+        if result:  # 如果有前面的部分
+            result.append(current_part + final_punctuation)
+        else:  # 如果整个句子都在一部分
+            result.append(sentence)
+    
+    # 检查是否满足条件：每部分最多15字
+    for i, part in enumerate(result):
+        if get_chinese_char_count(part) > 15:
+            # 如果某部分仍然超过15字（词语本身特别长），递归处理
+            sub_parts = split_long_sentence_fallback(part)
+            result = result[:i] + sub_parts + result[i+1:]
+            break
+    
+    return result
 
-
-def split_long_sentence(sentence):
-    """递归拆分超过15个汉字的句子"""
+def split_long_sentence_fallback(sentence):
+    """回退的递归拆分方法（当jieba无法处理时）"""
     chinese_count = get_chinese_char_count(sentence)
     
     if chinese_count <= 15:
@@ -1134,11 +1196,11 @@ def split_long_sentence(sentence):
         text_to_split = sentence
     
     # 寻找最优的拆分点
-    # 尝试在15个汉字处拆分，如果Part2太短，就向前调整
+    # 优先在接近15个汉字处拆分
     split_point = find_best_split_point(text_to_split)
     
     if split_point <= 0 or split_point >= len(text_to_split):
-        # 无法找到合适的拆分点
+        # 无法找到合适的拆分点，返回原句
         return [sentence]
     
     # 拆分为两部分
@@ -1149,27 +1211,17 @@ def split_long_sentence(sentence):
     part1_chinese_count = get_chinese_char_count(part1)
     part2_chinese_count = get_chinese_char_count(part2_body)
     
-    # 如果Part2太短（<5字），向前调整拆分点
-    if part2_chinese_count < 5 and part1_chinese_count > 10:
-        # 尝试向前移动拆分点，确保Part2至少有5个汉字
-        # 逆向查找找到倒数第5个汉字后的位置
-        chinese_count_from_start = 0
-        target_count = part1_chinese_count - 5  # 保留5个汉字给Part2
-        
-        for i, char in enumerate(text_to_split):
-            if '\u4e00' <= char <= '\u9fff':
-                chinese_count_from_start += 1
-                if chinese_count_from_start == target_count:
-                    split_point = i + 1
-                    part1 = text_to_split[:split_point]
-                    part2_body = text_to_split[split_point:]
-                    part1_chinese_count = chinese_count_from_start
-                    part2_chinese_count = get_chinese_char_count(part2_body)
-                    break
+    # 注意：不再强制要求Part2>=5字，允许任何长度的Part2
+    # 这确保任何超过15字的句子都能被拆分
     
-    # 再次检查最小限制
-    if part1_chinese_count < 5 or part2_chinese_count < 5:
-        # 仍然无法满足，返回原句
+    # 如果part1仍然超过15字（这不应该发生，但防守性编程）
+    # 或者part1太短（<1字），返回原句
+    if part1_chinese_count < 1 or part1_chinese_count > 15:
+        # 拆分失败，返回原句
+        return [sentence]
+    
+    # 如果part2为空，返回原句
+    if part2_chinese_count < 1:
         return [sentence]
     
     # 第二部分：只在最后一部分添加标点
@@ -1177,10 +1229,30 @@ def split_long_sentence(sentence):
     
     # 递归处理第二部分（如果仍 > 15 字）
     if part2_chinese_count > 15:
-        part2_splits = split_long_sentence(part2_with_punct)
+        part2_splits = split_long_sentence_fallback(part2_with_punct)
         return [part1] + part2_splits
     else:
         return [part1, part2_with_punct]
+
+def find_best_split_point(text):
+    """寻找最佳拆分点（在15个汉字处拆分）"""
+    target_count = 15
+    current_chinese_count = 0
+    
+    for i, char in enumerate(text):
+        # 检查是否为汉字
+        if '\u4e00' <= char <= '\u9fff':
+            current_chinese_count += 1
+            # 当达到恰好15个汉字时，返回当前位置后面的位置
+            if current_chinese_count == target_count:
+                return i + 1
+        
+        # 如果已经超过目标，返回当前位置
+        if current_chinese_count > target_count:
+            return i
+    
+    # 如果文本中汉字数少于等于15，返回中点
+    return len(text) // 2
 
 
 def split_long_sentences(sentences):
@@ -1193,7 +1265,8 @@ def split_long_sentences(sentences):
             result.append(sentence)
         else:
             # 汉字数 > 15：进入拆分流程
-            splits = split_long_sentence(sentence)
+            # 优先使用基于词语的拆分
+            splits = split_long_sentence_by_words(sentence)
             result.extend(splits)
     
     return result
@@ -1665,16 +1738,76 @@ def stats_simple(lesson_name):
                 'status': status
             })
     
-    # Calculate overall stats (only for words)
-    overall_percentage = round((word_stats['mastered'] / word_stats['total']) * 100, 1) if word_stats['total'] > 0 else 0
+    # Collect paragraph statistics
+    para_stats = {
+        'total': 0,
+        'mastered': 0,
+        'needs_review': 0,
+        'paragraphs': []
+    }
+    
+    if '段落' in lesson_content:
+        for para in lesson_content['段落']:
+            para_id = para.get('id', '')
+            para_info = {
+                'id': para_id,
+                'title': para['title'],
+                'total': 0,
+                'mastered': 0,
+                'needs_review': 0,
+                'sentences': [],
+                'para_attempts': para.get('attempts', 0),
+                'para_correct': para.get('correct', 0),
+                'para_incorrect': para.get('incorrect', 0)
+            }
+            
+            for sent in para.get('sentences', []):
+                para_stats['total'] += 1
+                para_info['total'] += 1
+                
+                if sent['attempts'] == 0:
+                    status = '未測試'
+                    accuracy = 0
+                    para_stats['needs_review'] += 1
+                    para_info['needs_review'] += 1
+                else:
+                    accuracy = sent['correct'] / sent['attempts']
+                    if accuracy >= 0.75:
+                        status = '已掌握'
+                        para_stats['mastered'] += 1
+                        para_info['mastered'] += 1
+                    else:
+                        status = '需複習'
+                        para_stats['needs_review'] += 1
+                        para_info['needs_review'] += 1
+                
+                para_info['sentences'].append({
+                    'sentence': sent['sentence'],
+                    'attempts': sent['attempts'],
+                    'correct': sent['correct'],
+                    'incorrect': sent['incorrect'],
+                    'accuracy': round(accuracy * 100, 1) if sent['attempts'] > 0 else 0,
+                    'status': status
+                })
+            
+            para_stats['paragraphs'].append(para_info)
+    
+    # Calculate overall stats - only count words, not paragraphs
+    total_items = word_stats['total']
+    total_mastered = word_stats['mastered']
+    total_needs_review = word_stats['needs_review']
+    overall_percentage = round((total_mastered / total_items) * 100, 1) if total_items > 0 else 0
     
     return render_template('stats.html',
                           lesson_name=lesson_name,
                           language='',
                           lesson_num=lesson_name,
+                          total_items=total_items,
+                          total_mastered=total_mastered,
+                          total_needs_review=total_needs_review,
                           overall_percentage=overall_percentage,
                           word_stats=word_stats,
-                          para_stats={'total': 0, 'mastered': 0, 'paragraphs': []})
+                          para_stats=para_stats)
 
 @app.route('/stats/<language>/<lesson_num>')
 def lesson_stats_new(language, lesson_num):
@@ -1783,10 +1916,10 @@ def lesson_stats_new(language, lesson_num):
             
             para_stats['paragraphs'].append(para_info)
     
-    # Calculate overall stats
-    total_items = word_stats['total'] + para_stats['total']
-    total_mastered = word_stats['mastered'] + para_stats['mastered']
-    total_needs_review = word_stats['needs_review'] + para_stats['needs_review']
+    # Calculate overall stats - only count words, not paragraphs
+    total_items = word_stats['total']
+    total_mastered = word_stats['mastered']
+    total_needs_review = word_stats['needs_review']
     overall_percentage = round((total_mastered / total_items) * 100, 1) if total_items > 0 else 0
     
     display_name = lesson_num if not language else f"{language} - {lesson_num}"
@@ -2037,4 +2170,4 @@ if __name__ == '__main__':
     
     # 禁用自动重加载以防止 TTS 线程重复启动
     print("[STARTUP] Starting Flask on http://127.0.0.1:5002")
-    app.run(debug=True, host='127.0.0.1', port=5002, use_reloader=False)
+    app.run(debug=False, host='127.0.0.1', port=5002, use_reloader=False)
