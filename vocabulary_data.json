@@ -108,8 +108,8 @@
       {
         "word": "映照",
         "meaning": "",
-        "attempts": 4,
-        "correct": 1,
+        "attempts": 5,
+        "correct": 2,
         "incorrect": 3,
         "history": [
           {
@@ -127,14 +127,18 @@
           {
             "timestamp": "2026-02-07 01:26:22",
             "known": false
+          },
+          {
+            "timestamp": "2026-02-08 13:34:44",
+            "known": true
           }
         ]
       },
       {
         "word": "镀上",
         "meaning": "",
-        "attempts": 4,
-        "correct": 2,
+        "attempts": 5,
+        "correct": 3,
         "incorrect": 2,
         "history": [
           {
@@ -152,14 +156,18 @@
           {
             "timestamp": "2026-02-07 01:26:26",
             "known": false
+          },
+          {
+            "timestamp": "2026-02-08 13:34:46",
+            "known": true
           }
         ]
       },
       {
         "word": "彷佛",
         "meaning": "",
-        "attempts": 4,
-        "correct": 1,
+        "attempts": 5,
+        "correct": 2,
         "incorrect": 3,
         "history": [
           {
@@ -177,6 +185,10 @@
           {
             "timestamp": "2026-02-07 01:26:29",
             "known": false
+          },
+          {
+            "timestamp": "2026-02-08 13:34:49",
+            "known": true
           }
         ]
       },
@@ -208,8 +220,8 @@
       {
         "word": "雄偉壯麗",
         "meaning": "",
-        "attempts": 4,
-        "correct": 2,
+        "attempts": 5,
+        "correct": 3,
         "incorrect": 2,
         "history": [
           {
@@ -227,6 +239,10 @@
           {
             "timestamp": "2026-02-07 01:26:37",
             "known": false
+          },
+          {
+            "timestamp": "2026-02-08 13:34:52",
+            "known": true
           }
         ]
       },
@@ -258,8 +274,8 @@
       {
         "word": "夜幕低垂",
         "meaning": "",
-        "attempts": 4,
-        "correct": 2,
+        "attempts": 5,
+        "correct": 3,
         "incorrect": 2,
         "history": [
           {
@@ -277,14 +293,18 @@
           {
             "timestamp": "2026-02-07 01:26:46",
             "known": false
+          },
+          {
+            "timestamp": "2026-02-08 13:34:55",
+            "known": true
           }
         ]
       },
       {
         "word": "燦爛奪目",
         "meaning": "",
-        "attempts": 4,
-        "correct": 2,
+        "attempts": 5,
+        "correct": 3,
         "incorrect": 2,
         "history": [
           {
@@ -302,6 +322,10 @@
           {
             "timestamp": "2026-02-07 01:26:52",
             "known": false
+          },
+          {
+            "timestamp": "2026-02-08 13:34:59",
+            "known": true
           }
         ]
       }
@@ -337,90 +361,145 @@
       {
         "word": "姿勢",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:35:02",
+            "known": true
+          }
+        ]
       },
       {
         "word": "扭傷",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:35:04",
+            "known": true
+          }
+        ]
       },
       {
         "word": "除非",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:35:07",
+            "known": true
+          }
+        ]
       },
       {
         "word": "燒飯",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:35:10",
+            "known": true
+          }
+        ]
       },
       {
         "word": "咦",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:35:12",
+            "known": true
+          }
+        ]
       },
       {
         "word": "需要",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:35:15",
+            "known": true
+          }
+        ]
       },
       {
         "word": "關心",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:35:19",
+            "known": true
+          }
+        ]
       },
       {
         "word": "僅量",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:35:22",
+            "known": true
+          }
+        ]
       },
       {
         "word": "嗯",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:35:25",
+            "known": true
+          }
+        ]
       },
       {
         "word": "使勁",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:35:28",
+            "known": true
+          }
+        ]
       },
       {
         "word": "一拐一拐",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:35:32",
+            "known": true
+          }
+        ]
       }
     ],
     "段落": []
@@ -430,98 +509,158 @@
       {
         "word": "一副",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:35:37",
+            "known": true
+          }
+        ]
       },
       {
         "word": "嚷",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:35:40",
+            "known": true
+          }
+        ]
       },
       {
         "word": "適合",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:35:45",
+            "known": true
+          }
+        ]
       },
       {
         "word": "建議",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:35:49",
+            "known": true
+          }
+        ]
       },
       {
         "word": "擺放",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:35:52",
+            "known": true
+          }
+        ]
       },
       {
         "word": "相應",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:35:55",
+            "known": true
+          }
+        ]
       },
       {
         "word": "優勝",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:35:58",
+            "known": true
+          }
+        ]
       },
       {
         "word": "越過",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:36:00",
+            "known": true
+          }
+        ]
       },
       {
         "word": "設法",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:36:03",
+            "known": true
+          }
+        ]
       },
       {
         "word": "阻止",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:36:06",
+            "known": true
+          }
+        ]
       },
       {
         "word": "噢",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:36:08",
+            "known": true
+          }
+        ]
       },
       {
         "word": "應該",
         "meaning": "",
-        "attempts": 0,
-        "correct": 0,
+        "attempts": 1,
+        "correct": 1,
         "incorrect": 0,
-        "history": []
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:36:11",
+            "known": true
+          }
+        ]
       }
     ],
     "段落": []
@@ -531,8 +670,8 @@
       {
         "word": "银河",
         "meaning": "",
-        "attempts": 2,
-        "correct": 2,
+        "attempts": 3,
+        "correct": 3,
         "incorrect": 0,
         "history": [
           {
@@ -542,15 +681,19 @@
           {
             "timestamp": "2026-02-08 11:37:17",
             "known": true
+          },
+          {
+            "timestamp": "2026-02-08 13:33:52",
+            "known": true
           }
         ]
       },
       {
         "word": "蝉鸣",
         "meaning": "",
-        "attempts": 3,
-        "correct": 1,
-        "incorrect": 2,
+        "attempts": 7,
+        "correct": 3,
+        "incorrect": 4,
         "history": [
           {
             "timestamp": "2026-02-08 11:36:36",
@@ -563,15 +706,31 @@
           {
             "timestamp": "2026-02-08 11:37:21",
             "known": true
+          },
+          {
+            "timestamp": "2026-02-08 13:33:55",
+            "known": true
+          },
+          {
+            "timestamp": "2026-02-08 13:36:14",
+            "known": false
+          },
+          {
+            "timestamp": "2026-02-08 13:36:24",
+            "known": false
+          },
+          {
+            "timestamp": "2026-02-08 13:36:33",
+            "known": true
           }
         ]
       },
       {
         "word": "驿站",
         "meaning": "",
-        "attempts": 3,
-        "correct": 2,
-        "incorrect": 1,
+        "attempts": 6,
+        "correct": 3,
+        "incorrect": 3,
         "history": [
           {
             "timestamp": "2026-02-08 11:36:39",
@@ -584,15 +743,27 @@
           {
             "timestamp": "2026-02-08 11:37:40",
             "known": true
+          },
+          {
+            "timestamp": "2026-02-08 13:33:58",
+            "known": false
+          },
+          {
+            "timestamp": "2026-02-08 13:36:17",
+            "known": false
+          },
+          {
+            "timestamp": "2026-02-08 13:36:27",
+            "known": true
           }
         ]
       },
       {
         "word": "璀璨",
         "meaning": "",
-        "attempts": 3,
-        "correct": 1,
-        "incorrect": 2,
+        "attempts": 7,
+        "correct": 2,
+        "incorrect": 5,
         "history": [
           {
             "timestamp": "2026-02-08 11:36:42",
@@ -605,14 +776,30 @@
           {
             "timestamp": "2026-02-08 11:37:27",
             "known": true
+          },
+          {
+            "timestamp": "2026-02-08 13:34:13",
+            "known": false
+          },
+          {
+            "timestamp": "2026-02-08 13:36:20",
+            "known": false
+          },
+          {
+            "timestamp": "2026-02-08 13:36:30",
+            "known": false
+          },
+          {
+            "timestamp": "2026-02-08 13:36:36",
+            "known": true
           }
         ]
       },
       {
         "word": "苍穹",
         "meaning": "",
-        "attempts": 3,
-        "correct": 2,
+        "attempts": 4,
+        "correct": 3,
         "incorrect": 1,
         "history": [
           {
@@ -626,6 +813,10 @@
           {
             "timestamp": "2026-02-08 11:37:34",
             "known": true
+          },
+          {
+            "timestamp": "2026-02-08 13:34:18",
+            "known": true
           }
         ]
       }
@@ -637,8 +828,8 @@
         "sentences": [
           {
             "sentence": "午后阳光穿过窗户，",
-            "attempts": 2,
-            "correct": 2,
+            "attempts": 3,
+            "correct": 3,
             "incorrect": 0,
             "history": [
               {
@@ -648,13 +839,17 @@
               {
                 "timestamp": "2026-02-08 11:48:57",
                 "known": true
+              },
+              {
+                "timestamp": "2026-02-08 13:33:38",
+                "known": true
               }
             ]
           },
           {
             "sentence": "在书桌上投下温暖的光斑，",
-            "attempts": 2,
-            "correct": 2,
+            "attempts": 3,
+            "correct": 3,
             "incorrect": 0,
             "history": [
               {
@@ -663,6 +858,10 @@
               },
               {
                 "timestamp": "2026-02-08 11:49:00",
+                "known": true
+              },
+              {
+                "timestamp": "2026-02-08 13:33:42",
                 "known": true
               }
             ]
@@ -733,8 +932,24 @@
               }
             ]
           }
+        ],
+        "attempts": 2,
+        "correct": 2,
+        "history": [
+          {
+            "timestamp": "2026-02-08 13:33:38",
+            "known": true
+          },
+          {
+            "timestamp": "2026-02-08 13:33:42",
+            "known": true
+          }
         ]
       }
     ]
+  },
+  "测是": {
+    "詞語": [],
+    "段落": []
   }
 }
