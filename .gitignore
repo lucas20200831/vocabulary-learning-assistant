@@ -32,6 +32,13 @@ DEBUG_SUMMARY_*.md
 # 生成的音频文件（TTS缓存）
 static/audio/*.mp3
 
+# 运行时生成的数据文件（每个部署环境的数据不同）
+vocabulary_data.json
+
+# 备份文件
+*.backup
+*.bak
+
 # 其他忽略规则...
 DEBUG*.md 
 __pycache__/ 
