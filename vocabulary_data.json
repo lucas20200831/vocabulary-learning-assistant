@@ -315,27 +315,20 @@
         "title": "段落1",
         "sentences": [
           {
-            "sentence": "登鸕鷀樓\n王之渙\n白日依山盡\n黃河入海流\n欲窮千里目\n更上一層樓",
-            "attempts": 1,
-            "correct": 1,
+            "sentence": "登鸕鷀樓\n王之渙\n白日依山盡\n黃河",
+            "attempts": 0,
+            "correct": 0,
             "incorrect": 0,
-            "history": [
-              {
-                "timestamp": "2026-02-05 16:26:06",
-                "known": true
-              }
-            ]
-          }
-        ],
-        "attempts": 1,
-        "correct": 1,
-        "history": [
+            "history": []
+          },
           {
-            "timestamp": "2026-02-05 16:26:06",
-            "known": true
+            "sentence": "入海流\n欲窮千里目\n更上一層樓",
+            "attempts": 0,
+            "correct": 0,
+            "incorrect": 0,
+            "history": []
           }
-        ],
-        "id": "para_1"
+        ]
       }
     ]
   },
@@ -532,5 +525,216 @@
       }
     ],
     "段落": []
+  },
+  "测试2": {
+    "詞語": [
+      {
+        "word": "银河",
+        "meaning": "",
+        "attempts": 2,
+        "correct": 2,
+        "incorrect": 0,
+        "history": [
+          {
+            "timestamp": "2026-02-08 11:36:33",
+            "known": true
+          },
+          {
+            "timestamp": "2026-02-08 11:37:17",
+            "known": true
+          }
+        ]
+      },
+      {
+        "word": "蝉鸣",
+        "meaning": "",
+        "attempts": 3,
+        "correct": 1,
+        "incorrect": 2,
+        "history": [
+          {
+            "timestamp": "2026-02-08 11:36:36",
+            "known": false
+          },
+          {
+            "timestamp": "2026-02-08 11:36:57",
+            "known": false
+          },
+          {
+            "timestamp": "2026-02-08 11:37:21",
+            "known": true
+          }
+        ]
+      },
+      {
+        "word": "驿站",
+        "meaning": "",
+        "attempts": 3,
+        "correct": 2,
+        "incorrect": 1,
+        "history": [
+          {
+            "timestamp": "2026-02-08 11:36:39",
+            "known": true
+          },
+          {
+            "timestamp": "2026-02-08 11:37:24",
+            "known": false
+          },
+          {
+            "timestamp": "2026-02-08 11:37:40",
+            "known": true
+          }
+        ]
+      },
+      {
+        "word": "璀璨",
+        "meaning": "",
+        "attempts": 3,
+        "correct": 1,
+        "incorrect": 2,
+        "history": [
+          {
+            "timestamp": "2026-02-08 11:36:42",
+            "known": false
+          },
+          {
+            "timestamp": "2026-02-08 11:37:00",
+            "known": false
+          },
+          {
+            "timestamp": "2026-02-08 11:37:27",
+            "known": true
+          }
+        ]
+      },
+      {
+        "word": "苍穹",
+        "meaning": "",
+        "attempts": 3,
+        "correct": 2,
+        "incorrect": 1,
+        "history": [
+          {
+            "timestamp": "2026-02-08 11:36:44",
+            "known": false
+          },
+          {
+            "timestamp": "2026-02-08 11:37:03",
+            "known": true
+          },
+          {
+            "timestamp": "2026-02-08 11:37:34",
+            "known": true
+          }
+        ]
+      }
+    ],
+    "段落": [
+      {
+        "id": "0",
+        "title": "段落1",
+        "sentences": [
+          {
+            "sentence": "午后阳光穿过窗户，",
+            "attempts": 2,
+            "correct": 2,
+            "incorrect": 0,
+            "history": [
+              {
+                "timestamp": "2026-02-08 11:45:34",
+                "known": true
+              },
+              {
+                "timestamp": "2026-02-08 11:48:57",
+                "known": true
+              }
+            ]
+          },
+          {
+            "sentence": "在书桌上投下温暖的光斑，",
+            "attempts": 2,
+            "correct": 2,
+            "incorrect": 0,
+            "history": [
+              {
+                "timestamp": "2026-02-08 11:45:39",
+                "known": true
+              },
+              {
+                "timestamp": "2026-02-08 11:49:00",
+                "known": true
+              }
+            ]
+          },
+          {
+            "sentence": "我静静地阅读着",
+            "attempts": 0,
+            "correct": 0,
+            "incorrect": 0,
+            "history": []
+          },
+          {
+            "sentence": "一本厚重的历史小说，",
+            "attempts": 0,
+            "correct": 0,
+            "incorrect": 0,
+            "history": []
+          },
+          {
+            "sentence": "时间仿佛在此刻慢了下来。",
+            "attempts": 2,
+            "correct": 2,
+            "incorrect": 0,
+            "history": [
+              {
+                "timestamp": "2026-02-08 11:46:01",
+                "known": true
+              },
+              {
+                "timestamp": "2026-02-08 11:49:12",
+                "known": true
+              }
+            ]
+          },
+          {
+            "sentence": "茶杯里的热气缓缓上升，",
+            "attempts": 3,
+            "correct": 2,
+            "incorrect": 1,
+            "history": [
+              {
+                "timestamp": "2026-02-08 11:46:08",
+                "known": false
+              },
+              {
+                "timestamp": "2026-02-08 11:46:23",
+                "known": true
+              },
+              {
+                "timestamp": "2026-02-08 11:49:16",
+                "known": true
+              }
+            ]
+          },
+          {
+            "sentence": "最终消散在空气之中。",
+            "attempts": 2,
+            "correct": 2,
+            "incorrect": 0,
+            "history": [
+              {
+                "timestamp": "2026-02-08 11:46:13",
+                "known": true
+              },
+              {
+                "timestamp": "2026-02-08 11:49:22",
+                "known": true
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 }

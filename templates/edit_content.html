@@ -473,8 +473,8 @@
                 textWithoutFinalPunct = sentence.substring(0, punctIndex);
             }
             
-            // 寻找拆分点（在15字附近）
-            const splitPoint = findSplitPoint(textWithoutFinalPunct);
+            // 寻找拆分点（使用改进的平衡分割算法）
+            const splitPoint = findBalancedSplitPoint(textWithoutFinalPunct);
             
             if (splitPoint <= 0 || splitPoint >= textWithoutFinalPunct.length) {
                 // 无法拆分，返回原句
@@ -514,9 +514,38 @@
             }
         }
 
-        // 寻找最佳拆分点
-        function findSplitPoint(text) {
-            const targetCount = 15;
+        // 改进的平衡拆分点寻找算法
+        function findBalancedSplitPoint(text) {
+            const totalChineseCount = getChineseCharCount(text);
+            
+            // 对于超过15字的句子，尝试更平衡的分割
+            if (totalChineseCount <= 15) {
+                return -1; // 不需要分割
+            }
+            
+            // 计算理想的分割点（使两部分长度更接近）
+            // 对于短句（15-20字），尝试平分；对于长句，仍用15字限制
+            let targetCount;
+            
+            if (totalChineseCount <= 20) {
+                // 15-20字的句子：尽量平衡分割，约在中点处
+                targetCount = Math.ceil(totalChineseCount / 2);
+            } else if (totalChineseCount <= 25) {
+                // 20-25字的句子：稍微往后一点，但不超过12-13字
+                targetCount = Math.min(13, Math.ceil(totalChineseCount / 2.2));
+            } else {
+                // 超过25字的句子：使用15字的限制
+                targetCount = 15;
+            }
+            
+            // 确保targetCount不超过15
+            targetCount = Math.min(targetCount, 15);
+            
+            return findSplitPointAtTarget(text, targetCount);
+        }
+
+        // 寻找在指定目标字符数处的拆分点
+        function findSplitPointAtTarget(text, targetCount) {
             let currentChineseCount = 0;
             
             for (let i = 0; i < text.length; i++) {
@@ -525,7 +554,7 @@
                 
                 if (isChineseChar) {
                     currentChineseCount++;
-                    // 当达到第15个汉字时，返回其后的位置作为拆分点
+                    // 当达到目标字符数时，返回其后的位置作为拆分点
                     if (currentChineseCount === targetCount) {
                         return i + 1;
                     }
@@ -537,8 +566,13 @@
                 }
             }
             
-            // 如果文本中汉字数少于等于15，返回中点
+            // 如果文本中汉字数少于目标，返回中点
             return Math.floor(text.length / 2);
+        }
+
+        // 寻找最佳拆分点（保留用于兼容性，但已被 findBalancedSplitPoint 替代）
+        function findSplitPoint(text) {
+            return findBalancedSplitPoint(text);
         }
 
         // 新的段落格式化函数

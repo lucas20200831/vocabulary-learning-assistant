@@ -167,8 +167,14 @@ def vocab_list():
             # Check if it looks like a lesson (has '詞語' and/or '段落' keys)
             if ('詞語' in value or '段落' in value):
                 # This is a new-format lesson (no language hierarchy)
+                # Ensure all paragraphs have IDs
+                paragraphs = value.get('段落', [])
+                for idx, para in enumerate(paragraphs):
+                    if 'id' not in para:
+                        para['id'] = str(idx)
+                
                 word_count = len(value.get('詞語', []))
-                para_count = len(value.get('段落', []))
+                para_count = len(paragraphs)
                 contents.append({
                     'language': '',  # Empty for new format
                     'lesson_number': key,
@@ -181,8 +187,14 @@ def vocab_list():
                 # This looks like a language key with nested lessons (old format)
                 for lesson_num, lesson_content in value.items():
                     if isinstance(lesson_content, dict) and ('詞語' in lesson_content or '段落' in lesson_content):
+                        # Ensure all paragraphs have IDs
+                        paragraphs = lesson_content.get('段落', [])
+                        for idx, para in enumerate(paragraphs):
+                            if 'id' not in para:
+                                para['id'] = str(idx)
+                        
                         word_count = len(lesson_content.get('詞語', []))
-                        para_count = len(lesson_content.get('段落', []))
+                        para_count = len(paragraphs)
                         contents.append({
                             'language': key,
                             'lesson_number': lesson_num,
@@ -974,9 +986,12 @@ def quiz_simple(lesson_name):
         if not paragraph_id:
             return "❌ 錯誤：請選擇要聽寫的特定段落", 400
         
-        # 查找指定的段落
-        for para in lesson_content['段落']:
-            if para.get('id') == paragraph_id:
+        # 查找指定的段落（支持 id 字段或使用索引）
+        paragraphs = lesson_content.get('段落', [])
+        for idx, para in enumerate(paragraphs):
+            # 支持兩種方式比對：para.id 或用索引作為備選
+            para_id = para.get('id') or str(idx)
+            if para_id == paragraph_id:
                 for sent_item in para.get('sentences', []):
                     words_to_practice.append(sent_item.get('sentence') if isinstance(sent_item, dict) else sent_item)
                 break
@@ -1043,9 +1058,12 @@ def quiz_new(language, lesson_num):
         if not paragraph_id:
             return "❌ 錯誤：請選擇要聽寫的特定段落", 400
         
-        # 查找指定的段落
-        for para in lesson_content['段落']:
-            if para.get('id') == paragraph_id:
+        # 查找指定的段落（支持 id 字段或使用索引）
+        paragraphs = lesson_content.get('段落', [])
+        for idx, para in enumerate(paragraphs):
+            # 支持兩種方式比對：para.id 或用索引作為備選
+            para_id = para.get('id') or str(idx)
+            if para_id == paragraph_id:
                 for sent_item in para.get('sentences', []):
                     words_to_practice.append(sent_item.get('sentence') if isinstance(sent_item, dict) else sent_item)
                 break
@@ -1109,8 +1127,28 @@ def split_by_punctuation(text):
     sentences = [s.strip() for s in parts if s.strip()]
     return sentences
 
+def get_target_split_count(total_chinese_count):
+    """根据总字符数计算目标拆分字符数（平衡分割）"""
+    if total_chinese_count <= 15:
+        return -1  # 不需要分割
+    
+    # 根据总长度计算目标拆分字符数
+    # 策略：使用较高的阈值让分割尽量不超过2段
+    if total_chinese_count <= 20:
+        # 15-20字的句子：使用14字的阈值，保证最多分2段且接近平衡
+        target_count = 14
+    elif total_chinese_count <= 25:
+        # 20-25字的句子：12字的阈值
+        target_count = 12
+    else:
+        # 超过25字的句子：使用15字的限制
+        target_count = 15
+    
+    # 确保target_count不超过15
+    return min(target_count, 15)
+
 def split_long_sentence_by_words(sentence):
-    """使用jieba分词后在词语边界处拆分长句子"""
+    """使用jieba分词后在词语边界处拆分长句子，优先按标点符号分割"""
     try:
         import jieba
     except ImportError:
@@ -1118,11 +1156,79 @@ def split_long_sentence_by_words(sentence):
         return split_long_sentence_fallback(sentence)
     
     chinese_count = get_chinese_char_count(sentence)
+    print(f"[SPLIT_BY_WORDS] Processing: '{sentence[:30]}...' ({chinese_count}字)")
     
     if chinese_count <= 15:
         return [sentence]
     
-    # 提取末尾标点
+    # 第一步：尝试按标点符号分割（逗号、句号等）
+    # 这是"天然"的分割点，应该优先使用
+    split_punctuations = ['，', '。', '？', '！', '；', '：', '、']
+    
+    # 找出所有标点符号的位置
+    punctuation_positions = []
+    for i, char in enumerate(sentence):
+        if char in split_punctuations:
+            punctuation_positions.append(i)
+    
+    # 如果有标点符号，按标点分割
+    if punctuation_positions:
+        print(f"[SPLIT_BY_WORDS] Found punctuation marks at positions: {punctuation_positions}")
+        result = []
+        start = 0
+        for pos in punctuation_positions:
+            # 包括标点符号
+            segment = sentence[start:pos+1]
+            if segment:
+                result.append(segment)
+            start = pos + 1
+        
+        # 添加最后一部分（如果有的话）
+        if start < len(sentence):
+            result.append(sentence[start:])
+        
+        # 对每个部分再进行递归检查，如果某部分太长且没有标点，进行算法分割
+        final_result = []
+        for part in result:
+            part_chinese_count = get_chinese_char_count(part)
+            
+            # 检查这个部分中是否有标点（除了已有的末尾标点）
+            has_internal_punctuation = False
+            for punct in split_punctuations:
+                if punct in part[:-1]:  # 检查末尾标点之外的部分
+                    has_internal_punctuation = True
+                    break
+            
+            # 如果这个部分太长且没有内部标点，进行算法分割
+            if part_chinese_count > 15 and not has_internal_punctuation:
+                print(f"[SPLIT_BY_WORDS] Part '{part}' ({part_chinese_count}字) too long, applying algorithm...")
+                sub_parts = _split_by_algorithm(part)
+                final_result.extend(sub_parts)
+            else:
+                final_result.append(part)
+        
+        print(f"[SPLIT_BY_WORDS] Final result: {final_result}")
+        return final_result
+    
+    # 第二步：如果没有标点符号，使用算法分割
+    print(f"[SPLIT_BY_WORDS] No punctuation marks found, using algorithm splitting")
+    result = _split_by_algorithm(sentence)
+    print(f"[SPLIT_BY_WORDS] Final result: {result}")
+    return result
+
+def _split_by_algorithm(sentence):
+    """使用算法分割没有标点的长句子（递归）"""
+    try:
+        import jieba
+    except ImportError:
+        return split_long_sentence_fallback(sentence)
+    
+    chinese_count = get_chinese_char_count(sentence)
+    
+    if chinese_count <= 15:
+        return [sentence]
+    
+    # 提取末尾标点（如果有）
     final_punctuation = ''
     text_to_split = sentence
     
@@ -1134,44 +1240,59 @@ def split_long_sentence_by_words(sentence):
     
     # 使用jieba进行分词
     tokens = list(jieba.cut(text_to_split))
+    print(f"[SPLIT_BY_WORDS] Tokens: {tokens}")
     
-    # 在词组边界处拆分，目标是保持每部分在15字以内
-    result = []
-    current_part = ''
-    current_count = 0
-    target_count = 15
+    # 计算理想的分割点（总长度的一半）
+    ideal_split_point = get_chinese_char_count(text_to_split) / 2
+    print(f"[SPLIT_BY_WORDS] Ideal split point: {ideal_split_point} chars")
+    
+    # 累积tokens，找到最接近ideal_split_point的词边界
+    accumulated = ''
+    accumulated_count = 0
+    closest_split_point = -1
+    min_distance = float('inf')
     
     for token in tokens:
         token_count = get_chinese_char_count(token)
         
-        # 如果加上当前token会超过15字，就拆分
-        if current_count + token_count > target_count and current_count > 0:
-            # 当前部分已经有内容，保存它
-            result.append(current_part)
-            current_part = token
-            current_count = token_count
+        # 检查这个token之前的累积是否最接近ideal_split_point
+        distance = abs(accumulated_count - ideal_split_point)
+        if distance < min_distance:
+            min_distance = distance
+            closest_split_point = accumulated_count
+        
+        accumulated += token
+        accumulated_count += token_count
+    
+    # 检查最后的位置
+    distance = abs(accumulated_count - ideal_split_point)
+    if distance < min_distance:
+        closest_split_point = accumulated_count
+    
+    # 如果找到了合理的分割点（不是开头也不是结尾），进行分割
+    if closest_split_point > 0 and closest_split_point < accumulated_count:
+        part1 = text_to_split[:closest_split_point]
+        part2 = text_to_split[closest_split_point:] + final_punctuation
+        
+        print(f"[SPLIT_BY_WORDS] Split at {closest_split_point}: '{part1}' ({get_chinese_char_count(part1)}字)")
+        print(f"[SPLIT_BY_WORDS] Remaining: '{part2}' ({get_chinese_char_count(part2)}字)")
+        
+        result = [part1]
+        
+        # 递归处理第二部分，如果它仍然太长
+        if get_chinese_char_count(part2) > 15:
+            print(f"[SPLIT_BY_WORDS] Part 2 still too long ({get_chinese_char_count(part2)}字), recursing...")
+            sub_parts = _split_by_algorithm(part2)
+            result.extend(sub_parts)
         else:
-            # 继续累积
-            current_part += token
-            current_count += token_count
-    
-    # 添加最后一部分
-    if current_part:
-        # 最后一部分需要添加标点
-        if result:  # 如果有前面的部分
-            result.append(current_part + final_punctuation)
-        else:  # 如果整个句子都在一部分
-            result.append(sentence)
-    
-    # 检查是否满足条件：每部分最多15字
-    for i, part in enumerate(result):
-        if get_chinese_char_count(part) > 15:
-            # 如果某部分仍然超过15字（词语本身特别长），递归处理
-            sub_parts = split_long_sentence_fallback(part)
-            result = result[:i] + sub_parts + result[i+1:]
-            break
+            result.append(part2)
+    else:
+        # 如果无法找到好的分割点，使用回退方法
+        print(f"[SPLIT_BY_WORDS] Could not find good split point, using fallback method")
+        result = split_long_sentence_fallback(sentence)
     
     return result
+
 
 def split_long_sentence_fallback(sentence):
     """回退的递归拆分方法（当jieba无法处理时）"""
@@ -1235,21 +1356,32 @@ def split_long_sentence_fallback(sentence):
         return [part1, part2_with_punct]
 
 def find_best_split_point(text):
-    """寻找最佳拆分点（在15个汉字处拆分）"""
-    target_count = 15
+    """寻找最佳拆分点（平衡分割）"""
+    # 首先计算总的汉字数
+    total_chinese_count = get_chinese_char_count(text)
+    
+    # 获取目标拆分字符数
+    target_count = get_target_split_count(total_chinese_count)
+    if target_count == -1:
+        return -1  # 不需要分割
+    
+    # 寻找在目标字符数处的拆分点
     current_chinese_count = 0
     
     for i, char in enumerate(text):
         # 检查是否为汉字
         if '\u4e00' <= char <= '\u9fff':
             current_chinese_count += 1
-            # 当达到恰好15个汉字时，返回当前位置后面的位置
+            # 当达到目标字符数时，返回当前位置后面的位置
             if current_chinese_count == target_count:
                 return i + 1
         
         # 如果已经超过目标，返回当前位置
         if current_chinese_count > target_count:
             return i
+    
+    # 如果文本中汉字数少于目标，返回中点
+    return len(text) // 2
     
     # 如果文本中汉字数少于等于15，返回中点
     return len(text) // 2
@@ -1996,7 +2128,7 @@ def save_content():
             updated_paragraphs = []
             existing_paras = {p['title']: p for p in lesson_content.get('段落', [])}
             
-            for para_data in paragraphs:
+            for para_idx, para_data in enumerate(paragraphs):
                 title = para_data.get('title')
                 sentences_text = para_data.get('sentences', [])
                 
@@ -2033,7 +2165,11 @@ def save_content():
                             'history': []
                         })
                 
+                # Generate paragraph ID (use index as ID)
+                para_id = str(para_idx)
+                
                 updated_paragraphs.append({
+                    'id': para_id,
                     'title': title,
                     'sentences': updated_sentences
                 })

@@ -442,10 +442,10 @@
                                             </div>
                                             {% if item.is_simple %}
                                                 {# 新流程 #}
-                                                <a href="/quiz_simple/{{ item.lesson_number | urlencode }}?content_type=段落&paragraph_id={{ para.id }}" onclick="saveExpandedLesson('', '{{ item.lesson_number }}', {{ item.word_count }}, {{ item.para_count }}, true)" class="btn btn-small" style="white-space: nowrap;">🎙️ 聽寫</a>
+                                                <a href="/quiz_simple/{{ item.lesson_number | urlencode }}?content_type=段落&paragraph_id={{ para.id if para.id else loop.index0 }}" onclick="saveExpandedLesson('', '{{ item.lesson_number }}', {{ item.word_count }}, {{ item.para_count }}, true)" class="btn btn-small" style="white-space: nowrap;">🎙️ 聽寫</a>
                                             {% else %}
                                                 {# 舊流程 #}
-                                                <a href="{{ url_for('quiz_new', language=item.language, lesson_num=item.lesson_number) }}?content_type=段落&paragraph_id={{ para.id }}" onclick="saveExpandedLesson('{{ item.language }}', '{{ item.lesson_number }}', {{ item.word_count }}, {{ item.para_count }}, false)" class="btn btn-small" style="white-space: nowrap;">🎙️ 聽寫</a>
+                                                <a href="{{ url_for('quiz_new', language=item.language, lesson_num=item.lesson_number) }}?content_type=段落&paragraph_id={{ para.id if para.id else loop.index0 }}" onclick="saveExpandedLesson('{{ item.language }}', '{{ item.lesson_number }}', {{ item.word_count }}, {{ item.para_count }}, false)" class="btn btn-small" style="white-space: nowrap;">🎙️ 聽寫</a>
                                             {% endif %}
                                         </div>
                                     </div>
