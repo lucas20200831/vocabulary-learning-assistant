@@ -2088,16 +2088,21 @@ def save_content():
         
         data = load_data()
         print(f"[SAVE] Data loaded, total lessons: {len(data)}")
+        print(f"[SAVE] Available lessons: {list(data.keys())}")
+        print(f"[SAVE] Looking for lesson: '{lesson}' (is_simple={is_simple}, language='{language}')")
         
         # 支持兩種數據結構：新流程（無語言）和舊流程（有語言）
         if is_simple or not language:
             # 新流程：直接在數據根層級查找課程
             if lesson not in data:
-                return jsonify({'status': 'error', 'message': '課程未找到'}), 404
+                print(f"[SAVE] ERROR: Lesson '{lesson}' not found in root level")
+                print(f"[SAVE] Available lessons: {list(data.keys())}")
+                return jsonify({'status': 'error', 'message': f'課程未找到: {lesson}'}), 404
             lesson_content = data[lesson]
         else:
             # 舊流程：通過語言和課程查找
             if language not in data or lesson not in data[language]:
+                print(f"[SAVE] ERROR: Language '{language}' or lesson '{lesson}' not found in language level")
                 return jsonify({'status': 'error', 'message': '內容未找到'}), 404
             lesson_content = data[language][lesson]
         
