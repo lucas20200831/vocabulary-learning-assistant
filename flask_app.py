@@ -2168,10 +2168,22 @@ def save_content():
                 # Generate paragraph ID (use index as ID)
                 para_id = str(para_idx)
                 
+                # Calculate paragraph statistics from sentences
+                para_attempts = sum(s.get('attempts', 0) for s in updated_sentences)
+                para_correct = sum(s.get('correct', 0) for s in updated_sentences)
+                para_history = []
+                for s in updated_sentences:
+                    para_history.extend(s.get('history', []))
+                # 按时间戳排序
+                para_history = sorted(para_history, key=lambda x: x.get('timestamp', ''))
+                
                 updated_paragraphs.append({
                     'id': para_id,
                     'title': title,
-                    'sentences': updated_sentences
+                    'sentences': updated_sentences,
+                    'attempts': para_attempts,
+                    'correct': para_correct,
+                    'history': para_history
                 })
             
             lesson_content['段落'] = updated_paragraphs
